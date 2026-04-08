@@ -198,6 +198,9 @@ Apply edits, then proceed.
 Create the Feature issue:
 
 ```bash
+# Ensure the label exists before creating the issue
+gh label create feature --color 0075ca --description "User-facing capability delivered as a vertical slice" 2>/dev/null || true
+
 gh issue create --title "🚀 Feature: <title>" --body-file /tmp/feature-body.md --label "feature"
 ```
 

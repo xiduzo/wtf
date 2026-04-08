@@ -9,6 +9,12 @@ Break a Feature down into its full set of Tasks and create them one by one. Core
 
 ## Process
 
+### 0. GitHub CLI setup
+
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created downstream (via `wtf:write-task`).
+
+Skip this step if gh-setup was already confirmed this session (e.g. when chained from `wtf:write-feature` or `wtf:epic-to-features`).
+
 ### 1. Identify the Feature
 
 If a Feature number was passed in as context, use it directly. Otherwise search for recent open issues with label `feature` to populate options and call `AskUserQuestion` with `question: "Which Feature are you breaking into Tasks?"`, `header: "Feature"`, and `options` pre-filled with 1–2 likely open Feature issue references inferred from GitHub search (e.g. recent open issues labeled `feature`).

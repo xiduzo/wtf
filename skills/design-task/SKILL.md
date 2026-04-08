@@ -29,7 +29,26 @@ gh issue view <task_number>    # Functional Description, Gherkin, Design Referen
 gh issue view <feature_number> # User stories, ACs, visual context
 ```
 
-### 2. Load the design steering document
+### 2. Lifecycle check
+
+Check whether the task already has a `designed` label:
+
+```bash
+gh issue view <task_number> --json labels --jq '.labels[].name'
+```
+
+If the `designed` label is **present**, call `AskUserQuestion` with:
+
+- `question`: "This task already has a `designed` label. Continuing will overwrite the existing Design Reference. How would you like to proceed?"
+- `header`: "Already designed"
+- `options`: `[{label: "Redesign it", description: "Overwrite the existing Design Reference with a new one"}, {label: "Exit", description: "Leave the existing design as-is"}]`
+
+- **Redesign it** → continue.
+- **Exit** → exit immediately.
+
+If the `designed` label is **absent**, continue silently.
+
+### 3. Load the design steering document
 
 Check whether `docs/steering/DESIGN.md` exists:
 
@@ -45,10 +64,10 @@ If the file **does not exist**, call `AskUserQuestion` with:
 - `header`: "Design steering doc missing"
 - `options`: `[{label: "Create it now", description: "Run wtf:steer-design before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — design decisions won't reference project standards"}]`
 
-- **Create it now** → follow the `wtf:steer-design` process, then return to this skill and continue from step 3.
+- **Create it now** → follow the `wtf:steer-design` process, then return to this skill and continue from step 4.
 - **Skip for this session** → continue without it.
 
-### 3. Explore the design system
+### 4. Explore the design system
 
 Use the Agent tool to search the codebase for:
 
@@ -57,7 +76,7 @@ Use the Agent tool to search the codebase for:
 - Patterns from similar screens or flows
 - Any existing Figma references linked in related issues
 
-### 4. Identify UI states from Gherkin
+### 5. Identify UI states from Gherkin
 
 For each Gherkin scenario in the Task:
 
@@ -66,15 +85,15 @@ For each Gherkin scenario in the Task:
 
 List these states explicitly — this becomes the design coverage checklist.
 
-### 5. Ask about design assets
+### 6. Ask about design assets
 
 Call `AskUserQuestion` with `question: "Do you have Figma frames ready to link?"`, `header: "Design assets"`, and `options: [{label: "Yes — I have Figma frames", description: "Collect frame URLs and map to UI states"}, {label: "No frames yet — scaffold from Gherkin", description: "Draft a component spec from the scenarios"}, {label: "Partial — some states designed, some not", description: "Collect available frames and scaffold the rest"}]`.
 
-- If all frames exist: collect frame URLs and map each to a UI state from step 4
+- If all frames exist: collect frame URLs and map each to a UI state from step 5
 - If no frames exist: draft a component spec using the structure in `references/component-spec-template.md`, listing each state with its required elements and interactions
 - If partial frames exist (some states designed, some not): collect the available frame URLs, map them to the states they cover, and scaffold a component spec for the remaining uncovered states. Note which states are pending design in the Design Reference.
 
-### 6. Draft the Design Reference
+### 7. Draft the Design Reference
 
 Produce the content for the Design Reference section of the Task:
 
@@ -84,13 +103,13 @@ Produce the content for the Design Reference section of the Task:
 - Responsive behavior if applicable
 - Design tokens to apply
 
-### 7. Review with user
+### 8. Review with user
 
 Show the draft. Then call `AskUserQuestion` with `question: "Does this cover all the states in the Gherkin?"`, `header: "Review"`, and `options: [{label: "Yes — looks complete", description: "Proceed to update the task"}, {label: "Missing states", description: "I want to add more coverage"}, {label: "Other changes", description: "I want to adjust something else"}]`.
 
 Apply edits, then proceed.
 
-### 8. Update the Task issue
+### 9. Update the Task issue
 
 > Note: read the current issue body first (`gh issue view <task_number>`), replace only the Design Reference section with the new content, and preserve all other sections unchanged. Write the full updated body to a temp file and use `--body-file`.
 
@@ -106,7 +125,7 @@ gh issue edit <task_number> --add-label "designed"
 
 Print the updated Task issue URL.
 
-### 9. Offer to continue
+### 10. Offer to continue
 
 Call `AskUserQuestion` with:
 

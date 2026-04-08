@@ -7,6 +7,8 @@ description: This skill should be used when a developer wants to capture learnin
 
 Capture learnings from this session and route them into the right steering document. Every hard-won insight — especially about where the AI went wrong or where implementation was harder than expected — belongs in a steering doc so it guides future work automatically.
 
+**Intervention tracker:** The `hooks/track-interventions.sh` hook runs automatically on every `UserPromptSubmit` event and increments `/tmp/wtf-interventions-$(whoami)` when it detects correction or frustration language (e.g. "no,", "wrong", "actually", "stop that"). When the counter reaches 3, the hook prints a reminder at the end of the session to run `/wtf:reflect`. Step 6 of this skill resets the counter to zero. No manual tracking is needed — the hook handles it.
+
 ## Process
 
 ### 1. Check which steering docs exist

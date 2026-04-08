@@ -121,12 +121,20 @@ Document all dependencies in the draft with GitHub issue references. For cross-f
 - Blocks #51 (Feature #15 — notification email requires this task's event to be emitted)
 ```
 
-### 6. Generate Gherkin from Feature ACs
+### 6. Ask about contracts
+
+Call `AskUserQuestion` with `question: "Are there specific API contracts, events, or data schemas I should know about?"`, `header: "Contracts"`, and `options` pre-filled with 1–2 contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4). Include `{label: "None — proceed without", description: "Skip this section"}` as an option if nothing was found.
+
+Use the answer to fill Contracts & Interfaces. Apply domain event naming rules from `../references/ddd-writing-rules.md` — past-tense domain names, named from the domain's perspective. If "none", stub events with the domain Event names derived in step 3 rather than leaving them blank.
+
+### 7. Generate Gherkin from Feature ACs
 
 For each Acceptance Criterion in the parent Feature:
 
 - Write at least one Scenario (happy path)
 - Write a failure or edge case Scenario if the Feature listed one
+
+Reference the contracts gathered in step 6 when writing scenarios — use the exact domain Event names, API operation names, and field names from those contracts in Given/When/Then steps so the scenarios align precisely with the implementation contracts.
 
 Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 
@@ -138,15 +146,9 @@ Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 - **Domain Events** appear in When steps where they trigger behavior ("When the `PaymentSettled` event is received")
 - **Business outcomes** appear in Then steps ("Then the Order is marked as Fulfilled") — not system states ("Then the orders table has status = 'fulfilled'")
 
-### 7. Ask about contracts
-
-Call `AskUserQuestion` with `question: "Are there specific API contracts, events, or data schemas I should know about?"`, `header: "Contracts"`, and `options` pre-filled with 1–2 contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4). Include `{label: "None — proceed without", description: "Skip this section"}` as an option if nothing was found.
-
-Use the answer to fill Contracts & Interfaces. Apply domain event naming rules from `../references/ddd-writing-rules.md` — past-tense domain names, named from the domain's perspective. If "none", stub events with the domain Event names derived in step 3 rather than leaving them blank.
-
 ### 8. Draft the Task
 
-Use the issue body structure from @.github/ISSUE_TEMPLATE/TASK.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 6.
+Use the issue body structure from @.github/ISSUE_TEMPLATE/TASK.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
 
 Section-specific guidance:
 
@@ -200,6 +202,9 @@ Apply edits, then proceed.
 Create the Task issue:
 
 ```bash
+# Ensure the label exists before creating the issue
+gh label create task --color e4e669 --description "Implementable vertical slice of a Feature" 2>/dev/null || true
+
 gh issue create --title "🛠 Task: <title>" --body-file /tmp/task-body.md --label "task"
 ```
 

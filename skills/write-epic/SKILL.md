@@ -146,6 +146,9 @@ If **one or more signals fire**, present your case: state which signals you foun
 > **Title generation:** Spawn a subagent using the `claude-haiku-4-5` model to generate a concise, domain-language title from the Epic's Goal. Pass in the Goal text and ask for a title (no prefix emoji/label needed — that is added below).
 
 ```bash
+# Ensure the label exists before creating the issue
+gh label create epic --color 5319e7 --description "Strategic initiative spanning multiple features" 2>/dev/null || true
+
 gh issue create --title "🎯 Epic: <title>" --body-file /tmp/epic-body.md --label "epic"
 ```
 

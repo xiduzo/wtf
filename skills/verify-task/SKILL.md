@@ -159,15 +159,24 @@ gh issue edit <task_number> --add-label "verified"
 
 Print the updated Task issue URL.
 
-### 8. Offer to open a PR
+### 8. Offer to open a PR and close the issue
 
 If the verdict is ✅ or ⚠️, call `AskUserQuestion` with:
 
-- `question`: "Task verified. Would you like to open a pull request now?"
-- `header`: "Open PR?"
-- `options`: `[{label: "Open PR now", description: "Create a pull request for this branch (recommended next step)"}, {label: "Skip for now", description: "Exit — I'll open the PR later"}]`
+- `question`: "Task verified. What would you like to do next?"
+- `header`: "Next step"
+- `options`: `[{label: "Open PR now", description: "Create a pull request for this branch (recommended next step)"}, {label: "Close this Task", description: "Mark the Task issue closed and check if Feature and Epic can be closed too"}, {label: "Skip for now", description: "Exit — I'll open the PR later"}]`
 
 - **Open PR now** → follow the `wtf:create-pr` process, passing the Task number in as context.
+- **Close this Task** →
+  ```bash
+  gh issue close <task_number>
+  ```
+  Then check if all Tasks under the parent Feature are now closed:
+  ```bash
+  gh sub-issue list <feature_number> --state open
+  ```
+  If **no open Tasks remain**, call `AskUserQuestion` with `question: "All Tasks for Feature #<feature_number> are complete. Close the Feature issue too?"`, `header: "Close Feature?"`, and `options: [{label: "Yes — close it", description: "Mark Feature #<feature_number> as closed"}, {label: "No — leave it open", description: "Keep the Feature open"}]`. If yes: `gh issue close <feature_number>`. Then check the Epic the same way — if all Features under the Epic are closed, offer to close the Epic issue too.
 - **Skip for now** → continue.
 
 ### 9. Offer bug reports for remaining failures

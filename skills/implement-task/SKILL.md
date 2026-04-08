@@ -13,7 +13,7 @@ The expected Task issue body structure is defined in @.github/ISSUE_TEMPLATE/TAS
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../skills/references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
+Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
 Skip this step if invoked from `wtf:verify-task` or another skill that already ran gh-setup this session.
 
@@ -161,7 +161,7 @@ For each Gherkin scenario in the Task, work through them in order. Match the pro
 
 ### 9. Verify coverage
 
-Once all scenarios pass, confirm unit test coverage meets the 80% minimum for all new and modified code:
+Once all scenarios pass, confirm unit test coverage meets the minimum threshold for all new and modified code. Use the threshold specified in `docs/steering/QA.md` if it exists; default to 80% if the document is absent or does not define a threshold:
 
 ```bash
 # Run the project's coverage command (check package.json scripts)

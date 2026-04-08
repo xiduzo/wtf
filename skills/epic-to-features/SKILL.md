@@ -11,7 +11,7 @@ Break an Epic down into its full set of Features and create them one by one. Cor
 
 ### 0. GitHub CLI setup
 
-Run the setup check from `../skills/references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created downstream (via `wtf:write-feature` and `wtf:write-task`).
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created downstream (via `wtf:write-feature` and `wtf:write-task`).
 
 Skip this step if gh-setup was already confirmed this session (e.g. when chained from `wtf:write-epic`).
 

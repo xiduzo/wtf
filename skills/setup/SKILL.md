@@ -5,7 +5,7 @@ description: This skill should be used when a user wants to set up WTF in a new 
 
 # Setup
 
-Pre-flight check and installer for the WTF workflow. Validates the GitHub CLI, installs required extensions, and ensures `.github/ISSUE_TEMPLATE/` contains all required templates so both agents and humans can create structured issues.
+Pre-flight check and installer for the WTF workflow. Validates the GitHub CLI, installs required extensions, ensures `.github/ISSUE_TEMPLATE/` contains all required templates, creates all lifecycle labels, and installs the PR template so both agents and humans can create structured issues and pull requests.
 
 ## Process
 
@@ -91,7 +91,39 @@ cp skills/setup/references/TASK.md .github/ISSUE_TEMPLATE/TASK.md
 
 Only copy files that are missing — do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
 
-### 6. Report status
+### 6. Check PR template
+
+Check whether `.github/pull_request_template.md` exists:
+
+```bash
+ls .github/pull_request_template.md 2>/dev/null
+```
+
+If missing, copy it from the skill's bundled references:
+
+```bash
+cp skills/setup/references/pull_request_template.md .github/pull_request_template.md
+```
+
+Do not overwrite if it already exists.
+
+### 7. Create required GitHub labels
+
+Create all lifecycle labels the workflow depends on. Using `--force` makes the command idempotent — it updates the description/color if the label already exists and creates it if it does not:
+
+```bash
+gh label create epic        --color 5319e7 --description "Strategic initiative spanning multiple features"      --force
+gh label create feature     --color 0075ca --description "User-facing capability delivered as a vertical slice" --force
+gh label create task        --color e4e669 --description "Implementable vertical slice of a Feature"            --force
+gh label create bug         --color d73a4a --description "Something is broken"                                  --force
+gh label create implemented --color 0e8a16 --description "Implementation complete — ready for QA"              --force
+gh label create designed    --color f9d0c4 --description "Design coverage added to the Task"                   --force
+gh label create verified    --color 006b75 --description "QA verified — ready for merge"                       --force
+```
+
+If any label creation fails (e.g. insufficient permissions), warn the user — note that the affected skills will fall back to creating labels on first use.
+
+### 8. Report status
 
 Print a clear status summary covering every check:
 
@@ -108,8 +140,21 @@ Issue templates
   EPIC.md                 ✅  (or ✅ installed from references)
   FEATURE.md              ✅  (or ✅ installed from references)
   TASK.md                 ✅  (or ✅ installed from references)
+PR template               ✅  (or ✅ installed from references)
+GitHub labels             ✅  epic, feature, task, bug, implemented, designed, verified
 ─────────────────────────
 Ready to use WTF. Start with /wtf:write-epic to plan your first initiative.
 ```
 
 If any item failed (gh not installed, not authenticated), replace the closing line with a clear "Fix the issues above before proceeding." and do not suggest next steps.
+
+### 9. Offer to set up steering docs
+
+If setup completed without fatal errors, call `AskUserQuestion` with:
+
+- `question`: "Setup complete. The steering docs (VISION.md, TECH.md, DESIGN.md, QA.md) capture your project's principles and standards — every skill reads them automatically. Would you like to create them now?"
+- `header`: "Steering docs"
+- `options`: `[{label: "Yes — set them up now", description: "Run wtf:steer-vision (it will chain to the others)"}, {label: "Not now", description: "Skip — skills will prompt you to create them on first use"}]`
+
+- **Yes** → follow the `wtf:steer-vision` process (it will offer to chain to TECH, DESIGN, and QA at the end).
+- **Not now** → exit.
