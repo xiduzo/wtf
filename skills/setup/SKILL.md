@@ -38,7 +38,7 @@ Check the output for both of the following extensions. For each that is missing,
 gh extension install yahsan2/gh-sub-issue
 
 # Issue dependency tracking (X blocks Y)
-gh extension install torynet/gh-issue-dependency
+gh extension install xiduzo/gh-issue-dependency
 ```
 
 If installation fails (e.g. network error, permissions), warn the user that relationship tracking will be unavailable until the extension is installed. Note the failure — it will be included in the final status report.
@@ -52,7 +52,7 @@ gh issue-dependency --help
 
 Record two booleans for the final report:
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
-- `gh-issue-dependency-available`: true if `torynet/gh-issue-dependency` is installed and working
+- `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
 
 ### 4. Detect repo context
 

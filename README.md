@@ -160,7 +160,7 @@ Each skill offers to chain to the next step automatically. When requirements evo
 | [Claude Code](https://claude.ai/code) | All skills | Skills run inside Claude Code |
 | [GitHub CLI (`gh`)](https://cli.github.com) | All skills except steering/reflect | Must be installed and authenticated (`gh auth login`) |
 | [`yahsan2/gh-sub-issue`](https://github.com/yahsan2/gh-sub-issue) | write-task, epic-to-features, feature-to-tasks | Epic → Feature → Task sub-issue hierarchy; auto-installed by gh-setup |
-| [`torynet/gh-issue-dependency`](https://github.com/torynet/gh-issue-dependency) | write-task, feature-to-tasks | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
+| [`xiduzo/gh-issue-dependency`](https://github.com/xiduzo/gh-issue-dependency) | write-task, feature-to-tasks | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
 | GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine | Project must be hosted on GitHub |
 | [Figma](https://figma.com) account | `design-task` (optional) | Only needed when linking Figma frames; skill can scaffold without it |
 

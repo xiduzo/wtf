@@ -31,14 +31,14 @@ Check the output for both of the following extensions. For each that is missing,
 gh extension install yahsan2/gh-sub-issue
 
 # Issue dependency tracking (X blocks Y)
-gh extension install torynet/gh-issue-dependency
+gh extension install xiduzo/gh-issue-dependency
 ```
 
 If installation fails (e.g. network error, permissions), warn the user that relationship tracking is unavailable until the extension is installed. **Do not fall back to writing `Depends on #X` or `Blocks #Y` into issue bodies** — body-text relationship references are not used in this workflow.
 
 After this step, record two booleans for use in the rest of the session:
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
-- `gh-issue-dependency-available`: true if `torynet/gh-issue-dependency` is installed and working
+- `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
 
 All callers reference these flags when deciding whether to create native links.
 
