@@ -74,6 +74,14 @@ Each skill researches the codebase first, only asks about gaps, and offers wiki 
 
 Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) under a "Hard-Won Lessons" section.
 
+### Refinement
+
+| Skill           | Trigger                    | Purpose                                                                 |
+| --------------- | -------------------------- | ----------------------------------------------------------------------- |
+| `/wtf:refine`   | "refine task #42"          | Update an existing Epic/Feature/Task from new insights with audit trail |
+
+Merges insights from conversation, GitHub comments, and referenced docs; re-validates only affected sections; shows a section-by-section diff before applying updates; and offers cascade refinement for impacted child issues.
+
 ## How it all fits together
 
 ```
@@ -141,7 +149,7 @@ Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) u
 
 DDD runs through everything — all issues use domain language, `ddd-writing-rules.md` is enforced at every write step, and actors are always named domain roles (never "user" or "admin"). The Task issue is the single source of truth: Designer, Developer, and QA each append their own section to it in sequence.
 
-Each skill offers to chain to the next step automatically.
+Each skill offers to chain to the next step automatically. When requirements evolve after creation, use `/wtf:refine` to keep hierarchy specs aligned without rewriting unchanged sections.
 
 ## Prerequisites
 
@@ -151,7 +159,7 @@ Each skill offers to chain to the next step automatically.
 | [GitHub CLI (`gh`)](https://cli.github.com) | All skills except steering/reflect | Must be installed and authenticated (`gh auth login`) |
 | [`yahsan2/gh-sub-issue`](https://github.com/yahsan2/gh-sub-issue) | write-task, epic-to-features, feature-to-tasks | Epic → Feature → Task sub-issue hierarchy; auto-installed by gh-setup |
 | [`torynet/gh-issue-dependency`](https://github.com/torynet/gh-issue-dependency) | write-task, feature-to-tasks | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
-| GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task | Project must be hosted on GitHub |
+| GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine | Project must be hosted on GitHub |
 | [Figma](https://figma.com) account | `design-task` (optional) | Only needed when linking Figma frames; skill can scaffold without it |
 
 The two `gh` extensions are checked and installed automatically the first time any issue-creating skill runs. You don't need to install them manually.
@@ -210,6 +218,9 @@ Replace `/absolute/path/to/.workflow` with the actual absolute path.
 
 "verify task #42"
 → /wtf:verify-task         (QA walks scenarios + posts verdict)
+
+"refine task #42 with latest stakeholder comments"
+→ /wtf:refine              (updates changed sections only, posts refinement audit trail)
 
 "create a PR"
 → /wtf:create-pr           (PR description from full spec hierarchy)
