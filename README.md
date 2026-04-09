@@ -4,6 +4,14 @@ Claude Code skills for managing GitHub issues using an **Epic → Feature → Ta
 
 ## Skills
 
+### Setup
+
+| Skill          | Trigger          | Purpose                                                        |
+| -------------- | ---------------- | -------------------------------------------------------------- |
+| `/wtf:setup`   | "set up wtf"     | Pre-flight check and installer — run once per repo on onboard  |
+
+Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, creates all lifecycle labels (`epic`, `feature`, `task`, `bug`, `implemented`, `designed`, `verified`), and prints a status report. Offers to kick off steering doc creation at the end.
+
 ### Planning spine
 
 | Skill                | Trigger            | Purpose                                     |
@@ -174,6 +182,12 @@ Run this from your project root:
 
 ```bash
 npx skills add https://github.com/xiduzo/wtf/skills
+```
+
+Get started by opening claude and run
+
+```bash
+/wtf:setup
 ```
 
 ### Keeping up to date
