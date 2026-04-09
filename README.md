@@ -181,7 +181,7 @@ The two `gh` extensions are checked and installed automatically the first time a
 Run this from your project root:
 
 ```bash
-npx skills add https://github.com/xiduzo/wtf/skills
+npx skills add https://github.com/xiduzo/wtf
 ```
 
 Get started by opening claude and run

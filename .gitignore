@@ -1,0 +1,4 @@
+# Remove our skills
+.claude/skills/wtf-*
+.agents/skills/wtf-*
+skills-lock.json
