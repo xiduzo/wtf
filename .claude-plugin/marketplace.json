@@ -2,7 +2,7 @@
   "name": "wtf",
   "description": "Workflow Task Framework — structured skills for the Epic → Feature → Task lifecycle",
   "owner": {
-    "name": "sander"
+    "name": "xiduzo"
   },
   "plugins": [
     {

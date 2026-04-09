@@ -173,30 +173,14 @@ The two `gh` extensions are checked and installed automatically the first time a
 Run this from your project root:
 
 ```bash
-claude "Add .wtf as a local marketplace in .claude/settings.local.json with source path $(pwd)/.wtf, enable the plugin wtf@wtf, then confirm it's working by listing the available wtf skills"
+npx skills add https://github.com/xiduzo/wtf/skills
 ```
 
-### Manual setup
+### Keeping up to date
 
-Add to `.claude/settings.local.json` (create if it doesn't exist):
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "wtf": {
-      "source": {
-        "source": "directory",
-        "path": "/absolute/path/to/.workflow"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "wtf@wtf": true
-  }
-}
+```bash
+npx skills update
 ```
-
-Replace `/absolute/path/to/.workflow` with the actual absolute path.
 
 ## Usage
 
