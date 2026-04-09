@@ -1,6 +1,6 @@
 # WTF — Workflow Task Framework
 
-Claude Code skills for managing GitHub issues using an **Epic → Feature → Task** hierarchy, with guided discipline-specific workflows, steering documents, and a full lifecycle from planning through verification.
+Skills for managing GitHub issues using an **Epic → Feature → Task** hierarchy, with guided discipline-specific workflows, steering documents, and a full lifecycle from planning through verification.
 
 ## Skills
 
