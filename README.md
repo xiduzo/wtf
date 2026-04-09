@@ -97,12 +97,12 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                                                                              │
 │                        STEERING  (Project Constitution)                      │
 │                                                                              │
-│     steer-vision ──→  steer-tech  ──→  steer-design  ──→  steer-qa           │
+│  wtf.steer-vision ─→ wtf.steer-tech ─→ wtf.steer-design ─→ wtf.steer-qa      │
 │         ↓                 ↓                ↓                 ↓               │
 │     VISION.md          TECH.md          DESIGN.md          QA.md             │
 │   (product/DDD)      (arch/ADRs)      (tokens/a11y)     (test strat)         │
 │                                                                              │
-│                          wtf.reflect                                        │
+│                          wtf.reflect                                         │
 │                    routes learnings back in ↺                                │
 │                                                                              │
 └──────────────────────────────────┬───────────────────────────────────────────┘
@@ -113,24 +113,24 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                                                                              │    │                                 │
 │                            PLANNING SPINE                                    │    │   New insights /                │
 │                                                                              │    │   feedback / comments           │
-│    wtf.write-epic  ◄───────────────────────────────────────────────────────────┐ │            │                    │
+│    wtf.write-epic  ◄────────────────────────────────────────────────────────────┐ │            │                    │
 │         │                                                                    │  │ │            ▼                    │
 │         │    creates GitHub Epic issue                                       │  │ │                                 │
-│         │                                                                    │  │ │       wtf.refine               │
-│         ├────→  wtf.epic-to-features   (bulk)                               │  │ │                                 │
+│         │                                                                    │  │ │       wtf.refine                │
+│         ├────→  wtf.epic-to-features   (bulk)                                │  │ │                                 │
 │         │                                                                    │  │ │       updates changed           │
 │         ▼                                                                    │  │ │       sections only,            │
 │                                                                              │  │ │       posts audit trail,        │
-│    wtf.write-feature  ◄────────────────────────────────────────────────────────┤ │       cascades to               │
+│    wtf.write-feature  ◄─────────────────────────────────────────────────────────┤ │       cascades to               │
 │         │                                                                    │  │ │       affected children         │
 │         │    creates GitHub Feature issue                                    │  │ │                                 │
 │         │    → derives user stories + Acceptance Criteria                    │  │ │            │                    │
 │         │                                                                    │  │ └────────────┤────────────────────┘
-│         ├────→  wtf.feature-to-tasks   (bulk)                               │  │              │
+│         ├────→  wtf.feature-to-tasks   (bulk)                                │  │              │
 │         │                                                                    │  └──────────────┤
 │         ▼                                                                    │                 │
 │                                                                              │                 │  updates
-│    wtf.write-task  ◄──────────────────────────────────────────────────────────────────────────┘
+│    wtf.write-task  ◄───────────────────────────────────────────────────────────────────────────┘
 │         │                                                                    │
 │         │    creates GitHub Task issue                                       │
 │         │    → generates Gherkin from Feature ACs                            │
@@ -145,12 +145,12 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                                                                              │
 │               PARALLEL DISCIPLINE PICKUP  (single Task)                      │
 │                                                                              │
-│    wtf.design-task        wtf.implement-task        wtf.verify-task       │
+│     wtf.design-task         wtf.implement-task        wtf.verify-task        │
 │    Design Reference        Tech approach + TDD        Scenario verdict       │
 │                                   │                         │                │
 │                                   ▼                         ▼                │
 │                                                                              │
-│                             wtf.create-pr          wtf.report-bug          │
+│                              wtf.create-pr          wtf.report-bug           │
 │                             PR from full            links failing            │
 │                             hierarchy context       scenario → Task          │
 │                                                                              │
