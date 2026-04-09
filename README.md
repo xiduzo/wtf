@@ -85,66 +85,68 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 ## How it all fits together
 
 ```
-┌───────────────────────────────────────────────────────────────────────┐
-│                    STEERING  (Project Constitution)                   │
-│                                                                       │
-│  steer-vision  →  steer-tech  →  steer-design  →  steer-qa            │
-│       ↓                ↓               ↓               ↓              │
-│   VISION.md        TECH.md         DESIGN.md        QA.md             │
-│  (product/DDD)    (arch/ADRs)     (tokens/a11y)   (test strat)        │
-│                                                                       │
-│                        /wtf:reflect                                   │
-│                  routes learnings back in ↺                           │
-└──────────────────────────────┬────────────────────────────────────────┘
-                               │ informs
-                               ▼
-┌───────────────────────────────────────────────────────────────────────┐
-│                         PLANNING SPINE                                │
-│                                                                       │
-│  /wtf:write-epic                                                      │
-│       │  creates GitHub Epic issue                                    │
-│       │                                                               │
-│       ├──▶ /wtf:epic-to-features  (bulk — propose all at once)        │
-│       │                                                               │
-│       ▼                                                               │
-│  /wtf:write-feature   (links to Epic)                                 │
-│       │  creates GitHub Feature issue                                 │
-│       │  → derives user stories + Acceptance Criteria                 │
-│       │                                                               │
-│       ├──▶ /wtf:feature-to-tasks  (bulk — propose all at once)        │
-│       │                                                               │
-│       ▼                                                               │
-│  /wtf:write-task      (links to Feature → Epic)                       │
-│       │  creates GitHub Task issue                                    │
-│       │  → generates Gherkin scenarios from Feature ACs               │
-│       │  → maps explicit Depends-on / Blocks relationships            │
-└───────┼───────────────────────────────────────────────────────────────┘
-        │
-        ▼
-┌───────────────────────────────────────────────────────────────────────┐
-│                   PARALLEL DISCIPLINE PICKUP                          │
-│                  (all read/write same Task issue)                     │
-│                                                                       │
-│   DESIGNER               DEVELOPER                QA ENGINEER         │
-│  /wtf:design-task       /wtf:implement-task      /wtf:verify-task     │
-│       │                       │                        │              │
-│  reads Gherkin           reads Gherkin +           reads Gherkin +    │
-│  maps UI states          Design Reference          implementation     │
-│       │                       │                        │              │
-│  writes Design           writes Tech Approach      walks scenarios    │
-│  Reference section       + Test Mapping            + probes edges     │
-│  to Task issue           to Task issue             + posts verdict    │
-│                               │                        │              │
-│                          creates branch            ✅ Ready           │
-│                          drives TDD cycle          ❌ Needs fixes     │
-│                          80% coverage req          ⚠️  Conditional    │
-└──────────────────────────────┼────────────────────────┼───────────────┘
-                               │                        │
-                               ▼                        ▼
-                         /wtf:create-pr          /wtf:report-bug
-                        (opens PR with           (if QA finds failures;
-                         full spec context,       links back to Task +
-                         updates Task)            failing Gherkin)
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                        STEERING  (Project Constitution)                      │
+│                                                                              │
+│     steer-vision ──→  steer-tech  ──→  steer-design  ──→  steer-qa           │
+│         ↓                 ↓                ↓                 ↓               │
+│     VISION.md          TECH.md          DESIGN.md          QA.md             │
+│   (product/DDD)      (arch/ADRs)      (tokens/a11y)     (test strat)         │
+│                                                                              │
+│                          /wtf:reflect                                        │
+│                    routes learnings back in ↺                                │
+│                                                                              │
+└──────────────────────────────────┬───────────────────────────────────────────┘
+                                   │
+                                   │  informs
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐    ┌─────────────────────────────────┐
+│                                                                              │    │                                 │
+│                            PLANNING SPINE                                    │    │   New insights /                │
+│                                                                              │    │   feedback / comments           │
+│    /wtf:write-epic  ◄───────────────────────────────────────────────────────────┐ │            │                    │
+│         │                                                                    │  │ │            ▼                    │
+│         │    creates GitHub Epic issue                                       │  │ │                                 │
+│         │                                                                    │  │ │       /wtf:refine               │
+│         ├────→  /wtf:epic-to-features   (bulk)                               │  │ │                                 │
+│         │                                                                    │  │ │       updates changed           │
+│         ▼                                                                    │  │ │       sections only,            │
+│                                                                              │  │ │       posts audit trail,        │
+│    /wtf:write-feature  ◄────────────────────────────────────────────────────────┤ │       cascades to               │
+│         │                                                                    │  │ │       affected children         │
+│         │    creates GitHub Feature issue                                    │  │ │                                 │
+│         │    → derives user stories + Acceptance Criteria                    │  │ │            │                    │
+│         │                                                                    │  │ └────────────┤────────────────────┘
+│         ├────→  /wtf:feature-to-tasks   (bulk)                               │  │              │
+│         │                                                                    │  └──────────────┤
+│         ▼                                                                    │                 │
+│                                                                              │                 │  updates
+│    /wtf:write-task  ◄──────────────────────────────────────────────────────────────────────────┘
+│         │                                                                    │
+│         │    creates GitHub Task issue                                       │
+│         │    → generates Gherkin from Feature ACs                            │
+│         │    → declares dependency links                                     │
+│         │                                                                    │
+└─────────┼────────────────────────────────────────────────────────────────────┘
+          │
+          │
+          │  excecuted by
+          ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│               PARALLEL DISCIPLINE PICKUP  (single Task)                      │
+│                                                                              │
+│    /wtf:design-task        /wtf:implement-task        /wtf:verify-task       │
+│    Design Reference        Tech approach + TDD        Scenario verdict       │
+│                                   │                         │                │
+│                                   ▼                         ▼                │
+│                                                                              │
+│                             /wtf:create-pr          /wtf:report-bug          │
+│                             PR from full            links failing            │
+│                             hierarchy context       scenario → Task          │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 DDD runs through everything — all issues use domain language, `ddd-writing-rules.md` is enforced at every write step, and actors are always named domain roles (never "user" or "admin"). The Task issue is the single source of truth: Designer, Developer, and QA each append their own section to it in sequence.
