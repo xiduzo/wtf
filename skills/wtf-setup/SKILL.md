@@ -1,5 +1,5 @@
 ---
-name: wtf:setup
+name: wtf.setup
 description: This skill should be used when a user wants to set up WTF in a new repository, verify their environment is ready, check that GitHub CLI is installed and authenticated, install required gh extensions, or ensure the .github/ISSUE_TEMPLATE/ templates are in place — for example "set up wtf", "run setup", "check my environment", "install wtf templates", or "verify everything is configured". Run once per repo when onboarding, or when a contributor joins the project.
 ---
 
@@ -143,7 +143,7 @@ Issue templates
 PR template               ✅  (or ✅ installed from references)
 GitHub labels             ✅  epic, feature, task, bug, implemented, designed, verified
 ─────────────────────────
-Ready to use WTF. Start with /wtf:write-epic to plan your first initiative.
+Ready to use WTF. Start with `write-epic` to plan your first initiative.
 ```
 
 If any item failed (gh not installed, not authenticated), replace the closing line with a clear "Fix the issues above before proceeding." and do not suggest next steps.
@@ -154,7 +154,7 @@ If setup completed without fatal errors, call `AskUserQuestion` with:
 
 - `question`: "Setup complete. The steering docs (VISION.md, TECH.md, DESIGN.md, QA.md) capture your project's principles and standards — every skill reads them automatically. Would you like to create them now?"
 - `header`: "Steering docs"
-- `options`: `[{label: "Yes — set them up now", description: "Run wtf:steer-vision (it will chain to the others)"}, {label: "Not now", description: "Skip — skills will prompt you to create them on first use"}]`
+- `options`: `[{label: "Yes — set them up now", description: "Run `steer-vision` (it will chain to the others)"}, {label: "Not now", description: "Skip — skills will prompt you to create them on first use"}]`
 
-- **Yes** → follow the `wtf:steer-vision` process (it will offer to chain to TECH, DESIGN, and QA at the end).
+- **Yes** → follow the `steer-vision` process (it will offer to chain to TECH, DESIGN, and QA at the end).
 - **Not now** → exit.

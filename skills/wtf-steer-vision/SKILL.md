@@ -1,5 +1,5 @@
 ---
-name: wtf:steer-vision
+name: wtf.steer-vision
 description: This skill should be used when a team wants to create or refine the project vision document — for example "create the vision document", "write our product constitution", "define the product principles", "document our bounded contexts", "what is our product vision", or "set up the steering docs". Generates docs/steering/VISION.md as a living document capturing product purpose, target users, principles, strategic goals, and bounded contexts. Generated once and refined — not regenerated from scratch.
 ---
 
@@ -125,6 +125,6 @@ Call `AskUserQuestion` with:
 
 - `question`: "What's next?"
 - `header`: "Next step"
-- `options`: `[{label: "Create TECH.md", description: "Run wtf:steer-tech to document the technical guidelines"}, {label: "Create DESIGN.md", description: "Run wtf:steer-design to document the design guidelines"}, {label: "Create QA.md", description: "Run wtf:steer-qa to document the QA standards"}, {label: "Stop here", description: "Exit — no further action"}]`
+- `options`: `[{label: "Create TECH.md", description: "Run `steer-tech` to document the technical guidelines"}, {label: "Create DESIGN.md", description: "Run `steer-design` to document the design guidelines"}, {label: "Create QA.md", description: "Run `steer-qa` to document the QA standards"}, {label: "Stop here", description: "Exit — no further action"}]`
 
 Route to the appropriate skill based on the answer.

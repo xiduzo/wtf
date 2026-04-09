@@ -1,6 +1,6 @@
 ---
-name: wtf:write-feature
-description: This skill should be used when a user wants to create a GitHub Feature issue, break down an Epic into user-facing capabilities, write user stories in domain language, or capture what a domain actor can do — for example "create a feature", "write a feature for this epic", "add a feature to an epic", "break this epic into features", "write user stories for this feature", or "describe what this actor can do". Use this skill to write a single Feature; use wtf:epic-to-features to generate the full set of Features for an Epic at once. Not applicable to Tasks, Epics, or bug reports.
+name: wtf.write-feature
+description: This skill should be used when a user wants to create a GitHub Feature issue, break down an Epic into user-facing capabilities, write user stories in domain language, or capture what a domain actor can do — for example "create a feature", "write a feature for this epic", "add a feature to an epic", "break this epic into features", "write user stories for this feature", or "describe what this actor can do". Use this skill to write a single Feature; use `epic-to-features` to generate the full set of Features for an Epic at once. Not applicable to Tasks, Epics, or bug reports.
 ---
 
 # Write Feature
@@ -13,7 +13,7 @@ Create a GitHub Feature issue defining a user-facing capability. Fetches the par
 
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created in step 10.
 
-Skip this step if invoked from `wtf:epic-to-features` or `wtf:write-epic` (the orchestrator already ran it), or on re-invocations within the same session (e.g. "Write next Feature" loop in step 11).
+Skip this step if invoked from `epic-to-features` or `write-epic` (the orchestrator already ran it), or on re-invocations within the same session (e.g. "Write next Feature" loop in step 11).
 
 ### 1. Identify the parent Epic
 
@@ -137,7 +137,7 @@ Present the list as named-but-unnumbered checklist items and add them to the **P
 
 Do not ask a separate question for this — it is shown as part of the draft in step 9. The user can adjust the task list during that review.
 
-This list is written into the Feature body and becomes the starting point for `wtf:feature-to-tasks` — it reads the Proposed Tasks checklist directly rather than re-deriving from ACs. Write it carefully; it will drive task creation.
+This list is written into the Feature body and becomes the starting point for `feature-to-tasks` — it reads the Proposed Tasks checklist directly rather than re-deriving from ACs. Write it carefully; it will drive task creation.
 
 ### 8. Run Definition of Ready checklist
 
@@ -237,8 +237,8 @@ Then call `AskUserQuestion` with:
 
 _(Replace N with actual count of remaining Features, or omit the description note if there are none.)_
 
-- **Plan all Tasks** → invoke the `wtf:feature-to-tasks` skill, passing the Feature number in as context.
-- **Write one Task** → proceed with the `wtf:write-task` skill, passing the Feature number in as context.
+- **Plan all Tasks** → invoke the `feature-to-tasks` skill, passing the Feature number in as context.
+- **Write one Task** → proceed with the `write-task` skill, passing the Feature number in as context.
 - **Write next Feature** → restart this skill from step 2, reusing the same Epic (skip re-fetching it). If the Epic has a Feature Breakdown list, propose the next uncreated Feature as the default capability name.
 - **Stop here** → exit.
 

@@ -1,5 +1,5 @@
 ---
-name: wtf:implement-task
+name: wtf.implement-task
 description: This skill should be used when a developer is ready to implement a GitHub Task issue and needs to read the full spec hierarchy (Task + Feature + Epic), explore the codebase, produce a concrete Technical Approach with real file paths, and drive TDD implementation against Gherkin scenarios. Triggers on phrases like "implement task #42", "pick up task", "start working on this task", "build the task", "develop task #X", "code up the task", "write the tests for task #X", "start coding this ticket", "resume task #X", "continue task #X", or "I want to implement this ticket".
 ---
 
@@ -15,7 +15,7 @@ The expected Task issue body structure is defined in @.github/ISSUE_TEMPLATE/TAS
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf:verify-task` or another skill that already ran gh-setup this session.
+Skip this step if invoked from `verify-task` or another skill that already ran gh-setup this session.
 
 ### 1. Identify the Task
 
@@ -42,9 +42,9 @@ If the `designed` label is **absent**, warn the user that the task hasn't been d
 
 - `question`: "This task doesn't have a `designed` label yet. How would you like to proceed?"
 - `header`: "Design check"
-- `options`: `[{label: "Design it first", description: "Go back and run wtf:design-task (default)"}, {label: "Skip design", description: "Proceed to implementation anyway"}]`
+- `options`: `[{label: "Design it first", description: "Go back and run `design-task` (default)"}, {label: "Skip design", description: "Proceed to implementation anyway"}]`
 
-- **Design it first** → follow the `wtf:design-task` process, passing the Task number in as context.
+- **Design it first** → follow the `design-task` process, passing the Task number in as context.
 - **Skip design** → proceed.
 
 If the `designed` label is present, continue silently.
@@ -63,9 +63,9 @@ If the file **does not exist**, call `AskUserQuestion` with:
 
 - `question`: "docs/steering/TECH.md doesn't exist yet. This document captures your stack, architecture patterns, and technical constraints. Would you like to create it now?"
 - `header`: "Tech steering doc missing"
-- `options`: `[{label: "Create it now", description: "Run wtf:steer-tech before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — technical decisions won't reference project standards"}]`
+- `options`: `[{label: "Create it now", description: "Run `steer-tech` before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — technical decisions won't reference project standards"}]`
 
-- **Create it now** → follow the `wtf:steer-tech` process, then return to this skill and continue from step 4.
+- **Create it now** → follow the `steer-tech` process, then return to this skill and continue from step 4.
 - **Skip for this session** → continue without it.
 
 ### 4. Set up the branch
@@ -199,6 +199,6 @@ Call `AskUserQuestion` with:
 - `header`: "Next step"
 - `options`: `[{label: "Verify this Task", description: "Run QA against the Gherkin scenarios (recommended next step, default)"}, {label: "Open a pull request", description: "Create a PR for this branch"}, {label: "Implement another Task", description: "Implement another Task for the same Feature"}]`
 
-- **Verify this Task** → follow the `wtf:verify-task` process, passing the Task number in as context so the user is not asked for it again.
-- **Open a pull request** → follow the `wtf:create-pr` process, passing the Task number and branch in as context.
+- **Verify this Task** → follow the `verify-task` process, passing the Task number in as context so the user is not asked for it again.
+- **Open a pull request** → follow the `create-pr` process, passing the Task number and branch in as context.
 - **Implement another Task** → restart this skill from step 1.

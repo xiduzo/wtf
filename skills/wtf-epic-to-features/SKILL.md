@@ -1,6 +1,6 @@
 ---
-name: wtf:epic-to-features
-description: This skill should be used when a user wants to decompose an Epic into its complete set of Features all at once, invoked automatically after write-epic completes, or triggered by phrases like "create all features for this epic", "walk me through all the features", "let's break down this epic", or "plan the features for epic #N". Use this skill for bulk Feature decomposition; use wtf:write-feature for creating a single Feature in isolation.
+name: wtf.epic-to-features
+description: This skill should be used when a user wants to decompose an Epic into its complete set of Features all at once, invoked automatically after write-epic completes, or triggered by phrases like "create all features for this epic", "walk me through all the features", "let's break down this epic", or "plan the features for epic #N". Use this skill for bulk Feature decomposition; use `write-feature` for creating a single Feature in isolation.
 ---
 
 # Epic to Features
@@ -11,9 +11,9 @@ Break an Epic down into its full set of Features and create them one by one. Cor
 
 ### 0. GitHub CLI setup
 
-Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created downstream (via `wtf:write-feature` and `wtf:write-task`).
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created downstream (via `write-feature` and `write-task`).
 
-Skip this step if gh-setup was already confirmed this session (e.g. when chained from `wtf:write-epic`).
+Skip this step if gh-setup was already confirmed this session (e.g. when chained from `write-epic`).
 
 ### 1. Identify the Epic
 
@@ -63,7 +63,7 @@ Wait for the user to confirm or adjust the list. Apply any changes.
 For each Feature in the confirmed list, in order:
 
 1. Announce: "Creating Feature [N/total]: _[capability name]_"
-2. Follow the `wtf:write-feature` process, passing:
+2. Follow the `write-feature` process, passing:
    - The Epic number (skip step 1 of write-feature — Epic is already fetched)
    - The capability name as the pre-filled answer to step 2 of write-feature
    - **Abbreviated clarification**: because the capability name already follows the `[Actor] can [verb] [object]` pattern and the Epic context is already in hand, skip write-feature step 3 (clarification questions) unless something is genuinely ambiguous from the Epic. Write-feature step 4 (user story derivation) and step 5 (DDD Language Guard) should still run silently. Resume from write-feature step 6 (vertical slice assessment).
@@ -91,8 +91,8 @@ Then call `AskUserQuestion` with:
 - `header`: "Next step"
 - `options`: `[{label: "Break down first Feature", description: "Plan and create Tasks for the first Feature (default)"}, {label: "Break down next Feature", description: "Plan and create Tasks for a different Feature"}, {label: "Stop here", description: "Exit — no further action"}]`
 
-- **Break down first Feature** → follow the `wtf:feature-to-tasks` process with the first created Feature number.
-- **Break down next Feature** → follow the `wtf:feature-to-tasks` process with the second created Feature number (or whichever the user specifies).
+- **Break down first Feature** → follow the `feature-to-tasks` process with the first created Feature number.
+- **Break down next Feature** → follow the `feature-to-tasks` process with the second created Feature number (or whichever the user specifies).
 - **Stop here** → exit.
 
 > Suggest `/clear` before continuing if the conversation has grown long.

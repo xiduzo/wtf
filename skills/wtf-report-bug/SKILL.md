@@ -1,5 +1,5 @@
 ---
-name: wtf:report-bug
+name: wtf.report-bug
 description: This skill should be used when a developer or QA engineer wants to report a bug, create a bug ticket, document a test failure, log a defect, file an issue found during a QA session, or report something that is broken — for example "report a bug", "create a bug ticket", "I found a defect", "something is broken in task #X", or "document this test failure". Files a structured GitHub Bug issue that links the originating Task and Feature, maps failing Gherkin scenarios as reproducible test evidence, and fills every section of the BUG template.
 ---
 
@@ -13,7 +13,7 @@ File a structured Bug issue from a QA finding. Core value: the Gherkin scenario 
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf:verify-task` or another skill that already ran gh-setup this session.
+Skip this step if invoked from `verify-task` or another skill that already ran gh-setup this session.
 
 ### 1. Identify the source
 

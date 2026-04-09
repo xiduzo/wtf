@@ -1,5 +1,5 @@
 ---
-name: wtf:design-task
+name: wtf.design-task
 description: This skill should be used when a designer is picking up a Task issue to add design coverage. Triggers on phrases like "I want to design task #X", "help me add Figma references to this task", "create a component spec for this feature", "what UI states need design coverage", "scaffold the design reference section", "what components do I need for this task", "which Figma frames cover this ticket", "add design coverage to task #X", "does task #X have design coverage", or "link designs to this task". Handles exploring the design system, deriving UI states from Gherkin scenarios, and writing back a structured Design Reference into the issue.
 ---
 
@@ -15,7 +15,7 @@ See `references/component-spec-template.md` for the expected structure when scaf
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf:write-task` or another skill that already ran gh-setup this session.
+Skip this step if invoked from `write-task` or another skill that already ran gh-setup this session.
 
 ### 1. Identify the Task
 
@@ -62,9 +62,9 @@ If the file **does not exist**, call `AskUserQuestion` with:
 
 - `question`: "docs/steering/DESIGN.md doesn't exist yet. This document captures your design principles, tokens, and component patterns. Would you like to create it now?"
 - `header`: "Design steering doc missing"
-- `options`: `[{label: "Create it now", description: "Run wtf:steer-design before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — design decisions won't reference project standards"}]`
+- `options`: `[{label: "Create it now", description: "Run `steer-design` before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — design decisions won't reference project standards"}]`
 
-- **Create it now** → follow the `wtf:steer-design` process, then return to this skill and continue from step 4.
+- **Create it now** → follow the `steer-design` process, then return to this skill and continue from step 4.
 - **Skip for this session** → continue without it.
 
 ### 4. Explore the design system
@@ -131,8 +131,8 @@ Call `AskUserQuestion` with:
 
 - `question`: "What's next?"
 - `header`: "Next step"
-- `options`: `[{label: "Implement this Task", description: "Run wtf:implement-task for this Task now (default)"}, {label: "Design another Task", description: "Design another Task for the same Feature"}, {label: "Stop here", description: "Exit — no further action"}]`
+- `options`: `[{label: "Implement this Task", description: "Run `implement-task` for this Task now (default)"}, {label: "Design another Task", description: "Design another Task for the same Feature"}, {label: "Stop here", description: "Exit — no further action"}]`
 
-- **Implement this Task** → follow the `wtf:implement-task` process, passing the Task number in as context so the user is not asked for it again.
+- **Implement this Task** → follow the `implement-task` process, passing the Task number in as context so the user is not asked for it again.
 - **Design another Task** → restart this skill from step 1, reusing the same Feature context.
 - **Stop here** → exit.

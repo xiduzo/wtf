@@ -1,5 +1,5 @@
 ---
-name: wtf:reflect
+name: wtf.reflect
 description: This skill should be used when a developer wants to capture learnings from a difficult session, record what Claude got wrong, save implementation gotchas, or update the steering docs with hard-won knowledge — for example "let's reflect", "capture what we learned", "that was painful, save this", "update the steering docs with what went wrong", or when prompted by the intervention tracker after multiple corrections. Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) under a "Hard-Won Lessons" section.
 ---
 
@@ -7,7 +7,7 @@ description: This skill should be used when a developer wants to capture learnin
 
 Capture learnings from this session and route them into the right steering document. Every hard-won insight — especially about where the AI went wrong or where implementation was harder than expected — belongs in a steering doc so it guides future work automatically.
 
-**Intervention tracker:** The `hooks/track-interventions.sh` hook runs automatically on every `UserPromptSubmit` event and increments `/tmp/wtf-interventions-$(whoami)` when it detects correction or frustration language (e.g. "no,", "wrong", "actually", "stop that"). When the counter reaches 3, the hook prints a reminder at the end of the session to run `/wtf:reflect`. Step 6 of this skill resets the counter to zero. No manual tracking is needed — the hook handles it.
+**Intervention tracker:** The `hooks/track-interventions.sh` hook runs automatically on every `UserPromptSubmit` event and increments `/tmp/wtf-interventions-$(whoami)` when it detects correction or frustration language (e.g. "no,", "wrong", "actually", "stop that"). When the counter reaches 3, the hook prints a reminder at the end of the session to run `reflect`. Step 6 of this skill resets the counter to zero. No manual tracking is needed — the hook handles it.
 
 ## Process
 
@@ -25,7 +25,7 @@ Build a map of which of the four docs are present: `TECH.md`, `QA.md`, `DESIGN.m
 - `header`: "No steering docs"
 - `options`: `[{label: "Create them now", description: "Run the steer-* skills to set up the docs"}, {label: "Skip — just capture notes", description: "Save all learnings to docs/steering/LEARNINGS.md instead"}]`
 
-If **Create them now** → invoke `wtf:steer-tech`. Note that `wtf:steer-tech` will offer to chain to the other steer-\* skills at the end — let the user complete that flow, then return here. When control returns, re-run the `ls` check to see which docs now exist.
+If **Create them now** → invoke `steer-tech`. Note that `steer-tech` will offer to chain to the other steer-\* skills at the end — let the user complete that flow, then return here. When control returns, re-run the `ls` check to see which docs now exist.
 If **Skip** → set all four doc paths to the fallback: `docs/steering/LEARNINGS.md`.
 
 **If some exist but not all** → continue. In step 4, route learnings for a missing doc to `docs/steering/LEARNINGS.md` as a per-doc fallback (create the file if needed).

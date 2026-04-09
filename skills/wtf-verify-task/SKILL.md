@@ -1,5 +1,5 @@
 ---
-name: wtf:verify-task
+name: wtf.verify-task
 description: This skill should be used when a QA engineer wants to test or verify a completed task, run through acceptance criteria, check Gherkin scenarios against the implementation, record pass/fail results, or sign off on a ticket before merge. Triggers on phrases like "verify task #42", "run QA on this issue", "test the acceptance criteria", "sign off on task", "check if this task is ready to merge", "does this task meet its acceptance criteria", "run acceptance tests for task #X", "walk through the Gherkin for task #X", or "I want to test this task".
 ---
 
@@ -15,7 +15,7 @@ Read `references/qa-verdict-guide.md` before starting — it defines the status 
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf:implement-task` or another skill that already ran gh-setup this session.
+Skip this step if invoked from `implement-task` or another skill that already ran gh-setup this session.
 
 ### 1. Identify the Task
 
@@ -33,9 +33,9 @@ Check the task labels. If the `implemented` label is **absent**, warn the user t
 
 - `question`: "This task hasn't been implemented yet. How would you like to proceed?"
 - `header`: "Implement first?"
-- `options`: `[{label: "Implement first", description: "Go back and run wtf:implement-task (default)"}, {label: "Verify anyway", description: "Skip and proceed with verification"}]`
+- `options`: `[{label: "Implement first", description: "Go back and run `implement-task` (default)"}, {label: "Verify anyway", description: "Skip and proceed with verification"}]`
 
-- **Implement first** → follow the `wtf:implement-task` process, passing the Task number in as context.
+- **Implement first** → follow the `implement-task` process, passing the Task number in as context.
 - **Verify anyway** → proceed.
 
 ### 2. Load the QA steering document
@@ -52,9 +52,9 @@ If the file **does not exist**, call `AskUserQuestion` with:
 
 - `question`: "docs/steering/QA.md doesn't exist yet. This document captures your test strategy, coverage thresholds, and definition of done. Would you like to create it now?"
 - `header`: "QA steering doc missing"
-- `options`: `[{label: "Create it now", description: "Run wtf:steer-qa before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — QA decisions won't reference project standards"}]`
+- `options`: `[{label: "Create it now", description: "Run `steer-qa` before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — QA decisions won't reference project standards"}]`
 
-- **Create it now** → follow the `wtf:steer-qa` process, then return to this skill and continue from step 3.
+- **Create it now** → follow the `steer-qa` process, then return to this skill and continue from step 3.
 - **Skip for this session** → continue without it.
 
 ### 3. Establish the test surface
@@ -78,7 +78,7 @@ For each scenario, one at a time:
    - `header`: "Result"
    - `options`: `[{label: "Yes ✅", description: "Scenario passed"}, {label: "No ❌", description: "Scenario failed"}, {label: "Blocked 🚫", description: "Could not test due to dependency or environment issue"}, {label: "N/A or Conditional ⚠️", description: "Not applicable, or passes only under a specific condition"}]`
    - **Yes ✅** → mark ✅ in the running Test Mapping table. Set `bug filed` to `—`.
-   - **No ❌** → call `AskUserQuestion` with `question: "What actually happened?"`, `header: "Failure details"`, and `options` pre-filled with 1–2 plausible failure modes inferred from the scenario (e.g. "No error shown", "Wrong data returned"). Record findings with repro steps. Then call `AskUserQuestion` with `question: "Would you like to file a bug report now?"`, `header: "File bug?"`, `options: [{label: "File now", description: "Run wtf:report-bug immediately (default)"}, {label: "Continue and file later", description: "Defer and move to the next scenario"}]` — if "File now", follow the `wtf:report-bug` process immediately with the task number and scenario details before moving on. Mark `bug filed` as `yes` (filed now) or `no` (deferred). Set `bug filed` accordingly.
+   - **No ❌** → call `AskUserQuestion` with `question: "What actually happened?"`, `header: "Failure details"`, and `options` pre-filled with 1–2 plausible failure modes inferred from the scenario (e.g. "No error shown", "Wrong data returned"). Record findings with repro steps. Then call `AskUserQuestion` with `question: "Would you like to file a bug report now?"`, `header: "File bug?"`, `options: [{label: "File now", description: "Run `report-bug` immediately (default)"}, {label: "Continue and file later", description: "Defer and move to the next scenario"}]` — if "File now", follow the `report-bug` process immediately with the task number and scenario details before moving on. Mark `bug filed` as `yes` (filed now) or `no` (deferred). Set `bug filed` accordingly.
    - **Blocked 🚫** → call `AskUserQuestion` with `question: "What dependency or environment issue prevented testing?"`, `header: "Blocker"`, and `options` pre-filled with common blockers inferred from the task context (e.g. "Missing test environment", "Depends on unmerged task"). Set `bug filed` to `—`.
    - **N/A or Conditional ⚠️** → call `AskUserQuestion` with `question: "Is this N/A, or does it pass only under a condition?"`, `header: "Condition"`, and `options: [{label: "N/A — not applicable", description: "This scenario does not apply"}, {label: "Conditional — specify the condition", description: "Passes only under a specific circumstance"}]`. Record appropriately. Set `bug filed` to `—` (track the condition separately).
 3. After recording the result, **immediately update the Task issue** with the current state of the Test Mapping table (do not wait until all scenarios are done). The table must include a `Bug Filed` column:
@@ -167,7 +167,7 @@ If the verdict is ✅ or ⚠️, call `AskUserQuestion` with:
 - `header`: "Next step"
 - `options`: `[{label: "Open PR now", description: "Create a pull request for this branch (recommended next step)"}, {label: "Close this Task", description: "Mark the Task issue closed and check if Feature and Epic can be closed too"}, {label: "Skip for now", description: "Exit — I'll open the PR later"}]`
 
-- **Open PR now** → follow the `wtf:create-pr` process, passing the Task number in as context.
+- **Open PR now** → follow the `create-pr` process, passing the Task number in as context.
 - **Close this Task** →
   ```bash
   gh issue close <task_number>
@@ -191,6 +191,6 @@ If unfiled failures exist, present them as a numbered list, then call `AskUserQu
 - `header`: "File bugs?"
 - `options`: `[{label: "File separately", description: "File one bug report per failing scenario (default)"}, {label: "File combined", description: "File one combined bug report for all failures"}, {label: "Skip", description: "Exit — I'll handle it manually"}]`
 
-- **File separately** → follow the `wtf:report-bug` process once per failing scenario, passing in the task number and the specific failing scenario each time.
-- **File combined** → follow the `wtf:report-bug` process once, passing in the task number and all failing scenarios together.
+- **File separately** → follow the `report-bug` process once per failing scenario, passing in the task number and the specific failing scenario each time.
+- **File combined** → follow the `report-bug` process once, passing in the task number and all failing scenarios together.
 - **Skip** → exit without filing reports.

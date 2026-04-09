@@ -1,5 +1,5 @@
 ---
-name: wtf:create-pr
+name: wtf.create-pr
 description: This skill should be used when a developer wants to open a pull request for a completed task branch — for example "create a PR", "open a pull request", "submit this for review", "make a PR for task #42", "push this up for review", or "create PR from current branch". Reads the Task + Feature + Epic hierarchy to write a meaningful PR description. Handles branches with or without a linked WTF task issue.
 ---
 
@@ -13,7 +13,7 @@ Open a pull request for a completed task branch. Core value: reads the full spec
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf:verify-task` or another skill that already ran gh-setup this session.
+Skip this step if invoked from `verify-task` or another skill that already ran gh-setup this session.
 
 ### 1. Confirm the branch
 
@@ -60,9 +60,9 @@ If the `verified` label is **absent**, warn the user that the task hasn't been v
 
 - `question`: "This task hasn't been verified yet. How would you like to proceed?"
 - `header`: "Verify first?"
-- `options`: `[{label: "Verify first", description: "Run wtf:verify-task before opening the PR (default)"}, {label: "Open PR anyway", description: "Skip verification and open the PR now"}]`
+- `options`: `[{label: "Verify first", description: "Run `verify-task` before opening the PR (default)"}, {label: "Open PR anyway", description: "Skip verification and open the PR now"}]`
 
-- **Verify first** → follow the `wtf:verify-task` process, passing the Task number in as context.
+- **Verify first** → follow the `verify-task` process, passing the Task number in as context.
 - **Open PR anyway** → proceed.
 
 If no Task is linked, skip this step.

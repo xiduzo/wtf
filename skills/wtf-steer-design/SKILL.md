@@ -1,5 +1,5 @@
 ---
-name: wtf:steer-design
+name: wtf.steer-design
 description: This skill should be used when a team wants to create or refine the design guidelines document — for example "create the design steering doc", "document our design system", "write the design principles", "document our component patterns", "set up the design guidelines", or "update the design doc". Generates docs/steering/DESIGN.md as a living document capturing design principles, the design system, tokens, component patterns, and accessibility standards. Generated once and refined — not regenerated from scratch.
 ---
 
@@ -121,6 +121,6 @@ Call `AskUserQuestion` with:
 
 - `question`: "What's next?"
 - `header`: "Next step"
-- `options`: `[{label: "Create QA.md", description: "Run wtf:steer-qa to document the QA standards"}, {label: "Create TECH.md", description: "Run wtf:steer-tech to document the technical guidelines"}, {label: "Create VISION.md", description: "Run wtf:steer-vision to document the product vision"}, {label: "Stop here", description: "Exit — no further action"}]`
+- `options`: `[{label: "Create QA.md", description: "Run `steer-qa` to document the QA standards"}, {label: "Create TECH.md", description: "Run `steer-tech` to document the technical guidelines"}, {label: "Create VISION.md", description: "Run `steer-vision` to document the product vision"}, {label: "Stop here", description: "Exit — no further action"}]`
 
 Route to the appropriate skill based on the answer.

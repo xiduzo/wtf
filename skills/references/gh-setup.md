@@ -1,6 +1,6 @@
 # GitHub CLI Setup
 
-Run this check at the start of any skill that creates or links GitHub issues. Skip if the calling orchestrator (`wtf:epic-to-features` or `wtf:feature-to-tasks`) already ran this check — those skills note their gh-setup run explicitly in their own step 0. Also skip on re-invocations within the same session (e.g. when `wtf:write-epic` loops back into `wtf:write-feature`).
+Run this check at the start of any skill that creates or links GitHub issues. Skip if the calling orchestrator (`epic-to-features` or `feature-to-tasks`) already ran this check — those skills note their gh-setup run explicitly in their own step 0. Also skip on re-invocations within the same session (e.g. when `write-epic` loops back into `write-feature`).
 
 ## 1. Verify `gh` is installed
 

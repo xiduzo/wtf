@@ -1,5 +1,5 @@
 ---
-name: wtf:steer-qa
+name: wtf.steer-qa
 description: This skill should be used when a team wants to create or refine the QA standards document — for example "create the QA steering doc", "document our test strategy", "write the QA standards", "document our definition of done", "set up the QA guidelines", or "update the QA doc". Generates docs/steering/QA.md as a living document capturing test strategy, coverage thresholds, test patterns, definition of done, and environments. Generated once and refined — not regenerated from scratch.
 ---
 
@@ -122,6 +122,6 @@ Call `AskUserQuestion` with:
 
 - `question`: "What's next?"
 - `header`: "Next step"
-- `options`: `[{label: "Create VISION.md", description: "Run wtf:steer-vision to document the product vision"}, {label: "Create TECH.md", description: "Run wtf:steer-tech to document the technical guidelines"}, {label: "Create DESIGN.md", description: "Run wtf:steer-design to document the design guidelines"}, {label: "Stop here", description: "Exit — no further action"}]`
+- `options`: `[{label: "Create VISION.md", description: "Run `steer-vision` to document the product vision"}, {label: "Create TECH.md", description: "Run `steer-tech` to document the technical guidelines"}, {label: "Create DESIGN.md", description: "Run `steer-design` to document the design guidelines"}, {label: "Stop here", description: "Exit — no further action"}]`
 
 Route to the appropriate skill based on the answer.

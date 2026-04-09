@@ -1,5 +1,5 @@
 ---
-name: wtf:write-epic
+name: wtf.write-epic
 description: This skill should be used when a user wants to create, draft, or plan a GitHub Epic issue — for example "write an epic", "I want to define a new initiative", "scope out this strategic project", "turn this idea into an epic", "plan work that spans multiple features", or "start from a bounded context". Also use when the user asks to define domain outcomes, capture a large initiative before breaking it into features, or describe work in terms of business goals rather than technical tasks.
 ---
 
@@ -13,7 +13,7 @@ Create a GitHub Epic issue capturing a strategic initiative with stakeholders, g
 
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native dependency links are created in step 8.
 
-Skip this step if gh-setup was already confirmed this session (e.g. when this skill is re-invoked via `wtf:write-feature` step 11 "Write another Epic").
+Skip this step if gh-setup was already confirmed this session (e.g. when this skill is re-invoked via `write-feature` step 11 "Write another Epic").
 
 ### 1. Capture the seed idea
 
@@ -187,8 +187,8 @@ Use the `AskUserQuestion` tool with the following question and options:
 
 Route based on the answer:
 
-- **Plan all Features** → invoke the `wtf:epic-to-features` skill, passing the Epic number in as context.
-- **Write one Feature** → proceed with the `wtf:write-feature` skill, passing the Epic number in as context so the user is not asked for it again.
+- **Plan all Features** → invoke the `epic-to-features` skill, passing the Epic number in as context.
+- **Write one Feature** → proceed with the `write-feature` skill, passing the Epic number in as context so the user is not asked for it again.
 - **Write another Epic** → restart this skill from step 1.
 - **Stop here** → exit.
 

@@ -1,5 +1,5 @@
 ---
-name: wtf:write-task
+name: wtf.write-task
 description: This skill should be used when a user wants to create a task, write a ticket, decompose a feature into implementable work, break down a story, define a vertical slice for development, or write Gherkin scenarios — for example "create a task", "write a task for this feature", "break this feature into tasks", "define implementation work", or "add a sub-issue to this feature". Guides creation of a GitHub Task issue linked to a parent Feature and Epic, derives Gherkin acceptance scenarios from the Feature's ACs, enforces DDD ubiquitous language in scenarios, and checks for vertical-slice integrity and task dependencies.
 ---
 
@@ -13,7 +13,7 @@ Create a GitHub Task issue — the implementable unit of work. Core value: deriv
 
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created in step 10.
 
-Skip this step if invoked from `wtf:feature-to-tasks` or `wtf:write-feature` (the orchestrator already ran it), or on re-invocations within the same session (e.g. "Write next Task" loop in step 11).
+Skip this step if invoked from `feature-to-tasks` or `write-feature` (the orchestrator already ran it), or on re-invocations within the same session (e.g. "Write next Task" loop in step 11).
 
 ### 1. Identify the parent Feature
 
@@ -31,7 +31,7 @@ If the Epic number was passed in as context (e.g. from an orchestrator), skip th
 
 ### 2. Name the task
 
-**If a task description was passed in from the orchestrator** (e.g. from `wtf:feature-to-tasks` step 3 or `wtf:write-feature` step 11), present it directly as the proposal without offering source options:
+**If a task description was passed in from the orchestrator** (e.g. from `feature-to-tasks` step 3 or `write-feature` step 11), present it directly as the proposal without offering source options:
 
 > "Here's the task I'll write: _[task description]_. Does this look right, or would you like to adjust it?"
 
@@ -243,9 +243,9 @@ Call `AskUserQuestion` with:
 
 _(Replace N with actual count.)_
 
-- **Design this Task** → follow the `wtf:design-task` process, opening with: "Continue with task #<task_number>".
+- **Design this Task** → follow the `design-task` process, opening with: "Continue with task #<task_number>".
 - **Write next Task** → restart from step 2, reusing the same Feature. If the Feature's Proposed Tasks list has named-but-uncreated items, propose the next one as the default.
-- **Write a Feature** → proceed with `wtf:write-feature`, passing the Epic number in as context.
+- **Write a Feature** → proceed with `write-feature`, passing the Epic number in as context.
 - **Stop here** → exit.
 
 > Suggest clearing context before continuing if the conversation has grown long.

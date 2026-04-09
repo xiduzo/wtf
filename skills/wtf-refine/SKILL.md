@@ -1,5 +1,5 @@
 ---
-name: wtf:refine
+name: wtf.refine
 description: Use when new insights change the scope, acceptance criteria, domain language, or technical constraints of an existing Epic, Feature, or Task — for example "refine epic #10", "update this task with the new requirements", "we got new feedback on feature #24", "incorporate these comments into the spec", or when new Figma designs, documents, or GitHub comments reveal that the current spec is out of date. Accepts insights from CLI text, GitHub comments, referenced files or URLs, and conversation context. Detects the issue type automatically, smart re-validates only what changed, shows a section-by-section before/after diff, posts an audit trail comment, warns about stale lifecycle labels, and cascades refinement offers to affected children.
 ---
 
@@ -53,7 +53,7 @@ Merge insights from every available source into a single consolidated list. Proc
 
 **a. CLI argument / conversation context**
 
-If the user passed insight text in the invocation (e.g. `/wtf:refine #42 "scope changed — exclude mobile"`), treat that as the primary insight. If nothing was passed, call `AskUserQuestion` with `question: "What changed or what new insight should I incorporate?"`, `header: "Insight"`, and `options` pre-filled with 1–2 plausible changes inferred from recent issue comments (e.g. the last comment's key point).
+If the user passed insight text in the invocation (e.g. `refine #42 "scope changed — exclude mobile"`), treat that as the primary insight. If nothing was passed, call `AskUserQuestion` with `question: "What changed or what new insight should I incorporate?"`, `header: "Insight"`, and `options` pre-filled with 1–2 plausible changes inferred from recent issue comments (e.g. the last comment's key point).
 
 **b. GitHub comments since last body edit**
 
@@ -250,7 +250,7 @@ Present the affected children as a numbered list. Then call `AskUserQuestion` wi
 
 - `question`: "These child issues may be out of sync with the updated spec: [list]. How would you like to handle them?"
 - `header`: "Cascade"
-- `options`: `[{label: "Refine each one now", description: "Walk through wtf:refine for each affected child in order (default)"}, {label: "I'll handle them manually", description: "Exit — I'll open each child and update it myself"}, {label: "Skip", description: "Leave children as-is"}]`
+- `options`: `[{label: "Refine each one now", description: "Walk through `refine` for each affected child in order (default)"}, {label: "I'll handle them manually", description: "Exit — I'll open each child and update it myself"}, {label: "Skip", description: "Leave children as-is"}]`
 
 - **Refine each one now** → restart this skill from step 2 for the first affected child, passing the insight as context so the user is not asked for it again. Continue through each child in order.
 - **I'll handle them manually** / **Skip** → exit.
