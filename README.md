@@ -8,7 +8,7 @@ Claude Code skills for managing GitHub issues using an **Epic → Feature → Ta
 
 | Skill          | Trigger          | Purpose                                                        |
 | -------------- | ---------------- | -------------------------------------------------------------- |
-| `/wtf:setup`   | "set up wtf"     | Pre-flight check and installer — run once per repo on onboard  |
+| `wtf.setup`   | "set up wtf"     | Pre-flight check and installer — run once per repo on onboard  |
 
 Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, creates all lifecycle labels (`epic`, `feature`, `task`, `bug`, `implemented`, `designed`, `verified`), and prints a status report. Offers to kick off steering doc creation at the end.
 
@@ -16,9 +16,9 @@ Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` a
 
 | Skill                | Trigger            | Purpose                                     |
 | -------------------- | ------------------ | ------------------------------------------- |
-| `/wtf:write-epic`    | "create an epic"   | Define a strategic initiative               |
-| `/wtf:write-feature` | "create a feature" | Break an epic into user-facing capabilities |
-| `/wtf:write-task`    | "create a task"    | Define implementable work under a feature   |
+| `wtf.write-epic`    | "create an epic"   | Define a strategic initiative               |
+| `wtf.write-feature` | "create a feature" | Break an epic into user-facing capabilities |
+| `wtf.write-task`    | "create a task"    | Define implementable work under a feature   |
 
 Each skill fetches parent issue context automatically and guides you through a structured workflow, ending with a created and linked GitHub issue. **Tasks auto-generate Gherkin scenarios** from the parent Feature's Acceptance Criteria.
 
@@ -28,8 +28,8 @@ Break down an entire level of the hierarchy at once, walking through each item w
 
 | Skill                    | Trigger                          | Purpose                                              |
 | ------------------------ | -------------------------------- | ---------------------------------------------------- |
-| `/wtf:epic-to-features`  | "break down this epic"           | Propose and create all Features for an Epic           |
-| `/wtf:feature-to-tasks`  | "plan all tasks for feature #12" | Propose and create all Tasks for a Feature            |
+| `wtf.epic-to-features`  | "break down this epic"           | Propose and create all Features for an Epic           |
+| `wtf.feature-to-tasks`  | "plan all tasks for feature #12" | Propose and create all Tasks for a Feature            |
 
 Both skills propose the full list upfront, then walk through creating each item one by one with pause/skip/add controls.
 
@@ -39,9 +39,9 @@ Once a task exists, any discipline can pick it up independently:
 
 | Skill                 | Trigger              | Purpose                                                     |
 | --------------------- | -------------------- | ----------------------------------------------------------- |
-| `/wtf:design-task`    | "design task #42"    | Designer adds Figma references and component specs          |
-| `/wtf:implement-task` | "implement task #42" | Developer drafts technical approach and drives TDD cycle    |
-| `/wtf:verify-task`    | "verify task #42"    | QA walks Gherkin scenarios and records pass/fail verdict    |
+| `wtf.design-task`    | "design task #42"    | Designer adds Figma references and component specs          |
+| `wtf.implement-task` | "implement task #42" | Developer drafts technical approach and drives TDD cycle    |
+| `wtf.verify-task`    | "verify task #42"    | QA walks Gherkin scenarios and records pass/fail verdict    |
 
 All three write their output back into the Task issue — it stays the single source of truth.
 
@@ -49,7 +49,7 @@ All three write their output back into the Task issue — it stays the single so
 
 | Skill            | Trigger          | Purpose                                                        |
 | ---------------- | ---------------- | -------------------------------------------------------------- |
-| `/wtf:create-pr` | "create a PR"    | Open a PR with description derived from the Task/Feature/Epic hierarchy |
+| `wtf.create-pr` | "create a PR"    | Open a PR with description derived from the Task/Feature/Epic hierarchy |
 
 Reads the full spec hierarchy and branch diff to write a PR description that explains _why_ the change exists. Checks for verification status and offers to run `verify-task` first.
 
@@ -57,7 +57,7 @@ Reads the full spec hierarchy and branch diff to write a PR description that exp
 
 | Skill              | Trigger          | Purpose                                                      |
 | ------------------ | ---------------- | ------------------------------------------------------------ |
-| `/wtf:report-bug`  | "report a bug"   | File a structured Bug issue linked to the originating Task   |
+| `wtf.report-bug`  | "report a bug"   | File a structured Bug issue linked to the originating Task   |
 
 Maps failing Gherkin scenarios as reproducible test evidence and links the originating Task and Feature automatically.
 
@@ -67,10 +67,10 @@ Generate and maintain living project guideline documents in `docs/steering/`:
 
 | Skill                | Trigger                    | Purpose                                          |
 | -------------------- | -------------------------- | ------------------------------------------------ |
-| `/wtf:steer-vision`  | "create the vision doc"    | Product constitution — purpose, users, principles |
-| `/wtf:steer-tech`    | "create the tech doc"      | Stack, architecture, constraints, ADRs            |
-| `/wtf:steer-design`  | "create the design doc"    | Design principles, tokens, component patterns     |
-| `/wtf:steer-qa`      | "create the QA doc"        | Test strategy, coverage thresholds, DoD           |
+| `wtf.steer-vision`  | "create the vision doc"    | Product constitution — purpose, users, principles |
+| `wtf.steer-tech`    | "create the tech doc"      | Stack, architecture, constraints, ADRs            |
+| `wtf.steer-design`  | "create the design doc"    | Design principles, tokens, component patterns     |
+| `wtf.steer-qa`      | "create the QA doc"        | Test strategy, coverage thresholds, DoD           |
 
 Each skill researches the codebase first, only asks about gaps, and offers wiki sync. They chain to each other so you can set up all four in one session.
 
@@ -78,7 +78,7 @@ Each skill researches the codebase first, only asks about gaps, and offers wiki 
 
 | Skill           | Trigger            | Purpose                                                       |
 | --------------- | ------------------ | ------------------------------------------------------------- |
-| `/wtf:reflect`  | "let's reflect"    | Capture session learnings and route them into steering docs   |
+| `wtf.reflect`  | "let's reflect"    | Capture session learnings and route them into steering docs   |
 
 Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) under a "Hard-Won Lessons" section.
 
@@ -86,7 +86,7 @@ Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) u
 
 | Skill           | Trigger                    | Purpose                                                                 |
 | --------------- | -------------------------- | ----------------------------------------------------------------------- |
-| `/wtf:refine`   | "refine task #42"          | Update an existing Epic/Feature/Task from new insights with audit trail |
+| `wtf.refine`   | "refine task #42"          | Update an existing Epic/Feature/Task from new insights with audit trail |
 
 Merges insights from conversation, GitHub comments, and referenced docs; re-validates only affected sections; shows a section-by-section diff before applying updates; and offers cascade refinement for impacted child issues.
 
@@ -102,7 +102,7 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │     VISION.md          TECH.md          DESIGN.md          QA.md             │
 │   (product/DDD)      (arch/ADRs)      (tokens/a11y)     (test strat)         │
 │                                                                              │
-│                          /wtf:reflect                                        │
+│                          wtf.reflect                                        │
 │                    routes learnings back in ↺                                │
 │                                                                              │
 └──────────────────────────────────┬───────────────────────────────────────────┘
@@ -113,24 +113,24 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                                                                              │    │                                 │
 │                            PLANNING SPINE                                    │    │   New insights /                │
 │                                                                              │    │   feedback / comments           │
-│    /wtf:write-epic  ◄───────────────────────────────────────────────────────────┐ │            │                    │
+│    wtf.write-epic  ◄───────────────────────────────────────────────────────────┐ │            │                    │
 │         │                                                                    │  │ │            ▼                    │
 │         │    creates GitHub Epic issue                                       │  │ │                                 │
-│         │                                                                    │  │ │       /wtf:refine               │
-│         ├────→  /wtf:epic-to-features   (bulk)                               │  │ │                                 │
+│         │                                                                    │  │ │       wtf.refine               │
+│         ├────→  wtf.epic-to-features   (bulk)                               │  │ │                                 │
 │         │                                                                    │  │ │       updates changed           │
 │         ▼                                                                    │  │ │       sections only,            │
 │                                                                              │  │ │       posts audit trail,        │
-│    /wtf:write-feature  ◄────────────────────────────────────────────────────────┤ │       cascades to               │
+│    wtf.write-feature  ◄────────────────────────────────────────────────────────┤ │       cascades to               │
 │         │                                                                    │  │ │       affected children         │
 │         │    creates GitHub Feature issue                                    │  │ │                                 │
 │         │    → derives user stories + Acceptance Criteria                    │  │ │            │                    │
 │         │                                                                    │  │ └────────────┤────────────────────┘
-│         ├────→  /wtf:feature-to-tasks   (bulk)                               │  │              │
+│         ├────→  wtf.feature-to-tasks   (bulk)                               │  │              │
 │         │                                                                    │  └──────────────┤
 │         ▼                                                                    │                 │
 │                                                                              │                 │  updates
-│    /wtf:write-task  ◄──────────────────────────────────────────────────────────────────────────┘
+│    wtf.write-task  ◄──────────────────────────────────────────────────────────────────────────┘
 │         │                                                                    │
 │         │    creates GitHub Task issue                                       │
 │         │    → generates Gherkin from Feature ACs                            │
@@ -145,12 +145,12 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                                                                              │
 │               PARALLEL DISCIPLINE PICKUP  (single Task)                      │
 │                                                                              │
-│    /wtf:design-task        /wtf:implement-task        /wtf:verify-task       │
+│    wtf.design-task        wtf.implement-task        wtf.verify-task       │
 │    Design Reference        Tech approach + TDD        Scenario verdict       │
 │                                   │                         │                │
 │                                   ▼                         ▼                │
 │                                                                              │
-│                             /wtf:create-pr          /wtf:report-bug          │
+│                             wtf.create-pr          wtf.report-bug          │
 │                             PR from full            links failing            │
 │                             hierarchy context       scenario → Task          │
 │                                                                              │
@@ -159,7 +159,7 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 
 DDD runs through everything — all issues use domain language, `ddd-writing-rules.md` is enforced at every write step, and actors are always named domain roles (never "user" or "admin"). The Task issue is the single source of truth: Designer, Developer, and QA each append their own section to it in sequence.
 
-Each skill offers to chain to the next step automatically. When requirements evolve after creation, use `/wtf:refine` to keep hierarchy specs aligned without rewriting unchanged sections.
+Each skill offers to chain to the next step automatically. When requirements evolve after creation, use `wtf.refine` to keep hierarchy specs aligned without rewriting unchanged sections.
 
 ## Prerequisites
 
@@ -187,7 +187,7 @@ npx skills add https://github.com/xiduzo/wtf
 Get started by opening claude and run
 
 ```bash
-/wtf:setup
+wtf.setup
 ```
 
 ### Keeping up to date
@@ -202,43 +202,43 @@ npx skills update
 
 ```
 "write an epic for user authentication"
-→ /wtf:write-epic
+→ wtf.write-epic
 
 "break down this epic"
-→ /wtf:epic-to-features  (proposes all Features, creates them one by one)
+→ wtf.epic-to-features  (proposes all Features, creates them one by one)
 
 "plan all tasks for feature #12"
-→ /wtf:feature-to-tasks   (proposes all Tasks, creates them one by one)
+→ wtf.feature-to-tasks   (proposes all Tasks, creates them one by one)
 
 "design task #42"
-→ /wtf:design-task         (designer adds Figma frames + component spec)
+→ wtf.design-task         (designer adds Figma frames + component spec)
 
 "implement task #42"
-→ /wtf:implement-task      (developer plans + codes TDD against Gherkin)
+→ wtf.implement-task      (developer plans + codes TDD against Gherkin)
 
 "verify task #42"
-→ /wtf:verify-task         (QA walks scenarios + posts verdict)
+→ wtf.verify-task         (QA walks scenarios + posts verdict)
 
 "refine task #42 with latest stakeholder comments"
-→ /wtf:refine              (updates changed sections only, posts refinement audit trail)
+→ wtf.refine              (updates changed sections only, posts refinement audit trail)
 
 "create a PR"
-→ /wtf:create-pr           (PR description from full spec hierarchy)
+→ wtf.create-pr           (PR description from full spec hierarchy)
 
 "report a bug"
-→ /wtf:report-bug          (structured bug from failing Gherkin scenario)
+→ wtf.report-bug          (structured bug from failing Gherkin scenario)
 
 "let's reflect"
-→ /wtf:reflect             (capture learnings into steering docs)
+→ wtf.reflect             (capture learnings into steering docs)
 ```
 
 ### Steering setup
 
 ```
-"create the vision doc"    → /wtf:steer-vision
-"create the tech doc"      → /wtf:steer-tech
-"create the design doc"    → /wtf:steer-design
-"create the QA doc"        → /wtf:steer-qa
+"create the vision doc"    → wtf.steer-vision
+"create the tech doc"      → wtf.steer-tech
+"create the design doc"    → wtf.steer-design
+"create the QA doc"        → wtf.steer-qa
 ```
 
 ## Issue Templates
