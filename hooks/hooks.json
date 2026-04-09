@@ -1,0 +1,27 @@
+{
+  "description": "WTF intervention tracker — counts user corrections and prompts /wtf:reflect when they accumulate",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-interventions.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-interventions.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
