@@ -106,15 +106,9 @@ Use the issue body structure from @.github/ISSUE_TEMPLATE/EPIC.md (ignore the YA
 - **Success Metrics:** Phrase as business-observable outcomes ("Merchants can view settlement status within 2 minutes of payment"), not system metrics ("API latency < 200ms").
 - **Risks:** Frame risks in domain terms ("Dispute resolution rules differ by jurisdiction") before listing technical risks.
 
-### 7. Review with user
+### 7. Scope gate
 
-Show the draft. Then call `AskUserQuestion` with `question: "Does this look right?"`, `header: "Review"`, and `options: [{label: "Looks good — create the issue", description: "Proceed with issue creation"}, {label: "I have changes", description: "I want to adjust something first"}]`.
-
-Apply edits, then proceed immediately.
-
-### 8. Scope gate
-
-This is a final structural guardrail that operates on the **written draft** — distinct from step 5, which checked intent before drafting. Even if step 5 passed, run this check: drafting sometimes reveals bundled objectives that were not visible in the abstract. Frame this to the user as a structural check, not a reversal of their approval: "Before I create this, I want to flag one structural concern."
+This is a final structural guardrail that operates on the **written draft** — distinct from step 5, which checked intent before drafting. It runs before user review so any structural issues are caught while they are cheapest to fix. Even if step 5 passed, run this check: drafting sometimes reveals bundled objectives that were not visible in the abstract.
 
 Look for these **Epic-level split signals** (heuristics — use judgement, not rigid thresholds):
 
@@ -135,9 +129,15 @@ If **one or more signals fire**, present your case: state which signals you foun
   2. `{label: "Split it", description: "Start over with one of the proposed smaller Epics"}`
   3. `{label: "Stop here", description: "Exit without creating — I'll revisit the scope separately"}`
 
-- **Keep the original draft** → proceed to creation without further comment.
+- **Keep the original draft** → proceed to user review (step 8) without further comment.
 - **Split it** → return to step 3 with the chosen focused Epic as the seed. Carry forward all research and codebase findings already gathered — only re-ask stakeholder questions that the narrowed scope makes ambiguous. Note the remaining proposed sub-epics to the user as follow-on work.
 - **Stop here** → exit.
+
+### 8. Review with user
+
+Show the draft. Then call `AskUserQuestion` with `question: "Does this look right?"`, `header: "Review"`, and `options: [{label: "Looks good — create the issue", description: "Proceed with issue creation"}, {label: "I have changes", description: "I want to adjust something first"}]`.
+
+Apply edits, then proceed immediately.
 
 ### 9. Create the issue
 

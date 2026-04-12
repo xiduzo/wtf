@@ -82,14 +82,14 @@ gh issue view <epic_number>    # Goal, context, constraints
 
 ### 5. Inspect the diff
 
-Collect the branch diff against `main`:
+Determine the base branch using the same logic as step 8 (task/* → parent feature branch; feature/* → main), then collect the branch diff against that base:
 
 ```bash
-git log main..HEAD --oneline
-git diff main...HEAD --stat
+git log <base_branch>..HEAD --oneline
+git diff <base_branch>...HEAD --stat
 ```
 
-Use this to understand the scope of the change: which files changed, how many commits, what the commit messages say. Do not read full file diffs; use `--stat` output only unless a specific commit message is ambiguous and cannot be resolved without the diff.
+This avoids including unrelated merged commits when the branch has a long history against main. Use `--stat` output only unless a specific commit message is ambiguous and cannot be resolved without the diff.
 
 ### 6. Draft the PR
 
@@ -108,7 +108,11 @@ Use this to understand the scope of the change: which files changed, how many co
 - **Summary**: derived from the Task's Intent + Functional Description (or commit messages if no Task). Explain the _why_.
 - **Changes**: grouped logical summary of `git diff --stat` output — not a file list.
 - **Test plan**: if a Task exists, derive checklist items from the Gherkin scenario names. If no Task, derive from changed files and commit messages. At minimum one item per observable behavior changed.
-- **Related**: `Closes #<task_number>` if a Task exists; omit section if no linked issue.
+- **Related**: one `Closes #<n>` line per closed issue — never comma-separated. If a Task exists, include `Closes #<task_number>`. If the PR also closes the parent Feature (all sibling tasks already merged), add `Closes #<feature_number>` on its own line. Example:
+  ```
+  Closes #42
+  Closes #15
+  ```
 
 ### 7. Review with user
 
@@ -118,9 +122,22 @@ Apply edits, then proceed.
 
 ### 8. Create the PR
 
-Write the body to a temp file, then create the PR targeting `main`:
+Determine the base branch from the current branch name:
+
+- `task/*` branch → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
+- `feature/*` branch → target `main`
+- Other → call `AskUserQuestion` with `question: "What branch should this PR target?"`, `header: "Base branch"`, options derived from `git branch -r`.
+
+Write the body to a temp file, then create the PR:
 
 ```bash
+# task branch:
+gh pr create \
+  --title "<title>" \
+  --body-file /tmp/pr-body.md \
+  --base feature/<feature-number>-<feature-slug>
+
+# feature branch:
 gh pr create \
   --title "<title>" \
   --body-file /tmp/pr-body.md \

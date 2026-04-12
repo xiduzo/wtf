@@ -13,9 +13,7 @@ See `references/vision-template.md` for the expected document shape.
 
 ### 1. Check if the document already exists
 
-```bash
-cat docs/steering/VISION.md 2>/dev/null
-```
+Use the Read tool to attempt reading `docs/steering/VISION.md`.
 
 If the file **exists**, call `AskUserQuestion` with:
 

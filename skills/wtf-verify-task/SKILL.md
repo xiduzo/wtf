@@ -17,9 +17,17 @@ Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). S
 
 Skip this step if invoked from `implement-task` or another skill that already ran gh-setup this session.
 
-### 1. Identify the Task
+### 1. Identify the verification scope
 
-Search for recent open issues with labels `task` or `implemented` to populate options. Call `AskUserQuestion` with `question: "Which Task are you testing?"`, `header: "Task"`, and `options` pre-filled with 1–2 likely open Task issue references inferred from GitHub search (e.g. recent open issues labeled `task` or `implemented`).
+Call `AskUserQuestion` with:
+
+- `question`: "Are you verifying a single Task or a full Feature?"
+- `header`: "Scope"
+- `options`: `[{label: "Single Task", description: "Verify one Task's Gherkin scenarios"}, {label: "Full Feature", description: "Verify all Tasks under a Feature using its sub-issues"}]`
+
+**If Single Task:**
+
+Search for recent open issues with labels `task` or `implemented` to populate options. Call `AskUserQuestion` with `question: "Which Task are you testing?"`, `header: "Task"`, and `options` pre-filled with 1–2 likely open Task issue references.
 
 Fetch the Task first, extract the Feature number from its Context section, then fetch the Feature:
 
@@ -29,24 +37,32 @@ gh issue view <task_number>    # Gherkin, Contracts, Edge Cases, Test Mapping, D
 gh issue view <feature_number> # ACs, edge cases for additional probe scenarios
 ```
 
-Check the task labels. If the `implemented` label is **absent**, warn the user that the task doesn't have an `implemented` label yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task**. Then call `AskUserQuestion` with:
+Check task labels. If `implemented` is **absent**, warn and call `AskUserQuestion` with:
 
 - `question`: "This task hasn't been implemented yet. How would you like to proceed?"
 - `header`: "Implement first?"
-- `options`: `[{label: "Implement first", description: "Go back and run `implement-task` (default)"}, {label: "Verify anyway", description: "Skip and proceed with verification"}]`
+- `options`: `[{label: "Implement first", description: "Go back and run wtf:implement-task (default)"}, {label: "Verify anyway", description: "Skip and proceed with verification"}]`
 
-- **Implement first** → follow the `implement-task` process, passing the Task number in as context.
+- **Implement first** → follow the `wtf:implement-task` process, passing the Task number in as context.
 - **Verify anyway** → proceed.
+
+**If Full Feature:**
+
+Call `AskUserQuestion` with `question: "Which Feature are you verifying?"`, `header: "Feature"`, and `options` pre-filled from open feature issues.
+
+Fetch all sub-issues of the Feature using the extension:
+
+```bash
+gh sub-issue list <feature_number>
+```
+
+This returns the authoritative list of Tasks — do not search by label or title matching. Walk through each Task's verification in order, running steps 3–9 for each one. Track a feature-level summary (total tasks, pass/fail/blocked counts) and present it at the end.
 
 ### 2. Load the QA steering document
 
-Check whether `docs/steering/QA.md` exists:
+Use the Read tool to attempt reading `docs/steering/QA.md`.
 
-```bash
-cat docs/steering/QA.md 2>/dev/null
-```
-
-If the file **exists**: read it and keep it in context. Use its test strategy, coverage thresholds, definition of done, and known flaky areas to inform every verification decision in this session. Do not surface it to the user — just apply it silently.
+If the file **exists**: keep its content in context. Use its test strategy, coverage thresholds, definition of done, and known flaky areas to inform every verification decision in this session. Do not surface it to the user — just apply it silently.
 
 If the file **does not exist**, call `AskUserQuestion` with:
 
@@ -129,13 +145,13 @@ For each item in the Observability section (logs, metrics, alerts), one at a tim
 The Test Mapping table has been updated after each scenario (step 4). Now do a final update: check off DoD items that passed; leave failing ones unchecked.
 
 ```bash
-gh issue view <task_number> --json body -q .body > /tmp/updated-task-body.md
+gh issue view <task_number> --json body -q .body > /tmp/verify-final-body.md
 ```
 
-Programmatically update the DoD checklist in `/tmp/updated-task-body.md` using the Write or Edit tool. Then push:
+Programmatically update the DoD checklist in `/tmp/verify-final-body.md` using the Write or Edit tool. Then push:
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/updated-task-body.md
+gh issue edit <task_number> --body-file /tmp/verify-final-body.md
 ```
 
 Post a QA summary comment:
@@ -165,19 +181,14 @@ If the verdict is ✅ or ⚠️, call `AskUserQuestion` with:
 
 - `question`: "Task verified. What would you like to do next?"
 - `header`: "Next step"
-- `options`: `[{label: "Open PR now", description: "Create a pull request for this branch (recommended next step)"}, {label: "Close this Task", description: "Mark the Task issue closed and check if Feature and Epic can be closed too"}, {label: "Skip for now", description: "Exit — I'll open the PR later"}]`
+- `options`: `[{label: "Open PR now", description: "Create a pull request — the task closes automatically when the PR is merged (recommended)"}, {label: "Skip for now", description: "Exit — I'll open the PR later"}]`
 
-- **Open PR now** → follow the `create-pr` process, passing the Task number in as context.
-- **Close this Task** →
-  ```bash
-  gh issue close <task_number>
-  ```
-  Then check if all Tasks under the parent Feature are now closed:
-  ```bash
-  gh sub-issue list <feature_number> --state open
-  ```
-  If **no open Tasks remain**, call `AskUserQuestion` with `question: "All Tasks for Feature #<feature_number> are complete. Close the Feature issue too?"`, `header: "Close Feature?"`, and `options: [{label: "Yes — close it", description: "Mark Feature #<feature_number> as closed"}, {label: "No — leave it open", description: "Keep the Feature open"}]`. If yes: `gh issue close <feature_number>`. Then check the Epic the same way — if all Features under the Epic are closed, offer to close the Epic issue too.
+- **Open PR now** → follow the `wtf:create-pr` process, passing the Task number in as context. The Task (and Feature / Epic) will be closed automatically when the PR with `Closes #<task_number>` is merged — do not close issues directly.
 - **Skip for now** → continue.
+
+> **Closing policy:** Issues are only "closed as completed" via a merged PR that contains `Closes #<n>`. Never call `gh issue close <n>` for completed work. Direct closes are reserved for:
+> - `gh issue close <n> --reason "not planned"` — won't implement
+> - `gh issue close <n> --reason "duplicate"` — duplicate of another issue
 
 ### 9. Offer bug reports for remaining failures
 

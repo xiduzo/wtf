@@ -50,13 +50,9 @@ If the `designed` label is **absent**, continue silently.
 
 ### 3. Load the design steering document
 
-Check whether `docs/steering/DESIGN.md` exists:
+Use the Read tool to attempt reading `docs/steering/DESIGN.md`.
 
-```bash
-cat docs/steering/DESIGN.md 2>/dev/null
-```
-
-If the file **exists**: read it and keep it in context. Use its design principles, tokens, component patterns, and accessibility standards to inform every decision in this session. Do not surface it to the user — just apply it silently.
+If the file **exists**: keep its content in context. Use its design principles, tokens, component patterns, and accessibility standards to inform every decision in this session. Do not surface it to the user — just apply it silently.
 
 If the file **does not exist**, call `AskUserQuestion` with:
 

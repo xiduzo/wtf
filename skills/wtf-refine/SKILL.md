@@ -61,7 +61,7 @@ Extract comments posted after the issue body was last edited:
 
 ```bash
 gh issue view <issue_number> --json comments,updatedAt \
-  --jq '[.comments[] | select(.createdAt > .updatedAt)] | .[] | "[\(.author.login)] \(.body)"'
+  --jq '.updatedAt as $bodyUpdatedAt | .comments[] | select(.createdAt > $bodyUpdatedAt) | "[\(.author.login)] \(.body)"'
 ```
 
 Read each comment and extract actionable insights — discard discussion noise ("+1", "agreed", "thanks"). Synthesise into concrete change signals (e.g. "Stakeholder comment: settlement must support multi-currency").

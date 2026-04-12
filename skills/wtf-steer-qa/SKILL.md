@@ -13,9 +13,7 @@ See `references/qa-template.md` for the expected document shape.
 
 ### 1. Check if the document already exists
 
-```bash
-cat docs/steering/QA.md 2>/dev/null
-```
+Use the Read tool to attempt reading `docs/steering/QA.md`.
 
 If the file **exists**, call `AskUserQuestion` with:
 

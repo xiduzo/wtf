@@ -33,6 +33,14 @@ Break down an entire level of the hierarchy at once, walking through each item w
 
 Both skills propose the full list upfront, then walk through creating each item one by one with pause/skip/add controls.
 
+### Autonomous execution
+
+| Skill         | Trigger                         | Purpose                                                  |
+| ------------- | ------------------------------- | -------------------------------------------------------- |
+| `wtf.loop`   | "go", "start building", "build it all" | Chain implement → verify → PR for every Task in dependency order |
+
+Requires a fully-specified Epic/Feature/Task tree. Builds a dependency graph, topologically sorts tasks into execution phases, runs pre-flight checks (spec completeness, contradictions, codebase mismatches, circular deps), and chains `wtf.implement-task → wtf.verify-task → wtf.create-pr` for each task — pausing only when a human decision is actually needed. Supports resuming a previous run (skips tasks already labeled `implemented` or `verified`). Ends by opening a feature → main PR once all task PRs are merged.
+
 ### Discipline pickup
 
 Once a task exists, any discipline can pick it up independently:
@@ -44,6 +52,8 @@ Once a task exists, any discipline can pick it up independently:
 | `wtf.verify-task`    | "verify task #42"    | QA walks Gherkin scenarios and records pass/fail verdict    |
 
 All three write their output back into the Task issue — it stays the single source of truth.
+
+`wtf.implement-task` runs the TDD cycle scenario-by-scenario. Lint and type-checking run once after all scenarios are green (not per-commit), which keeps things fast on large codebases.
 
 ### Shipping
 
@@ -139,11 +149,18 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 └─────────┼────────────────────────────────────────────────────────────────────┘
           │
           │
-          │  excecuted by
+          │  executed by
           ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
-│               PARALLEL DISCIPLINE PICKUP  (single Task)                      │
+│                  AUTONOMOUS EXECUTION  (wtf.loop)                            │
+│                                                                              │
+│  builds dependency graph → topological sort → pre-flight checks              │
+│  chains: implement-task → verify-task → create-pr  (per task, in order)      │
+│  resumes from last completed task if interrupted                             │
+│  ends with: feature → main PR                                                │
+│                                                                              │
+│          OR  run each step manually via DISCIPLINE PICKUP:                   │
 │                                                                              │
 │     wtf.design-task         wtf.implement-task        wtf.verify-task        │
 │    Design Reference        Tech approach + TDD        Scenario verdict       │
@@ -168,8 +185,9 @@ Each skill offers to chain to the next step automatically. When requirements evo
 | [Claude Code](https://claude.ai/code) | All skills | Skills run inside Claude Code |
 | [GitHub CLI (`gh`)](https://cli.github.com) | All skills except steering/reflect | Must be installed and authenticated (`gh auth login`) |
 | [`yahsan2/gh-sub-issue`](https://github.com/yahsan2/gh-sub-issue) | write-task, epic-to-features, feature-to-tasks | Epic → Feature → Task sub-issue hierarchy; auto-installed by gh-setup |
-| [`xiduzo/gh-issue-dependency`](https://github.com/xiduzo/gh-issue-dependency) | write-task, feature-to-tasks | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
-| GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine | Project must be hosted on GitHub |
+| [`xiduzo/gh-issue-dependency`](https://github.com/xiduzo/gh-issue-dependency) | write-task, feature-to-tasks, loop | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
+| [`MeroFuruya/gh-dep`](https://github.com/MeroFuruya/gh-dep) | loop | Dependency graph for topological sort; installed by loop on first run |
+| GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine, loop | Project must be hosted on GitHub |
 | [Figma](https://figma.com) account | `design-task` (optional) | Only needed when linking Figma frames; skill can scaffold without it |
 
 The two `gh` extensions are checked and installed automatically the first time any issue-creating skill runs. You don't need to install them manually.
@@ -213,17 +231,22 @@ npx skills update
 "design task #42"
 → wtf.design-task         (designer adds Figma frames + component spec)
 
+# Option A: autonomous
+"go" / "build it all" / "start the loop"
+→ wtf.loop                (chains implement → verify → PR for every task in dependency order)
+
+# Option B: manual, per discipline
 "implement task #42"
 → wtf.implement-task      (developer plans + codes TDD against Gherkin)
 
 "verify task #42"
 → wtf.verify-task         (QA walks scenarios + posts verdict)
 
-"refine task #42 with latest stakeholder comments"
-→ wtf.refine              (updates changed sections only, posts refinement audit trail)
-
 "create a PR"
 → wtf.create-pr           (PR description from full spec hierarchy)
+
+"refine task #42 with latest stakeholder comments"
+→ wtf.refine              (updates changed sections only, posts refinement audit trail)
 
 "report a bug"
 → wtf.report-bug          (structured bug from failing Gherkin scenario)

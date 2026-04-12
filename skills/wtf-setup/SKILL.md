@@ -82,11 +82,11 @@ For each missing file, copy it from this skill's bundled references:
 mkdir -p .github/ISSUE_TEMPLATE
 
 # Copy each missing template from the skill's references folder.
-# The references folder is at: skills/setup/references/
-cp skills/setup/references/BUG.md .github/ISSUE_TEMPLATE/BUG.md
-cp skills/setup/references/EPIC.md .github/ISSUE_TEMPLATE/EPIC.md
-cp skills/setup/references/FEATURE.md .github/ISSUE_TEMPLATE/FEATURE.md
-cp skills/setup/references/TASK.md .github/ISSUE_TEMPLATE/TASK.md
+# The references folder is at: skills/wtf-setup/references/
+cp skills/wtf-setup/references/BUG.md .github/ISSUE_TEMPLATE/BUG.md
+cp skills/wtf-setup/references/EPIC.md .github/ISSUE_TEMPLATE/EPIC.md
+cp skills/wtf-setup/references/FEATURE.md .github/ISSUE_TEMPLATE/FEATURE.md
+cp skills/wtf-setup/references/TASK.md .github/ISSUE_TEMPLATE/TASK.md
 ```
 
 Only copy files that are missing — do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
@@ -102,7 +102,7 @@ ls .github/pull_request_template.md 2>/dev/null
 If missing, copy it from the skill's bundled references:
 
 ```bash
-cp skills/setup/references/pull_request_template.md .github/pull_request_template.md
+cp skills/wtf-setup/references/pull_request_template.md .github/pull_request_template.md
 ```
 
 Do not overwrite if it already exists.
@@ -122,6 +122,8 @@ gh label create verified    --color 006b75 --description "QA verified — ready 
 ```
 
 If any label creation fails (e.g. insufficient permissions), warn the user — note that the affected skills will fall back to creating labels on first use.
+
+> **Closing convention:** GitHub has no native setting to require PR-based closure, so this is enforced by skill behavior. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (won't implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
 ### 8. Report status
 

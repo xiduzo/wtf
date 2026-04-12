@@ -13,9 +13,7 @@ See `references/design-template.md` for the expected document shape.
 
 ### 1. Check if the document already exists
 
-```bash
-cat docs/steering/DESIGN.md 2>/dev/null
-```
+Use the Read tool to attempt reading `docs/steering/DESIGN.md`.
 
 If the file **exists**, call `AskUserQuestion` with:
 
