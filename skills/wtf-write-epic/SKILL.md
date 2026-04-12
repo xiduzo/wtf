@@ -27,10 +27,12 @@ Run in parallel using the Agent tool and GitHub issue search:
 
 **Codebase exploration:**
 
-- Existing systems or features this initiative builds on or replaces
-- Current architecture constraints and integration points
-- Patterns, conventions, or prior attempts relevant to the initiative
-- Any existing domain glossary, ubiquitous language docs, or domain expert documentation (README, ADRs, wiki files)
+Use the Agent tool with these concrete searches (run in parallel):
+
+- `Glob('**/{README,readme}.md')` + `Glob('docs/**/*.md')` + `Glob('**/*.{adr,ADR}.md')` — for existing product descriptions, ADRs, and architectural notes
+- `Glob('src/**', 'lib/**', 'packages/**')` — to understand the module structure and which systems exist
+- `Grep` for the initiative's key domain nouns across `*.{ts,tsx,js,jsx,py,go,rb,java,cs}` files — to find existing implementations, prior attempts, or integration points
+- `Glob('**/{GLOSSARY,glossary,ubiquitous-language,domain}.md')` + `Glob('.github/**/*.md')` — for any existing domain glossary, ubiquitous language docs, or prior DDD artefacts
 
 **Wiki / glossary fetch:**
 Fetch relevant GitHub wiki pages or in-repo glossary docs. Search for pages matching the initiative's domain area. Use these to:
@@ -149,7 +151,7 @@ Apply edits, then proceed immediately.
 # Ensure the label exists before creating the issue
 gh label create epic --color 5319e7 --description "Strategic initiative spanning multiple features" 2>/dev/null || true
 
-gh issue create --title "🎯 Epic: <title>" --body-file /tmp/epic-body.md --label "epic"
+gh issue create --title "🎯 Epic: <title>" --body-file /tmp/wtf-epic-body.md --label "epic"
 ```
 
 Print the issue URL and number.

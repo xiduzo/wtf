@@ -65,12 +65,12 @@ If the file **does not exist**, call `AskUserQuestion` with:
 
 ### 4. Explore the design system
 
-Use the Agent tool to search the codebase for:
+Use the Agent tool with these concrete searches (run in parallel):
 
-- Existing UI components relevant to this task
-- Design tokens (colors, spacing, typography) in use
-- Patterns from similar screens or flows
-- Any existing Figma references linked in related issues
+- `Glob('src/components/**/*', 'src/**/components/**/*', 'components/**/*')` — existing UI components; note file names that match domain objects or UI states in the Task
+- `Glob('**/{tokens,theme,variables,design-tokens}.{css,scss,ts,js,json}')` + `Grep` for CSS custom property declarations (`--`) or Tailwind config keys — design tokens in use (colors, spacing, typography)
+- `Glob('src/**/*.{stories,story}.{ts,tsx,js,jsx,mdx}')` — Storybook stories as pattern references for similar screens or flows
+- `Grep` for `figma.com` URLs across all `.md`, `.mdx`, and issue body files in the repo — existing Figma references linked in related issues or docs
 
 ### 5. Identify UI states from Gherkin
 
@@ -110,7 +110,7 @@ Apply edits, then proceed.
 > Note: read the current issue body first (`gh issue view <task_number>`), replace only the Design Reference section with the new content, and preserve all other sections unchanged. Write the full updated body to a temp file and use `--body-file`.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/updated-task-body.md
+gh issue edit <task_number> --body-file /tmp/wtf-design-task-body.md
 ```
 
 Add the `designed` lifecycle label to mark this step complete:

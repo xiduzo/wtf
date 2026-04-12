@@ -247,27 +247,72 @@ Follow the `wtf:implement-task` process for the Task, passing the Task number in
 
 **c. Verify**
 
-Follow the `wtf:verify-task` process (single-task mode), passing the Task number in as context. If verification fails:
+Follow the `wtf:verify-task` process (single-task mode), passing the Task number in as context.
+
+Before verifying, classify each Gherkin scenario in the Task:
+
+- **Test-suite covered** — a test file exists that exercises this scenario (e.g. a `describe`/`it` block, a Cucumber step, a `test_*` function). Verification is the test run result. If the suite passes, the scenario is verified — continue automatically.
+- **Not covered** — no automated test maps to this scenario. Requires a human-in-the-loop check (manual steps, UI walkthrough, or explicit sign-off).
+
+If **all** scenarios are test-suite covered and the suite passes → proceed to step 4d automatically.
+
+If **any** scenario is not covered by the test suite → pause and present only those uncovered scenarios for human verification. Do not re-verify covered scenarios.
+
+If a covered scenario's tests **fail**:
 
 Call `AskUserQuestion` with:
 
-- `question`: "Task #<n> verification failed. How do you want to proceed?"
-- `header`: "Verify failed"
+- `question`: "Task #<n> — [n] test(s) failed. How do you want to proceed?"
+- `header`: "Tests failed"
 - `options`:
   - `{label: "Fix and re-verify", description: "Pause the loop — fix the implementation, then re-run from this task"}`
   - `{label: "Skip and continue", description: "Skip this task for now and proceed to the next"}`
   - `{label: "Stop loop", description: "Exit the loop entirely"}`
 
-**d. Open PR**
+**d. Open PR and wait for pipeline**
 
-Follow the `wtf:create-pr` process, passing the Task number and branch in as context. The PR targets the parent feature branch. Closing happens via `Closes #<task_number>` in the PR body — do not call `gh issue close` directly.
+Follow the `wtf:create-pr` process, passing the Task number and branch in as context. The PR targets the parent feature branch. Closing happens via `Closes #<task_number>` in the PR body — do not call `gh issue close` directly. Run non-interactively — no confirmation, title review, or body approval.
+
+After the PR is opened, poll its pipeline until all status checks complete:
+
+```bash
+gh pr checks <pr_number> --watch
+```
+
+This blocks until every check finishes. Once complete, inspect the result:
+
+```bash
+gh pr checks <pr_number> --json name,state,conclusion \
+  --jq '.[] | "\(.state) \(.conclusion) \(.name)"'
+```
+
+**If all checks pass** (`conclusion: SUCCESS` or `conclusion: SKIPPED` for every check) → merge automatically:
+
+```bash
+gh pr merge <pr_number> --merge --delete-branch
+```
+
+Then continue to the next task.
+
+**If any check fails** (`conclusion: FAILURE` or `conclusion: ACTION_REQUIRED`):
+
+Call `AskUserQuestion` with:
+
+- `question`: "Task #<n> PR pipeline failed — [list failing check names]. How do you want to proceed?"
+- `header`: "Pipeline failed"
+- `options`:
+  - `{label: "Fix and re-run", description: "Pause the loop — push a fix, then re-run the pipeline"}`
+  - `{label: "Skip this task", description: "Leave the PR open and continue with remaining tasks"}`
+  - `{label: "Stop loop", description: "Exit the loop entirely"}`
+
+**If the pipeline times out or returns no checks** (repo has no CI configured) → merge automatically, as there is nothing to wait on.
 
 **e. Progress update**
 
-After each Task's PR is opened, print:
+After each Task's PR is merged, print:
 
 ```
-✅ Task #<n> — <title> — PR: <url>
+✅ Task #<n> — <title> — merged: <url>
    [n remaining]
 ```
 
@@ -284,6 +329,8 @@ gh sub-issue list <feature_number>
 # Should be empty (all task issues closed via merged PRs)
 ```
 
+If both checks show all work is complete (no open sub-issues, all task PRs merged), open the feature PR automatically — no confirmation needed.
+
 If either check shows pending work, list the outstanding tasks and call `AskUserQuestion` with:
 
 - `question`: "Not all task PRs are merged yet. Open the feature PR anyway?"
@@ -292,7 +339,9 @@ If either check shows pending work, list the outstanding tasks and call `AskUser
   - `{label: "Wait — I'll merge them first", description: "Pause here"}`
   - `{label: "Open it now", description: "Open feature → main PR with unmerged tasks noted in description"}`
 
-Open the feature PR using `wtf:create-pr` targeting `main`. The body must include `Closes #<feature_number>` and one `Closes #<task_number>` per task on separate lines.
+Open the feature PR using `wtf:create-pr` targeting `main`, running non-interactively. The body must include `Closes #<feature_number>` and one `Closes #<task_number>` per task on separate lines.
+
+After opening, poll and merge using the same pipeline pattern as step 4d — wait for all checks, auto-merge on green, gate on red.
 
 ### 6. Summary
 
@@ -303,8 +352,8 @@ Loop complete — Feature #<n>: <title>
 ─────────────────────────────────────
 Tasks completed:  [n]
 Tasks skipped:    [n]
-PRs opened:       [list of URLs]
-Feature PR:       <url>
+PRs merged:       [list of URLs]
+Feature PR:       <url> (merged / open — pipeline pending)
 ```
 
 If any Tasks were skipped, list them with reasons and suggest follow-up actions.
@@ -322,5 +371,7 @@ The loop pauses and asks for human input only when:
 | Circular dependency (internal) | Hard stop — cannot resolve automatically |
 | External blocker not yet merged/closed | Loop cannot start until upstream work is done |
 | Internal blocker skipped or unmerged mid-run | Ordering constraint within the current run |
-| Verify failed | Implementation may need rework |
-| All-tasks merged check before feature PR | Human confirms merge sequence |
+| Gherkin scenario not covered by test suite | No automated signal — human must verify manually |
+| Covered test(s) fail | Implementation may need rework |
+| PR pipeline check(s) fail | CI signal is authoritative — human must decide whether to fix or skip |
+| Pending task PRs before feature PR | Some tasks not yet merged — human decides whether to wait or open early |

@@ -1,6 +1,6 @@
 ---
 name: wtf.reflect
-description: This skill should be used when a developer wants to capture learnings from a difficult session, record what Claude got wrong, save implementation gotchas, or update the steering docs with hard-won knowledge — for example "let's reflect", "capture what we learned", "that was painful, save this", "update the steering docs with what went wrong", or when prompted by the intervention tracker after multiple corrections. Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) under a "Hard-Won Lessons" section.
+description: This skill should be used when a developer wants to capture learnings from a difficult session, record what Claude got wrong, save implementation gotchas, or update the steering docs with hard-won knowledge — for example "let's reflect", "capture what we learned", "that was painful, save this", "update the steering docs with what went wrong", "I need to debrief", "what went wrong today", "log this lesson", "save this gotcha", "document this mistake", "I want to write this down before I forget", "add this to the steering docs", or when prompted by the intervention tracker after multiple corrections. Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) under a "Hard-Won Lessons" section.
 ---
 
 # WTF Reflect

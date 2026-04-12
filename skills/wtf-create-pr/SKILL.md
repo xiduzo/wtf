@@ -134,13 +134,13 @@ Write the body to a temp file, then create the PR:
 # task branch:
 gh pr create \
   --title "<title>" \
-  --body-file /tmp/pr-body.md \
+  --body-file /tmp/wtf-create-pr-body.md \
   --base feature/<feature-number>-<feature-slug>
 
 # feature branch:
 gh pr create \
   --title "<title>" \
-  --body-file /tmp/pr-body.md \
+  --body-file /tmp/wtf-create-pr-body.md \
   --base main
 ```
 

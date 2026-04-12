@@ -114,13 +114,13 @@ Before exploring, identify the test framework setup by reading a sample of exist
 | Run command       | (e.g. `npm test`, `pytest`)                    |
 | Coverage command  | (e.g. `npm run coverage`, `pytest --cov`)      |
 
-Use the Agent tool to search the codebase for:
+Use the Agent tool with these concrete searches (run in parallel):
 
-- Files and modules this task will touch
-- Existing patterns at the integration point
-- Current interfaces that match the contracts defined in the Task
-- Existing tests covering adjacent behavior
-- Dependencies that must exist first
+- `Grep` for the domain nouns and verbs from the Task's Functional Description across `*.{ts,tsx,js,jsx,py,go,rb}` files — finds files and modules this task will touch
+- `Glob` matching the file patterns for each **Impacted Area** listed in the Task (e.g. `src/api/**/*`, `src/features/<feature-slug>/**/*`) — surfaces integration points and existing patterns
+- `Grep` for interface or type names from the Task's Contracts section — finds current interface definitions to implement against
+- `Glob` matching the test file pattern from the scratchpad (e.g. `**/*.test.ts`) near the integration points found above — surfaces existing tests covering adjacent behavior
+- `Grep` for any import of the domain objects or services this task depends on — identifies dependencies that must exist first
 
 Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context. Use these to ensure the implementation and test naming aligns with the team's Ubiquitous Language.
 
@@ -139,10 +139,10 @@ Show the Technical Approach. Then call `AskUserQuestion` with `question: "Does t
 
 Apply changes. Then update the Task issue with the Technical Approach and Impacted Areas.
 
-> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Use `/tmp/updated-task-body.md` as the temp file.
+> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Use `/tmp/wtf-implement-task-approach.md` as the temp file.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/updated-task-body.md
+gh issue edit <task_number> --body-file /tmp/wtf-implement-task-approach.md
 ```
 
 ### 8. Drive the TDD cycle
@@ -192,10 +192,10 @@ Fill the Test Mapping table in the Task issue with concrete file paths:
 | ----------------- | ----------------------- | ------- |
 | `<scenario name>` | `<test file path:line>` | passing |
 
-> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Re-fetch the body (do not reuse the temp file from step 6). Use `/tmp/updated-task-body-test-mapping.md` as the temp file.
+> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Re-fetch the body (do not reuse the temp file from step 6). Use `/tmp/wtf-implement-task-test-mapping.md` as the temp file.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/updated-task-body-test-mapping.md
+gh issue edit <task_number> --body-file /tmp/wtf-implement-task-test-mapping.md
 ```
 
 Print the updated Task issue URL.

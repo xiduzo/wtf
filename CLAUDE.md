@@ -33,6 +33,10 @@ skills/<skill-name>/SKILL.md
 | wtf-write-feature | `skills/wtf-write-feature/SKILL.md` |
 | wtf-write-task | `skills/wtf-write-task/SKILL.md` |
 
+## Skill invocation policy
+
+**Never invoke wtf skills automatically.** Skills in this project are only activated when the user explicitly triggers them via a `/` slash command (e.g. `/wtf.loop`, `/wtf.write-task`). Do not auto-trigger any wtf skill based on inferred intent, conversation context, or keywords.
+
 ## Shared references
 
 Cross-skill references (gh-setup, issue templates, DDD rules, etc.) live in `skills/references/`.

@@ -1,6 +1,6 @@
 ---
 name: wtf.setup
-description: This skill should be used when a user wants to set up WTF in a new repository, verify their environment is ready, check that GitHub CLI is installed and authenticated, install required gh extensions, or ensure the .github/ISSUE_TEMPLATE/ templates are in place — for example "set up wtf", "run setup", "check my environment", "install wtf templates", or "verify everything is configured". Run once per repo when onboarding, or when a contributor joins the project.
+description: This skill should be used when a user wants to set up WTF in a new repository, verify their environment is ready, check that GitHub CLI is installed and authenticated, install required gh extensions, or ensure the .github/ISSUE_TEMPLATE/ templates are in place — for example "set up wtf", "run setup", "check my environment", "install wtf templates", "verify everything is configured", "initialize wtf", "onboard to wtf", "first time setup", "configure gh for wtf", "prepare this repo for wtf", "is wtf ready", "get wtf running", or "a new dev joined, set them up". Run once per repo when onboarding, or when a contributor joins the project.
 ---
 
 # Setup
