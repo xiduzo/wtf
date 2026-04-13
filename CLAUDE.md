@@ -15,6 +15,7 @@ skills/<skill-name>/SKILL.md
 | Skill | File |
 |---|---|
 | wtf-create-pr | `skills/wtf-create-pr/SKILL.md` |
+| wtf-design-feature | `skills/wtf-design-feature/SKILL.md` |
 | wtf-design-task | `skills/wtf-design-task/SKILL.md` |
 | wtf-epic-to-features | `skills/wtf-epic-to-features/SKILL.md` |
 | wtf-feature-to-tasks | `skills/wtf-feature-to-tasks/SKILL.md` |

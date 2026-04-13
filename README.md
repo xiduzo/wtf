@@ -41,17 +41,33 @@ Both skills propose the full list upfront, then walk through creating each item 
 
 Requires a fully-specified Epic/Feature/Task tree. Builds a dependency graph, topologically sorts tasks into execution phases, runs pre-flight checks (spec completeness, contradictions, codebase mismatches, circular deps), and chains `wtf.implement-task → wtf.verify-task → wtf.create-pr` for each task — pausing only when a human decision is actually needed. Supports resuming a previous run (skips tasks already labeled `implemented` or `verified`). Ends by opening a feature → main PR once all task PRs are merged.
 
+### Feature design
+
+Before breaking a Feature into Tasks, a designer can produce a holistic design covering the full user journey:
+
+| Skill                   | Trigger                    | Purpose                                                          |
+| ----------------------- | -------------------------- | ---------------------------------------------------------------- |
+| `wtf.design-feature`   | "design feature #12"       | Map the full UX flow for a Feature and write the Design Handoff  |
+
+`wtf.design-feature` reads the Feature's user stories and Acceptance Criteria, derives every screen and state across the journey, collects or scaffolds Figma frames, and writes the result back into the **Design Handoff** section of the Feature issue — fulfilling the Definition of Ready gate ("Design handoff complete") before tasks are cut.
+
+This is distinct from the Epic's **Design Artifacts** field, which holds upstream strategic inputs (vision prototypes, UX research) that informed the Epic's scope. Feature Design Handoff is the execution-level output — the concrete Figma flow a developer and task-level designer will actually build against.
+
+The shared component map produced here flows into `wtf.design-task` so per-task designers don't re-derive cross-feature decisions.
+
 ### Discipline pickup
 
 Once a task exists, any discipline can pick it up independently:
 
 | Skill                 | Trigger              | Purpose                                                     |
 | --------------------- | -------------------- | ----------------------------------------------------------- |
-| `wtf.design-task`    | "design task #42"    | Designer adds Figma references and component specs          |
+| `wtf.design-task`    | "design task #42"    | Designer maps Gherkin scenarios to Figma frames and component specs |
 | `wtf.implement-task` | "implement task #42" | Developer drafts technical approach and drives TDD cycle    |
 | `wtf.verify-task`    | "verify task #42"    | QA walks Gherkin scenarios and records pass/fail verdict    |
 
 All three write their output back into the Task issue — it stays the single source of truth.
+
+`wtf.design-task` inherits the shared component map from `wtf.design-feature` when available — it covers Gherkin-level UI states for one task, not the full feature journey.
 
 `wtf.implement-task` runs the TDD cycle scenario-by-scenario. Lint and type-checking run once after all scenarios are green (not per-commit), which keeps things fast on large codebases.
 
@@ -137,9 +153,13 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │         │    → derives user stories + Acceptance Criteria                    │  │ │            │                    │
 │         │                                                                    │  │ └────────────┤────────────────────┘
 │         ├────→  wtf.feature-to-tasks   (bulk)                                │  │              │
-│         │                                                                    │  └──────────────┤
+│         │                                                                    │  └──────────────┤  updates
+│         │    wtf.design-feature  (optional, before tasks are cut)            │                 │
+│         │    ├─ reads user stories + ACs → maps full screen journey          │                 │
+│         │    ├─ Epic "Design Artifacts" = upstream strategic input           │                 │
+│         │    └─ Feature "Design Handoff" = execution output for devs ↓       │                 │
 │         ▼                                                                    │                 │
-│                                                                              │                 │  updates
+│                                                                              │                 │
 │    wtf.write-task  ◄───────────────────────────────────────────────────────────────────────────┘
 │         │                                                                    │
 │         │    creates GitHub Task issue                                       │
@@ -163,7 +183,9 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │          OR  run each step manually via DISCIPLINE PICKUP:                   │
 │                                                                              │
 │     wtf.design-task         wtf.implement-task        wtf.verify-task        │
-│    Design Reference        Tech approach + TDD        Scenario verdict       │
+│  Gherkin → UI states      Tech approach + TDD        Scenario verdict        │
+│  inherits from            (per task)                 (per task)              │
+│  design-feature ↑                                                            │
 │                                   │                         │                │
 │                                   ▼                         ▼                │
 │                                                                              │
@@ -182,13 +204,13 @@ Each skill offers to chain to the next step automatically. When requirements evo
 
 | Requirement | Required by | Notes |
 | --- | --- | --- |
-| [Claude Code](https://claude.ai/code) | All skills | Skills run inside Claude Code |
+| An AI assistant supporting skills | All skills | See [skills documentation](https://skills.sh/docs/faq) for supported runtimes |
 | [GitHub CLI (`gh`)](https://cli.github.com) | All skills except steering/reflect | Must be installed and authenticated (`gh auth login`) |
 | [`yahsan2/gh-sub-issue`](https://github.com/yahsan2/gh-sub-issue) | write-task, epic-to-features, feature-to-tasks | Epic → Feature → Task sub-issue hierarchy; auto-installed by gh-setup |
 | [`xiduzo/gh-issue-dependency`](https://github.com/xiduzo/gh-issue-dependency) | write-task, feature-to-tasks, loop | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
 | [`MeroFuruya/gh-dep`](https://github.com/MeroFuruya/gh-dep) | loop | Dependency graph for topological sort; installed by loop on first run |
 | GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine, loop | Project must be hosted on GitHub |
-| [Figma](https://figma.com) account | `design-task` (optional) | Only needed when linking Figma frames; skill can scaffold without it |
+| [Figma](https://figma.com) account | `design-feature`, `design-task` (optional) | Only needed when linking Figma frames; both skills can scaffold without it |
 
 The two `gh` extensions are checked and installed automatically the first time any issue-creating skill runs. You don't need to install them manually.
 
@@ -228,8 +250,11 @@ npx skills update
 "plan all tasks for feature #12"
 → wtf.feature-to-tasks   (proposes all Tasks, creates them one by one)
 
+"design feature #12"
+→ wtf.design-feature      (map full UX journey before tasks are cut; writes Design Handoff into Feature issue)
+
 "design task #42"
-→ wtf.design-task         (designer adds Figma frames + component spec)
+→ wtf.design-task         (Gherkin scenarios → per-task Figma frames + component spec; inherits shared components from design-feature)
 
 # Option A: autonomous
 "go" / "build it all" / "start the loop"
