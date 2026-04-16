@@ -56,7 +56,7 @@ Fetch all sub-issues of the Feature using the extension:
 gh sub-issue list <feature_number>
 ```
 
-This returns the authoritative list of Tasks — do not search by label or title matching. Walk through each Task's verification in order, running steps 3–9 for each one. Track a feature-level summary (total tasks, pass/fail/blocked counts) and present it at the end.
+This returns the authoritative list of Tasks — do not search by label or title matching. Spawn one sub-agent per Task in parallel using the Agent tool, each running steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch. Wait for all sub-agents to complete, then aggregate results into a feature-level summary (total tasks, pass/fail/blocked counts) and present it.
 
 ### 2. Load the QA steering document
 
@@ -202,6 +202,6 @@ If unfiled failures exist, present them as a numbered list, then call `AskUserQu
 - `header`: "File bugs?"
 - `options`: `[{label: "File separately", description: "File one bug report per failing scenario (default)"}, {label: "File combined", description: "File one combined bug report for all failures"}, {label: "Skip", description: "Exit — I'll handle it manually"}]`
 
-- **File separately** → follow the `report-bug` process once per failing scenario, passing in the task number and the specific failing scenario each time.
+- **File separately** → spawn one sub-agent per failing scenario in parallel using the Agent tool, each running the `report-bug` process with the task number and the specific failing scenario. Wait for all sub-agents to complete before exiting.
 - **File combined** → follow the `report-bug` process once, passing in the task number and all failing scenarios together.
 - **Skip** → exit without filing reports.

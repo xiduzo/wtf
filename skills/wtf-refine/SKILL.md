@@ -252,7 +252,7 @@ Present the affected children as a numbered list. Then call `AskUserQuestion` wi
 - `header`: "Cascade"
 - `options`: `[{label: "Refine each one now", description: "Walk through `refine` for each affected child in order (default)"}, {label: "I'll handle them manually", description: "Exit — I'll open each child and update it myself"}, {label: "Skip", description: "Leave children as-is"}]`
 
-- **Refine each one now** → restart this skill from step 2 for the first affected child, passing the insight as context so the user is not asked for it again. Continue through each child in order.
+- **Refine each one now** → spawn one sub-agent per affected child in parallel using the Agent tool. Each sub-agent receives: the child issue number, the parent insight as pre-loaded context (so the user is not asked for it again), and instructions to run this skill from step 2. Do not run refinements inline or sequentially — use parallel sub-agents so all children are refined concurrently. Wait for all sub-agents to complete, then summarise results.
 - **I'll handle them manually** / **Skip** → exit.
 
 If no children are affected, skip this step entirely.
