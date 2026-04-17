@@ -215,7 +215,7 @@ Call `AskUserQuestion` with:
 
 ### 4. Execute each task
 
-**Parallelism within phases:** Tasks within the same phase (from the plan in step 3) have no internal dependencies between them. For each phase, spawn one sub-agent per task in parallel using the Agent tool, passing the task number and full spec context to each sub-agent. Wait for all sub-agents in the phase to complete before starting the next phase.
+**Parallelism within phases:** Tasks within the same phase (from the plan in step 3) have no internal dependencies between them. For each phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`, passing the task number and full spec context to each sub-agent. Wait for all sub-agents in the phase to complete before starting the next phase.
 
 For each Task (within its phase):
 

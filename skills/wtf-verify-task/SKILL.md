@@ -56,7 +56,7 @@ Fetch all sub-issues of the Feature using the extension:
 gh sub-issue list <feature_number>
 ```
 
-This returns the authoritative list of Tasks — do not search by label or title matching. Spawn one sub-agent per Task in parallel using the Agent tool, each running steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch. Wait for all sub-agents to complete, then aggregate results into a feature-level summary (total tasks, pass/fail/blocked counts) and present it.
+This returns the authoritative list of Tasks — do not search by label or title matching. Spawn one sub-agent per Task in parallel using the Agent tool with `isolation: "worktree"`, each running steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch. Wait for all sub-agents to complete, then aggregate results into a feature-level summary (total tasks, pass/fail/blocked counts) and present it.
 
 ### 2. Load the QA steering document
 
