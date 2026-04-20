@@ -190,13 +190,13 @@ Record the decision for the audit comment in step 8.
 Read the current issue body, merge only the changed sections (preserving all unchanged content), and write the updated body:
 
 ```bash
-gh issue view <issue_number> --json body -q .body > /tmp/wtf-refine-body.md
+gh issue view <issue_number> --json body -q .body > /tmp/wtf-refine-<issue_number>-body.md
 ```
 
-Use the Edit tool to replace each changed section in `/tmp/wtf-refine-body.md` with its updated content. Preserve all other sections verbatim.
+Use the Edit tool to replace each changed section in `/tmp/wtf-refine-<issue_number>-body.md` with its updated content. Preserve all other sections verbatim.
 
 ```bash
-gh issue edit <issue_number> --body-file /tmp/wtf-refine-body.md
+gh issue edit <issue_number> --body-file /tmp/wtf-refine-<issue_number>-body.md
 ```
 
 If stale labels should be stripped (from step 6):
@@ -252,7 +252,7 @@ Present the affected children as a numbered list. Then call `AskUserQuestion` wi
 - `header`: "Cascade"
 - `options`: `[{label: "Refine each one now", description: "Walk through `refine` for each affected child in order (default)"}, {label: "I'll handle them manually", description: "Exit — I'll open each child and update it myself"}, {label: "Skip", description: "Leave children as-is"}]`
 
-- **Refine each one now** → spawn one sub-agent per affected child in parallel using the Agent tool. Each sub-agent receives: the child issue number, the parent insight as pre-loaded context (so the user is not asked for it again), and instructions to run this skill from step 2. Do not run refinements inline or sequentially — use parallel sub-agents so all children are refined concurrently. Wait for all sub-agents to complete, then summarise results.
+- **Refine each one now** → before spawning, build a conflict graph over the affected children: draw an edge between two children if their Impacted Areas sections share any file, module, or component (fetch each child's body and parse `## Impacted Areas`). Apply greedy graph coloring to partition children into conflict-free **sub-groups** — children within a sub-group share no overlapping areas and can run concurrently; sub-groups must run sequentially. Children with no Impacted Areas section go into their own sub-group. For each sub-group, spawn one sub-agent per child in parallel using the Agent tool. Each sub-agent receives: the child issue number, the parent insight as pre-loaded context (so the user is not asked for it again), and instructions to run this skill from step 2. Wait for all sub-agents in a sub-group to complete before starting the next sub-group. After all sub-groups complete, summarise results.
 - **I'll handle them manually** / **Skip** → exit.
 
 If no children are affected, skip this step entirely.

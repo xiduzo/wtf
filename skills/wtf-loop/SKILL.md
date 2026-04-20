@@ -137,7 +137,39 @@ Using the dependency graph built in step 1:
 
    An external blocker is resolved only if its state is `CLOSED` with `stateReason: COMPLETED` (i.e., closed via a merged PR). If any external blocker is unresolved, list them as blockers — the loop cannot start until they are resolved.
 
-3. **Topological sort** — sort all internal nodes into an execution order that respects every `blocked_by` edge. Group nodes at the same depth into **execution phases** — tasks within a phase have no dependency between them and could run in parallel.
+3. **Topological sort** — sort all internal nodes into an execution order that respects every `blocked_by` edge. Group nodes at the same depth into **execution phases** — tasks within a phase have no dependency between them.
+
+4. **File-conflict sub-phasing** — refine each phase into conflict-free parallel sets so worktree agents never touch overlapping files simultaneously.
+
+   For each phase produced by the topological sort:
+
+   a. Fetch each task's Impacted Areas from the issue body (the `## Impacted Areas` section):
+      ```bash
+      gh issue view <task_number> --json body --jq '.body'
+      # Parse "## Impacted Areas" section — collect all file paths, modules, and components listed
+      ```
+
+   b. Build an undirected **conflict graph** within the phase: draw an edge between tasks A and B if they share at least one impacted file, module, or component (case-insensitive path prefix match is sufficient — e.g. `src/payments/` conflicts with `src/payments/service.ts`).
+
+   c. Apply greedy graph coloring to the conflict graph:
+      - Assign sub-phase 1 to the first task
+      - For each subsequent task (ordered by issue number), assign the lowest-numbered sub-phase whose already-assigned tasks share no conflict edge with this task
+      - This partitions the phase into numbered sub-phases where every pair of tasks within a sub-phase is conflict-free
+
+   d. Replace the original phase in the execution plan with its sub-phases. Sub-phases are ordered lowest-first and executed sequentially; tasks within a single sub-phase are executed in parallel.
+
+   **If a task has no Impacted Areas section** (or it is empty), treat it as conflicting with all other tasks in the phase — assign it to its own sub-phase to be safe.
+
+   Record the final execution structure as:
+   ```
+   phases: [
+     { phase: 1, sub_phases: [
+       { sub: 1, tasks: [#10, #11] },   # no file overlap — run in parallel
+       { sub: 2, tasks: [#14] }          # overlaps with #10 or #11 — run after
+     ]},
+     { phase: 2, sub_phases: [...] }
+   ]
+   ```
 
 **Gate — surface all findings at once:**
 
@@ -175,16 +207,21 @@ Proposed execution plan — Feature #<n>: <title>
 External blockers: ✅ #<x> merged  ✅ #<y> merged
 
 Phase 1  (no blockers)
-  Task #10 — Setup DB schema
-  Task #11 — Define API contracts
+  Sub-phase 1.1  [parallel]
+    Task #10 — Setup DB schema        impacted: src/db/
+    Task #11 — Define API contracts   impacted: src/api/contracts/
+  Sub-phase 1.2  [after 1.1 — file conflict with #10]
+    Task #14 — Seed migrations        impacted: src/db/
 
 Phase 2  (blocked by Phase 1)
-  Task #12 — Settlement logic       blocked by #10, #11  ·  blocks #13
+  Sub-phase 2.1  [parallel]
+    Task #12 — Settlement logic       blocked by #10, #11  ·  blocks #13
 
 Phase 3  (blocked by Phase 2)
-  Task #13 — Notifications          blocked by #12
+  Sub-phase 3.1  [parallel]
+    Task #13 — Notifications          blocked by #12
 ─────────────────────────────────────────────
-3 phases · 4 tasks
+3 phases · 5 tasks · 4 sub-phases
 ```
 
 If executing an Epic, also show cross-feature blocking:
@@ -241,7 +278,11 @@ Sub-agents spawned by the loop do NOT inherit the parent session's loaded skills
    
    Neither step may be deferred to the orchestrator or omitted. If the `gh` command fails, record it in the sub-agent result so the orchestrator can retry.
 
-**Parallelism within phases:** Tasks within the same phase (from the plan in step 3) have no internal dependencies between them. For each phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`, passing the task number and full spec context to each sub-agent. Apply the sub-agent protocol above. Wait for all sub-agents in the phase to complete, then process any `NEEDS_INPUT` results before starting the next phase.
+**Parallelism via DAG sub-phases:** The conflict-free sub-phases from step 2d are the unit of parallel execution. For each sub-phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`. Tasks in different sub-phases within the same phase share overlapping files and must NOT run concurrently — execute sub-phases sequentially within a phase.
+
+Execution order: iterate phases in order → within each phase, iterate sub-phases in order → within each sub-phase, spawn all tasks in parallel. Wait for all sub-agents in a sub-phase to complete (and process any `NEEDS_INPUT` results) before starting the next sub-phase.
+
+Pass the full sub-phase conflict map to each sub-agent in its prompt context so it knows which files are exclusively owned by its worktree during execution. Apply the sub-agent protocol above to every spawned agent.
 
 For each Task (within its phase):
 

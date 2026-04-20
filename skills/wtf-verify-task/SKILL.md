@@ -56,7 +56,21 @@ Fetch all sub-issues of the Feature using the extension:
 gh sub-issue list <feature_number>
 ```
 
-This returns the authoritative list of Tasks — do not search by label or title matching. Spawn one sub-agent per Task in parallel using the Agent tool with `isolation: "worktree"`, each running steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch.
+This returns the authoritative list of Tasks — do not search by label or title matching.
+
+**Build a file-conflict graph before spawning agents:**
+
+For each task, fetch its Impacted Areas:
+```bash
+gh issue view <task_number> --json body --jq '.body'
+# Parse "## Impacted Areas" section — collect all file paths, modules, components listed
+```
+
+Build an undirected conflict graph: draw an edge between tasks A and B if they share at least one impacted file, module, or component (case-insensitive prefix match). Apply greedy graph coloring to partition the task list into conflict-free **sub-phases** — tasks within a sub-phase share no overlapping files and can run safely in parallel worktrees; sub-phases must run sequentially.
+
+If a task has no Impacted Areas section or it is empty, treat it as conflicting with all others — assign it its own sub-phase.
+
+Spawn sub-agents sequentially by sub-phase: for each sub-phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`, wait for all to complete, then start the next sub-phase. Each sub-agent runs steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch.
 
 **Sub-agent protocol for Full Feature mode:**
 
@@ -131,13 +145,13 @@ For each scenario, one at a time:
    | `<scenario name>` | ✅/❌/🚫/N/A/⚠️ | yes / no / — |
 
    ```bash
-   gh issue view <task_number> --json body -q .body > /tmp/updated-task-body.md
+   gh issue view <task_number> --json body -q .body > /tmp/wtf-verify-<task_number>-body.md
    ```
 
-   Programmatically replace the Test Mapping table section in `/tmp/updated-task-body.md` using the Write or Edit tool, preserving all other sections unchanged. Then push:
+   Programmatically replace the Test Mapping table section in `/tmp/wtf-verify-<task_number>-body.md` using the Write or Edit tool, preserving all other sections unchanged. Then push:
 
    ```bash
-   gh issue edit <task_number> --body-file /tmp/updated-task-body.md
+   gh issue edit <task_number> --body-file /tmp/wtf-verify-<task_number>-body.md
    ```
 
 4. Keep a running tally. After updating, confirm: "Updated. Moving to next scenario..."
@@ -170,13 +184,13 @@ For each item in the Observability section (logs, metrics, alerts), one at a tim
 The Test Mapping table has been updated after each scenario (step 4). Now do a final update: check off DoD items that passed; leave failing ones unchecked.
 
 ```bash
-gh issue view <task_number> --json body -q .body > /tmp/verify-final-body.md
+gh issue view <task_number> --json body -q .body > /tmp/wtf-verify-<task_number>-final.md
 ```
 
-Programmatically update the DoD checklist in `/tmp/verify-final-body.md` using the Write or Edit tool. Then push:
+Programmatically update the DoD checklist in `/tmp/wtf-verify-<task_number>-final.md` using the Write or Edit tool. Then push:
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/verify-final-body.md
+gh issue edit <task_number> --body-file /tmp/wtf-verify-<task_number>-final.md
 ```
 
 Post a QA summary comment:
