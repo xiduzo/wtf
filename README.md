@@ -1,6 +1,6 @@
 # WTF — Workflow Task Framework
 
-Skills for managing GitHub issues using an **Epic → Feature → Task** hierarchy, with guided discipline-specific workflows, steering documents, and a full lifecycle from planning through verification.
+Skills for managing GitHub issues using an **Epic → Feature → Task** hierarchy, with guided discipline-specific workflows, steering documents, and a full lifecycle from planning through verification and release.
 
 ## Skills
 
@@ -11,6 +11,14 @@ Skills for managing GitHub issues using an **Epic → Feature → Task** hierarc
 | `wtf.setup`   | "set up wtf"     | Pre-flight check and installer — run once per repo on onboard  |
 
 Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, creates all lifecycle labels (`epic`, `feature`, `task`, `bug`, `implemented`, `designed`, `verified`), and prints a status report. Offers to kick off steering doc creation at the end.
+
+### Pre-planning
+
+| Skill         | Trigger                               | Purpose                                                               |
+| ------------- | ------------------------------------- | --------------------------------------------------------------------- |
+| `wtf.spike`  | "run a spike on X", "investigate this before we commit" | Time-boxed technical investigation before committing to an approach |
+
+When a technical unknown blocks planning, `wtf.spike` defines the question, time-boxes the investigation, researches the codebase and docs, derives 2–3 concrete approaches with trade-offs, and produces a recommendation + findings doc in `docs/spikes/`. Output feeds directly into `write-epic` or `write-task`.
 
 ### Planning spine
 
@@ -79,6 +87,16 @@ All three write their output back into the Task issue — it stays the single so
 
 Reads the full spec hierarchy and branch diff to write a PR description that explains _why_ the change exists. Checks for verification status and offers to run `verify-task` first.
 
+### Code review
+
+| Skill              | Trigger           | Purpose                                                              |
+| ------------------ | ----------------- | -------------------------------------------------------------------- |
+| `wtf.pr-review`   | "review PR #42"   | Review a PR's code against the linked Task spec                      |
+
+Reads the diff against the Task's Gherkin scenarios, Contracts, and Impacted Areas. Checks spec adherence, contract compliance, test coverage, and code quality against `TECH.md`. Posts a structured GitHub PR review (approve / request changes / comment).
+
+**Distinct from `wtf.verify-task`** — `verify-task` is a QA engineer testing by *running the software* (does it behave correctly?). `wtf.pr-review` is a tech lead reviewing *the code itself* (is it written correctly against the spec?).
+
 ### Bug reporting
 
 | Skill              | Trigger          | Purpose                                                      |
@@ -86,6 +104,14 @@ Reads the full spec hierarchy and branch diff to write a PR description that exp
 | `wtf.report-bug`  | "report a bug"   | File a structured Bug issue linked to the originating Task   |
 
 Maps failing Gherkin scenarios as reproducible test evidence and links the originating Task and Feature automatically.
+
+### Emergency fix
+
+| Skill            | Trigger                                    | Purpose                                                             |
+| ---------------- | ------------------------------------------ | ------------------------------------------------------------------- |
+| `wtf.hotfix`    | "production is down", "emergency fix for #X" | Cut a hotfix branch from main and fix — bypasses normal hierarchy   |
+
+For production incidents where the full Epic→Feature→Task flow is too slow. Cuts a hotfix branch directly from `main`, runs a targeted TDD fix, and opens a PR back to `main`. Includes a scope gate — if the fix turns out to be large, it redirects to the normal workflow. Offers backport to release branches.
 
 ### Steering documents
 
@@ -116,6 +142,25 @@ Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) u
 
 Merges insights from conversation, GitHub comments, and referenced docs; re-validates only affected sections; shows a section-by-section diff before applying updates; and offers cascade refinement for impacted child issues.
 
+### Project health
+
+| Skill           | Trigger                                       | Purpose                                              |
+| --------------- | --------------------------------------------- | ---------------------------------------------------- |
+| `wtf.health`   | "project health check", "what's blocked"      | Cross-issue status scan with actionable findings     |
+
+Scans all open Epics, Features, Tasks, and Bugs against expected lifecycle labels. Surfaces tasks implemented but not verified, features with all tasks done but no PR opened, stale issues with no recent activity, and bugs without a linked task. Ends with a triage-ready action list and offers to route directly into the appropriate skill for each finding.
+
+### Release & closure
+
+| Skill              | Trigger                                      | Purpose                                                           |
+| ------------------ | -------------------------------------------- | ----------------------------------------------------------------- |
+| `wtf.changelog`   | "write the changelog", "generate release notes" | Derive user-facing release notes from closed Tasks and Features |
+| `wtf.retro`       | "run a retro on this epic", "close out the epic" | Close an Epic with planned-vs-shipped comparison and routed learnings |
+
+`wtf.changelog` reads the Gherkin `Then` steps and Feature capability names to produce plain-language release notes — not raw commit messages. Outputs to `CHANGELOG.md` or a GitHub Release.
+
+`wtf.retro` compares the original Epic spec against what actually shipped, gathers learnings, routes them into the appropriate steering docs via `reflect`, and formally closes the Epic. Chains to `changelog` at the end.
+
 ## How it all fits together
 
 ```
@@ -134,6 +179,17 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 └──────────────────────────────────┬───────────────────────────────────────────┘
                                    │
                                    │  informs
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                          PRE-PLANNING                                        │
+│                                                                              │
+│  wtf.spike  ──  define question → research → 2–3 approaches → recommend      │
+│             └──→ docs/spikes/<date>-<slug>.md                                │
+│                                                                              │
+└──────────────────────────────────┬───────────────────────────────────────────┘
+                                   │
+                                   │  feeds into
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐    ┌─────────────────────────────────┐
 │                                                                              │    │                                 │
@@ -184,7 +240,7 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                                                                              │
 │     wtf.design-task         wtf.implement-task        wtf.verify-task        │
 │  Gherkin → UI states      Tech approach + TDD        Scenario verdict        │
-│  inherits from            (per task)                 (per task)              │
+│  inherits from            (per task)                 (per task, by QA)       │
 │  design-feature ↑                                                            │
 │                                   │                         │                │
 │                                   ▼                         ▼                │
@@ -193,7 +249,35 @@ Merges insights from conversation, GitHub comments, and referenced docs; re-vali
 │                             PR from full            links failing            │
 │                             hierarchy context       scenario → Task          │
 │                                                                              │
+│                              wtf.pr-review                                   │
+│                             code vs spec            ← tech lead reviews      │
+│                             (distinct from          PR before merge          │
+│                              verify-task)                                    │
+│                                                                              │
+└──────────────────────────────────┬───────────────────────────────────────────┘
+                                   │
+                                   │  after merge
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                         RELEASE & CLOSURE                                    │
+│                                                                              │
+│     wtf.changelog  ──→  CHANGELOG.md / GitHub Release                        │
+│                         (user-facing language from Gherkin, not commits)     │
+│                                                                              │
+│     wtf.retro  ──→  planned vs. shipped comparison                           │
+│                     routes learnings → steering docs  ↺                      │
+│                     closes Epic                                              │
+│                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
+
+EMERGENCY PATH  (bypasses planning spine entirely):
+
+    main ──→  wtf.hotfix  ──→  hotfix/<bug>-<slug>  ──→  fix + test  ──→  PR → main
+
+CROSS-CUTTING  (run any time, any scope):
+
+    wtf.health  ──→  scans all open issues  ──→  surfaces label gaps, stale work, and blockers
 ```
 
 DDD runs through everything — all issues use domain language, `ddd-writing-rules.md` is enforced at every write step, and actors are always named domain roles (never "user" or "admin"). The Task issue is the single source of truth: Designer, Developer, and QA each append their own section to it in sequence.
@@ -208,8 +292,7 @@ Each skill offers to chain to the next step automatically. When requirements evo
 | [GitHub CLI (`gh`)](https://cli.github.com) | All skills except steering/reflect | Must be installed and authenticated (`gh auth login`) |
 | [`yahsan2/gh-sub-issue`](https://github.com/yahsan2/gh-sub-issue) | write-task, epic-to-features, feature-to-tasks | Epic → Feature → Task sub-issue hierarchy; auto-installed by gh-setup |
 | [`xiduzo/gh-issue-dependency`](https://github.com/xiduzo/gh-issue-dependency) | write-task, feature-to-tasks, loop | Native `Blocks`/`Blocked-by` links; auto-installed by gh-setup |
-| [`MeroFuruya/gh-dep`](https://github.com/MeroFuruya/gh-dep) | loop | Dependency graph for topological sort; installed by loop on first run |
-| GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine, loop | Project must be hosted on GitHub |
+| GitHub repository | write-epic, write-feature, write-task, epic-to-features, feature-to-tasks, report-bug, create-pr, design-task, implement-task, verify-task, refine, loop, hotfix, pr-review, health, changelog, retro | Project must be hosted on GitHub |
 | [Figma](https://figma.com) account | `design-feature`, `design-task` (optional) | Only needed when linking Figma frames; both skills can scaffold without it |
 
 The two `gh` extensions are checked and installed automatically the first time any issue-creating skill runs. You don't need to install them manually.
@@ -241,6 +324,10 @@ npx skills update
 ### Full lifecycle example
 
 ```
+# Before committing to an approach:
+"run a spike on whether we should use Redis or in-memory for session storage"
+→ wtf.spike     (findings doc + recommendation → feeds into write-epic)
+
 "write an epic for user authentication"
 → wtf.write-epic
 
@@ -267,9 +354,20 @@ npx skills update
 "verify task #42"
 → wtf.verify-task         (QA walks scenarios + posts verdict)
 
+"review PR #84"
+→ wtf.pr-review           (tech lead reviews code vs spec — distinct from QA)
+
 "create a PR"
 → wtf.create-pr           (PR description from full spec hierarchy)
 
+# After merge:
+"write the changelog for feature #12"
+→ wtf.changelog           (user-facing release notes from Gherkin, not commits)
+
+"run a retro on epic #3"
+→ wtf.retro               (planned vs. shipped, routes learnings, closes Epic)
+
+# Supporting, run any time:
 "refine task #42 with latest stakeholder comments"
 → wtf.refine              (updates changed sections only, posts refinement audit trail)
 
@@ -278,6 +376,13 @@ npx skills update
 
 "let's reflect"
 → wtf.reflect             (capture learnings into steering docs)
+
+"project health check"
+→ wtf.health              (surfaces blocked/stale issues + suggested next actions)
+
+# Emergency:
+"production is down — null pointer in payment settlement"
+→ wtf.hotfix              (hotfix branch from main, fix, PR — bypasses normal flow)
 ```
 
 ### Steering setup
