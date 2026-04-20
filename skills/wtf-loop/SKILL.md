@@ -215,7 +215,34 @@ Call `AskUserQuestion` with:
 
 ### 4. Execute each task
 
-**Parallelism within phases:** Tasks within the same phase (from the plan in step 3) have no internal dependencies between them. For each phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`, passing the task number and full spec context to each sub-agent. Wait for all sub-agents in the phase to complete before starting the next phase.
+**Sub-agent protocol (mandatory for all phases)**
+
+Sub-agents spawned by the loop do NOT inherit the parent session's loaded skills. Each sub-agent prompt must include:
+
+1. **Inline instructions** — Embed the full step-by-step content of `wtf-implement-task`, `wtf-verify-task`, and `wtf-create-pr` directly in the prompt. Do not reference skill names — sub-agents cannot load them.
+
+2. **Non-interactive overrides** — Sub-agents must NOT call `AskUserQuestion`. All interactive prompts are replaced:
+   - Approach review (implement-task step 7): skip, proceed automatically with the derived approach
+   - "What's next?" prompts (implement-task step 11, verify-task step 8): skip, the loop controls sequencing
+   - Any other interactive choice that would normally pause: record as a pending question (see point 3)
+
+3. **Question/blocker protocol** — If a genuine blocker or ambiguity requires human input (e.g. test failures, missing contracts, codebase mismatches, approach conflicts), the sub-agent must return a structured result instead of asking:
+   ```
+   NEEDS_INPUT
+   task: #<n>
+   question: <the question text>
+   options: <list of options>
+   context: <relevant details>
+   ```
+   The orchestrator collects all `NEEDS_INPUT` results after each phase, groups them by task, presents them to the user via a single `AskUserQuestion` call, and re-dispatches affected sub-agents with the answers embedded in the prompt before continuing to the next phase.
+
+4. **Mandatory labels** — Sub-agents own label lifecycle for their assigned task. These must always execute, regardless of other outcomes:
+   - After TDD cycle completes (implement-task step 11): `gh issue edit <task_number> --add-label "implemented"`
+   - After verification passes (verify-task step 7): `gh issue edit <task_number> --add-label "verified"`
+   
+   Neither step may be deferred to the orchestrator or omitted. If the `gh` command fails, record it in the sub-agent result so the orchestrator can retry.
+
+**Parallelism within phases:** Tasks within the same phase (from the plan in step 3) have no internal dependencies between them. For each phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`, passing the task number and full spec context to each sub-agent. Apply the sub-agent protocol above. Wait for all sub-agents in the phase to complete, then process any `NEEDS_INPUT` results before starting the next phase.
 
 For each Task (within its phase):
 
@@ -242,10 +269,10 @@ If all internal blockers are resolved, continue silently.
 
 **b. Implement**
 
-Follow the `wtf:implement-task` process for the Task, passing the Task number in as context. The skill will:
+Follow the `wtf:implement-task` process for the Task (embedded inline per the sub-agent protocol above), passing the Task number in as context. The sub-agent must:
 - Set up the correct feature branch (creating it if absent)
 - Run the TDD cycle
-- Mark `implemented`
+- Explicitly run `gh issue edit <task_number> --add-label "implemented"` — this is mandatory and must not be skipped or deferred
 
 **c. Verify**
 

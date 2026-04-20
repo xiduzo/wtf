@@ -202,11 +202,13 @@ Print the updated Task issue URL.
 
 ### 11. Mark implemented and offer to continue
 
-Add the `implemented` lifecycle label:
+Add the `implemented` lifecycle label — this is mandatory regardless of invocation mode:
 
 ```bash
 gh issue edit <task_number> --add-label "implemented"
 ```
+
+If invoked from the loop (non-interactive mode), skip the AskUserQuestion below and return control to the loop.
 
 Call `AskUserQuestion` with:
 

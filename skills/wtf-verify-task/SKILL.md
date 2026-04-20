@@ -56,7 +56,32 @@ Fetch all sub-issues of the Feature using the extension:
 gh sub-issue list <feature_number>
 ```
 
-This returns the authoritative list of Tasks — do not search by label or title matching. Spawn one sub-agent per Task in parallel using the Agent tool with `isolation: "worktree"`, each running steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch. Wait for all sub-agents to complete, then aggregate results into a feature-level summary (total tasks, pass/fail/blocked counts) and present it.
+This returns the authoritative list of Tasks — do not search by label or title matching. Spawn one sub-agent per Task in parallel using the Agent tool with `isolation: "worktree"`, each running steps 3–9 independently. Pass the task number and feature context to each sub-agent so it does not need to re-fetch.
+
+**Sub-agent protocol for Full Feature mode:**
+
+Sub-agents do NOT inherit the parent session's loaded skills. Each sub-agent prompt must:
+
+1. **Embed inline instructions** — Include the full step-by-step content of this skill's steps 3–9 directly. Do not reference the skill by name.
+
+2. **Non-interactive overrides** — Sub-agents must NOT call `AskUserQuestion`. Replace interactive prompts:
+   - "Test surface" confirmation (step 3): skip, proceed with all found scenarios
+   - Per-scenario pass/fail result: record as pending — return to orchestrator (see point 3)
+   - Bug filing prompts: defer to orchestrator's aggregated step 9
+
+3. **Question/blocker protocol** — If a scenario result, blocker, or any other human decision is needed, the sub-agent must return a structured block instead of asking:
+   ```
+   NEEDS_INPUT
+   task: #<n>
+   question: <question text>
+   options: <list>
+   context: <scenario name and relevant details>
+   ```
+   The orchestrator collects all `NEEDS_INPUT` results, groups them by task, presents them to the user via a single `AskUserQuestion` call, and feeds answers back to sub-agents before finalising.
+
+4. **Mandatory label** — After verification completes (step 7), the sub-agent must run: `gh issue edit <task_number> --add-label "verified"`. This must not be skipped or deferred.
+
+Wait for all sub-agents to complete, process any `NEEDS_INPUT` results, then aggregate into a feature-level summary (total tasks, pass/fail/blocked counts) and present it.
 
 ### 2. Load the QA steering document
 
@@ -202,6 +227,6 @@ If unfiled failures exist, present them as a numbered list, then call `AskUserQu
 - `header`: "File bugs?"
 - `options`: `[{label: "File separately", description: "File one bug report per failing scenario (default)"}, {label: "File combined", description: "File one combined bug report for all failures"}, {label: "Skip", description: "Exit — I'll handle it manually"}]`
 
-- **File separately** → spawn one sub-agent per failing scenario in parallel using the Agent tool, each running the `report-bug` process with the task number and the specific failing scenario. Wait for all sub-agents to complete before exiting.
+- **File separately** → spawn one sub-agent per failing scenario in parallel using the Agent tool, each running the `report-bug` process with the task number and the specific failing scenario. Each sub-agent prompt must embed the full `wtf-report-bug` skill instructions inline — sub-agents do not inherit loaded skills. Sub-agents must not call `AskUserQuestion`; any clarifying question must be returned as `NEEDS_INPUT` (same protocol as step 1 Full Feature mode) for the orchestrator to resolve. Wait for all sub-agents to complete before exiting.
 - **File combined** → follow the `report-bug` process once, passing in the task number and all failing scenarios together.
 - **Skip** → exit without filing reports.
