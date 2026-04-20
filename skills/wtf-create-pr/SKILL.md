@@ -93,7 +93,7 @@ This avoids including unrelated merged commits when the branch has a long histor
 
 ### 6. Draft the PR
 
-**Title generation:** Spawn a subagent using the `claude-haiku-4-5` model to generate a PR title following **Conventional Commits 1.0.0**. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly using the same rules below. Rules:
+**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a PR title following **Conventional Commits 1.0.0**. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly using the same rules below. Rules:
 
 - Format: `<type>[optional scope]: <description>`
 - Types: `feat` (new feature), `fix` (bug fix), `docs`, `style`, `refactor`, `perf`, `test`, `build`, `chore`, `ci`

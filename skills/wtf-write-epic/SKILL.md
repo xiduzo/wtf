@@ -145,7 +145,7 @@ Apply edits, then proceed immediately.
 
 > Note: Write the issue body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
 
-> **Title generation:** Spawn a subagent using the `claude-haiku-4-5` model to generate a concise, domain-language title from the Epic's Goal. Pass in the Goal text and ask for a title (no prefix emoji/label needed — that is added below).
+> **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the Epic's Goal. Pass in the Goal text and ask for a title (no prefix emoji/label needed — that is added below).
 
 ```bash
 # Ensure the label exists before creating the issue

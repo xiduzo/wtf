@@ -122,7 +122,7 @@ Apply edits, then proceed.
 
 > Note: the commands below are pseudo-code. Write each body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
 
-**Title generation:** Spawn a subagent using the `claude-haiku-4-5` model to generate a concise title from the bug's one-sentence description. Pass in the description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence description.
+**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the bug's one-sentence description. Pass in the description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence description.
 
 ```bash
 gh issue create --title "🐞 Bug: <title>" --body-file /tmp/bug-body.md --label "bug"

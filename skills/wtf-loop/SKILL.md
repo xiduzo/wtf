@@ -31,7 +31,6 @@ gh extension list
 Required:
 - `yahsan2/gh-sub-issue` — hierarchy traversal
 - `xiduzo/gh-issue-dependency` — dependency ordering
-- `MeroFuruya/gh-dep` — dependency graph
 
 If any are missing, install them before proceeding.
 

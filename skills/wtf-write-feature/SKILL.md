@@ -193,7 +193,7 @@ Apply edits, then proceed.
 
 > Note: Write each body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
 
-**Title generation:** Spawn a subagent using the `claude-haiku-4-5` model to generate a concise, domain-language title from the capability name. Pass in the capability name and ask for a short title (no prefix emoji/label needed — that is added below).
+**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the capability name. Pass in the capability name and ask for a short title (no prefix emoji/label needed — that is added below).
 
 Create the Feature issue:
 

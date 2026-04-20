@@ -74,7 +74,7 @@ main
     └── task/<task-number>-<task-slug>         (merges → feature branch)
 ```
 
-**Slug generation:** For both the feature slug and task slug, spawn a subagent using the `claude-haiku-4-5` model. Pass in the title and ask for a 2–4 word kebab-case summary restricted to `[a-z0-9-]` characters (e.g. `date-range-filter`).
+**Slug generation:** For both the feature slug and task slug, spawn a subagent using the `claude-haiku-4-5-20251001` model. Pass in the title and ask for a 2–4 word kebab-case summary restricted to `[a-z0-9-]` characters (e.g. `date-range-filter`).
 
 **Feature branch — create if missing:**
 
@@ -164,7 +164,7 @@ For each Gherkin scenario in the Task, work through them in order. Match the pro
 
    Commit type: `feat` for new behavior, `fix` for bug fixes, `test` for test-only changes, `refactor` for refactors, `chore` for config/build changes.
 
-6. Do not skip ahead — each scenario is a checkpoint.
+5. Do not skip ahead — each scenario is a checkpoint.
 
 Once all scenarios are green, run the full lint and type-check gate once across all changes. Check `package.json` for `lint`, `typecheck`, `type-check`, or `check` script keys and run whichever exist:
 
