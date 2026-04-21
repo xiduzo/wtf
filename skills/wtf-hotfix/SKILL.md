@@ -104,7 +104,7 @@ Commit:
 git add <changed files>
 git commit -m "fix(<scope>): <description>
 
-Fixes: #<bug_number>"
+Closes: #<bug_number>"
 ```
 
 ### 8. Open the PR
@@ -124,7 +124,11 @@ gh pr create \
 
 PR body must include:
 
-- `Fixes #<bug_number>` (closes the bug issue on merge)
+- **Related**: one `Closes #<n>` line per closed issue — never comma-separated. Always include `Closes #<bug_number>`. Add additional lines for any other issues this PR resolves. Example:
+  ```
+  Closes #42
+  Closes #15
+  ```
 - **Impact**: what was broken and who was affected
 - **Root cause**: what caused it
 - **Fix**: what was changed and why it's safe
@@ -161,7 +165,7 @@ Hotfix
 ──────────────────────────────────
 Branch:   hotfix/<slug>
 PR:       <url>
-Fixes:    #<bug_number>
+Closes:   #<bug_number>
 Target:   main
 Backport: <branch> or —
 ```

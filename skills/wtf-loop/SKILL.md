@@ -280,7 +280,15 @@ Sub-agents spawned by the loop do NOT inherit the parent session's loaded skills
 
 **Parallelism via DAG sub-phases:** The conflict-free sub-phases from step 2d are the unit of parallel execution. For each sub-phase, spawn one sub-agent per task in parallel using the Agent tool with `isolation: "worktree"`. Tasks in different sub-phases within the same phase share overlapping files and must NOT run concurrently — execute sub-phases sequentially within a phase.
 
-Execution order: iterate phases in order → within each phase, iterate sub-phases in order → within each sub-phase, spawn all tasks in parallel. Wait for all sub-agents in a sub-phase to complete (and process any `NEEDS_INPUT` results) before starting the next sub-phase.
+Execution order: iterate phases in order → within each phase, iterate sub-phases in order → within each sub-phase, spawn all tasks in parallel. **Before spawning the next sub-phase or phase, all PRs from the current sub-phase must be merged into the feature branch** — not just the sub-agents completed. Poll each PR until merged:
+
+```bash
+gh pr view <pr_number> --json state,mergedAt --jq '"\(.state) \(.mergedAt)"'
+```
+
+Only advance when every PR in the current sub-phase shows `MERGED`. This ensures each new worktree branches off a feature branch that already contains all prior work.
+
+**Worktree base:** Each sub-agent worktree is created from the feature branch at the moment it is spawned — after all preceding PRs have merged. The sub-agent must not assume any particular local state; it should always pull the latest feature branch before starting work.
 
 Pass the full sub-phase conflict map to each sub-agent in its prompt context so it knows which files are exclusively owned by its worktree during execution. Apply the sub-agent protocol above to every spawned agent.
 
@@ -290,14 +298,22 @@ For each Task (within its phase):
 
 Before starting each task, do a quick re-check against its **internal** blockers from the graph built in step 1. The full dependency validation already ran in step 2d — this check only guards against the case where an earlier task in this run was skipped or its PR wasn't merged before the dependent task starts.
 
-For each internal blocker of the current task:
+For each internal blocker of the current task, verify the PR is merged (not just the issue closed):
+
+```bash
+# Find the PR that closes the blocker issue
+gh pr list --state merged --search "Closes #<blocker_number>" --json number,mergedAt \
+  --jq '.[0] | "#\(.number) merged \(.mergedAt)"'
+```
+
+If no merged PR is found for the blocker, also check issue state as fallback:
 
 ```bash
 gh issue view <blocker_number> --json state,stateReason \
   --jq '"#\(.number) \(.state) (\(.stateReason))"'
 ```
 
-If a blocker is not `CLOSED` / `COMPLETED`, pause:
+A blocker is resolved only when its PR is merged (preferred signal) or the issue is `CLOSED` / `COMPLETED`. If a blocker is unresolved, pause:
 
 - `question`: "Task #<blocker> (an internal blocker) hasn't been merged yet. How do you want to proceed?"
 - `header`: "Blocked"
