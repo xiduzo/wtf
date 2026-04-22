@@ -14,31 +14,31 @@ skills/<skill-name>/SKILL.md
 
 | Skill | File |
 |---|---|
-| wtf-changelog | `skills/wtf-changelog/SKILL.md` |
-| wtf-create-pr | `skills/wtf-create-pr/SKILL.md` |
-| wtf-design-feature | `skills/wtf-design-feature/SKILL.md` |
-| wtf-design-task | `skills/wtf-design-task/SKILL.md` |
-| wtf-epic-to-features | `skills/wtf-epic-to-features/SKILL.md` |
-| wtf-feature-to-tasks | `skills/wtf-feature-to-tasks/SKILL.md` |
-| wtf-health | `skills/wtf-health/SKILL.md` |
-| wtf-hotfix | `skills/wtf-hotfix/SKILL.md` |
-| wtf-implement-task | `skills/wtf-implement-task/SKILL.md` |
-| wtf-loop | `skills/wtf-loop/SKILL.md` |
-| wtf-pr-review | `skills/wtf-pr-review/SKILL.md` |
-| wtf-refine | `skills/wtf-refine/SKILL.md` |
-| wtf-reflect | `skills/wtf-reflect/SKILL.md` |
-| wtf-report-bug | `skills/wtf-report-bug/SKILL.md` |
-| wtf-retro | `skills/wtf-retro/SKILL.md` |
-| wtf-setup | `skills/wtf-setup/SKILL.md` |
-| wtf-spike | `skills/wtf-spike/SKILL.md` |
-| wtf-steer-design | `skills/wtf-steer-design/SKILL.md` |
-| wtf-steer-qa | `skills/wtf-steer-qa/SKILL.md` |
-| wtf-steer-tech | `skills/wtf-steer-tech/SKILL.md` |
-| wtf-steer-vision | `skills/wtf-steer-vision/SKILL.md` |
-| wtf-verify-task | `skills/wtf-verify-task/SKILL.md` |
-| wtf-write-epic | `skills/wtf-write-epic/SKILL.md` |
-| wtf-write-feature | `skills/wtf-write-feature/SKILL.md` |
-| wtf-write-task | `skills/wtf-write-task/SKILL.md` |
+| wtf.changelog | `skills/wtf.changelog/SKILL.md` |
+| wtf.create-pr | `skills/wtf.create-pr/SKILL.md` |
+| wtf.design-feature | `skills/wtf.design-feature/SKILL.md` |
+| wtf.design-task | `skills/wtf.design-task/SKILL.md` |
+| wtf.epic-to-features | `skills/wtf.epic-to-features/SKILL.md` |
+| wtf.feature-to-tasks | `skills/wtf.feature-to-tasks/SKILL.md` |
+| wtf.health | `skills/wtf.health/SKILL.md` |
+| wtf.hotfix | `skills/wtf.hotfix/SKILL.md` |
+| wtf.implement-task | `skills/wtf.implement-task/SKILL.md` |
+| wtf.loop | `skills/wtf.loop/SKILL.md` |
+| wtf.pr-review | `skills/wtf.pr-review/SKILL.md` |
+| wtf.refine | `skills/wtf.refine/SKILL.md` |
+| wtf.reflect | `skills/wtf.reflect/SKILL.md` |
+| wtf.report-bug | `skills/wtf.report-bug/SKILL.md` |
+| wtf.retro | `skills/wtf.retro/SKILL.md` |
+| wtf.setup | `skills/wtf.setup/SKILL.md` |
+| wtf.spike | `skills/wtf.spike/SKILL.md` |
+| wtf.steer-design | `skills/wtf.steer-design/SKILL.md` |
+| wtf.steer-qa | `skills/wtf.steer-qa/SKILL.md` |
+| wtf.steer-tech | `skills/wtf.steer-tech/SKILL.md` |
+| wtf.steer-vision | `skills/wtf.steer-vision/SKILL.md` |
+| wtf.verify-task | `skills/wtf.verify-task/SKILL.md` |
+| wtf.write-epic | `skills/wtf.write-epic/SKILL.md` |
+| wtf.write-feature | `skills/wtf.write-feature/SKILL.md` |
+| wtf.write-task | `skills/wtf.write-task/SKILL.md` |
 
 ## Skill invocation policy
 

@@ -1,6 +1,26 @@
 # GitHub CLI Setup
 
-Run this check at the start of any skill that creates or links GitHub issues. Skip if the calling orchestrator (`epic-to-features` or `feature-to-tasks`) already ran this check — those skills note their gh-setup run explicitly in their own step 0. Also skip on re-invocations within the same session (e.g. when `write-epic` loops back into `write-feature`).
+Run this check at the start of any wtf skill that creates or links GitHub issues. Every calling skill has an identical step 0:
+
+```
+### 0. GitHub CLI setup
+
+Run `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated.
+```
+
+## When to skip
+
+Skip this entire step if **any** of the following is true:
+
+- The calling orchestrator already ran gh-setup this session (e.g. `wtf.epic-to-features` → `wtf.write-feature`, `wtf.implement-task` → `wtf.verify-task`). The orchestrator passes along the confirmation implicitly by not re-asking.
+- A prior wtf skill in the same session ran gh-setup and succeeded.
+- The skill is re-invoking itself in a loop (e.g. "Write next Task" → restart from step 2).
+
+## Which sections apply to which skills
+
+- **Sections 1–2 (install + auth):** all skills — hard stop if either fails.
+- **Sections 3–4 (extensions):** only skills that create or traverse native sub-issue/dependency links (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-task`, `wtf.loop`, `wtf.refine`, `wtf.epic-to-features`, `wtf.feature-to-tasks`). Other skills (`wtf.verify-task`, `wtf.create-pr`, `wtf.report-bug`, `wtf.design-task`, `wtf.design-feature`, `wtf.pr-review`, `wtf.changelog`, `wtf.spike`, `wtf.retro`, `wtf.health`, `wtf.hotfix`) may skip these — they do not rely on the extensions.
+- **Section 5 (repo detect):** run if the skill needs the `<owner>/<repo>` pair (wiki sync, repo-scoped queries).
 
 ## 1. Verify `gh` is installed
 
