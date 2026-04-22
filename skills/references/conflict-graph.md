@@ -14,22 +14,31 @@ Without this step, parallel worktrees can race on the same file and produce dirt
 
 ## Algorithm
 
-### 1. Fetch Impacted Areas
+### 1. Fetch Impacted Areas (with parent inheritance)
 
-For each task in the input set:
+For **every** issue in the input set — Task, Feature, Epic, Bug, or any loose/untyped issue:
 
 ```bash
-gh issue view <task_number> --json body --jq '.body'
+gh issue view <issue_number> --json body --jq '.body'
 ```
 
-Parse the `## Impacted Areas` section — collect all file paths, modules, and components listed.
+Parse the `## Impacted Areas` section — collect all file paths, modules, and components listed. Bugs and loose issues often skip this section; treat them like any other node below.
+
+**Inherit from parents (when a parent exists).** A node's *effective* impacted set is the union of:
+
+- its own `## Impacted Areas`
+- every ancestor's `## Impacted Areas` (walk `gh sub-issue list` / parent links up to the root)
+- any `## Bounded Context` paths declared at any ancestor level
+
+Parent-declared scope counts as conflict surface even when the child omits the specific file. This prevents two issues under different parents from racing on a shared module that only an ancestor names. Loose issues with no parent use only their own declared set.
 
 ### 2. Build the conflict graph
 
 Undirected graph:
 
-- Node = task
-- Edge between A and B if they share at least one impacted file, module, or component
+- Node = any issue in the run (Task, Feature, Epic, Bug, loose item — type-agnostic)
+- Edge between A and B if their *effective* impacted sets share at least one path, module, or component
+- Edge also exists if A and B sit under different ancestors whose impacted sets overlap — cross-parent conflicts are real conflicts
 - Use case-insensitive path prefix match — `src/payments/` conflicts with `src/payments/service.ts`
 
 ### 3. Greedy coloring
@@ -41,7 +50,9 @@ Assign tasks to sub-phases in issue-number order (stable):
 
 ### 4. Handle missing Impacted Areas
 
-If a task has no `## Impacted Areas` section (or it is empty), treat it as conflicting with all others — assign it to its own sub-phase to be safe. Note this in the execution plan so the user understands why the task is serialized.
+If an issue has no `## Impacted Areas` *and* inherits nothing from any ancestor (common for bugs and loose issues), treat it as conflicting with all others — assign it to its own sub-phase. Note this in the execution plan so the user understands why it is serialized.
+
+If the issue is empty but an ancestor declares impacted areas, use the inherited set (step 1) — do not serialize unnecessarily.
 
 ## Output shape
 

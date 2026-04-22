@@ -71,11 +71,13 @@ gh sub-issue list <epic_number>        # yields feature numbers
 gh sub-issue list <feature_number>     # yields task numbers
 ```
 
-Build the full node list with parent context: `(issue_number, type, feature_number, epic_number)`. Include both Tasks and Features in the node list — features can also have cross-feature dependencies.
+Build the full node list with parent context: `(issue_number, type, parent_chain)`. **Include every issue in the run regardless of type** — Tasks, Features, Epics, Bugs, and any loose/untyped issues linked in via sub-issue or dependency edges. Type does not gate inclusion; any issue that can block, be blocked by, or share files with another issue in the run belongs in the graph.
+
+Walk the full transitive closure: start from the selected target, follow `gh sub-issue list` down, follow `gh issue-dependency list` outward (both directions), and keep pulling until no new issues surface. Do not stop at Feature or Epic boundaries — a Bug linked as a blocker of a Task belongs in the DAG just like the Task does.
 
 **Build the dependency graph:**
 
-For every node (Task and Feature) in the list, fetch its dependency edges in parallel:
+For every node in the list — type-agnostic — fetch its dependency edges in parallel:
 
 ```bash
 gh issue-dependency list <issue_number>
@@ -148,9 +150,9 @@ Using the dependency graph built in step 1:
 
    An external blocker is resolved only if its state is `CLOSED` with `stateReason: COMPLETED` (i.e., closed via a merged PR). If any external blocker is unresolved, list them as blockers — the loop cannot start until they are resolved.
 
-3. **Topological sort** — sort all internal nodes into an execution order that respects every `blocked_by` edge. Group nodes at the same depth into **execution phases** — tasks within a phase have no dependency between them.
+3. **Topological sort** — sort **every** node (any type) into an execution order that respects every `blocked_by` edge at every level. A node inherits every ancestor's `blocked_by` edges: it cannot start until every dependency of every ancestor is also satisfied. Group nodes at the same effective depth into **execution phases** — nodes within a phase have no dependency between them, directly or through any ancestor.
 
-4. **File-conflict sub-phasing** — apply the algorithm in `../references/conflict-graph.md` to each phase. This partitions each phase into numbered sub-phases where tasks within a sub-phase share no overlapping impacted files. Record the final execution structure as:
+4. **File-conflict sub-phasing** — apply the algorithm in `../references/conflict-graph.md` to each phase, using the *effective* impacted set (node ∪ every ancestor's impacted set). This partitions each phase into numbered sub-phases where nodes within a sub-phase share no overlapping impacted files — including cross-parent overlaps inherited from ancestors, and overlaps against loose bugs/issues mixed into the run. Record the final execution structure as:
 
    ```
    phases: [
