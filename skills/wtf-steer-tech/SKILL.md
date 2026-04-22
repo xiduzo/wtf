@@ -101,10 +101,11 @@ If **yes**:
 
 ```bash
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-git clone https://github.com/$REPO.wiki.git /tmp/wiki-sync
-cp docs/steering/TECH.md /tmp/wiki-sync/WTF-Tech.md
-cd /tmp/wiki-sync && git add WTF-Tech.md && git commit -m "Sync: technical guidelines" && git push
-rm -rf /tmp/wiki-sync
+WIKI_DIR=$(mktemp -d -t wtf-wiki-sync-tech-XXXXXX)
+git clone https://github.com/$REPO.wiki.git "$WIKI_DIR"
+cp docs/steering/TECH.md "$WIKI_DIR/WTF-Tech.md"
+(cd "$WIKI_DIR" && git add WTF-Tech.md && git commit -m "Sync: technical guidelines" && git push)
+rm -rf "$WIKI_DIR"
 ```
 
 ### 8. Offer to continue

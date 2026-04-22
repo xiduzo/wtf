@@ -205,7 +205,7 @@ Create the Task issue:
 # Ensure the label exists before creating the issue
 gh label create task --color e4e669 --description "Implementable vertical slice of a Feature" 2>/dev/null || true
 
-gh issue create --title "🛠 Task: <title>" --body-file /tmp/task-body.md --label "task"
+gh issue create --title "🛠 Task: <title>" --body-file /tmp/wtf-task-$(date +%s)-body.md --label "task"
 ```
 
 Print the Task issue URL and number.

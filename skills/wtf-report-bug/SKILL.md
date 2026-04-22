@@ -125,7 +125,8 @@ Apply edits, then proceed.
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the bug's one-sentence description. Pass in the description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence description.
 
 ```bash
-gh issue create --title "🐞 Bug: <title>" --body-file /tmp/bug-body.md --label "bug"
+BUG_TMP=/tmp/wtf-bug-$(date +%s)-body.md
+gh issue create --title "🐞 Bug: <title>" --body-file "$BUG_TMP" --label "bug"
 ```
 
 If the originating Task is known, add a comment to it linking the bug:
@@ -137,7 +138,7 @@ gh issue comment <task_number> --body "🐞 Bug reported: #<bug_number> — <one
 Print the Bug issue URL and number.
 
 ```bash
-rm /tmp/bug-body.md
+rm "$BUG_TMP"
 ```
 
 > Note: if the `bug` label does not exist on the repo, create it first with `gh label create bug --color d73a4a` before running `gh issue create`.

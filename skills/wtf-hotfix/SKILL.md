@@ -117,7 +117,7 @@ gh label create hotfix --color e11d48 --description "Emergency fix targeting mai
 
 gh pr create \
   --title "fix(<scope>): <description>" \
-  --body-file /tmp/wtf-hotfix-body.md \
+  --body-file /tmp/wtf-hotfix-<bug_number>-body.md \
   --base main \
   --label "hotfix"
 ```

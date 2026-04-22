@@ -131,16 +131,19 @@ Determine the base branch from the current branch name:
 Write the body to a temp file, then create the PR:
 
 ```bash
+# Derive a unique suffix from the branch name (fallback to timestamp):
+SUFFIX=$(git rev-parse --abbrev-ref HEAD | tr '/' '-' || date +%s)
+
 # task branch:
 gh pr create \
   --title "<title>" \
-  --body-file /tmp/wtf-create-pr-body.md \
+  --body-file /tmp/wtf-create-pr-${SUFFIX}-body.md \
   --base feature/<feature-number>-<feature-slug>
 
 # feature branch:
 gh pr create \
   --title "<title>" \
-  --body-file /tmp/wtf-create-pr-body.md \
+  --body-file /tmp/wtf-create-pr-${SUFFIX}-body.md \
   --base main
 ```
 

@@ -131,7 +131,7 @@ Call `AskUserQuestion` with `question: "What tag should this release use?"`, `he
 ```bash
 gh release create <tag> \
   --title "<release title>" \
-  --notes-file /tmp/wtf-release-notes.md
+  --notes-file /tmp/wtf-release-notes-<tag>.md
 ```
 
 Print the release URL or CHANGELOG.md path.

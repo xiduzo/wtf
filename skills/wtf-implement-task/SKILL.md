@@ -139,10 +139,10 @@ Show the Technical Approach. Then call `AskUserQuestion` with `question: "Does t
 
 Apply changes. Then update the Task issue with the Technical Approach and Impacted Areas.
 
-> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Use `/tmp/wtf-implement-task-approach.md` as the temp file.
+> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Use `/tmp/wtf-implement-task-<task_number>-approach.md` as the temp file.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf-implement-task-approach.md
+gh issue edit <task_number> --body-file /tmp/wtf-implement-task-<task_number>-approach.md
 ```
 
 ### 8. Drive the TDD cycle
@@ -192,10 +192,10 @@ Fill the Test Mapping table in the Task issue with concrete file paths:
 | ----------------- | ----------------------- | ------- |
 | `<scenario name>` | `<test file path:line>` | passing |
 
-> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Re-fetch the body (do not reuse the temp file from step 6). Use `/tmp/wtf-implement-task-test-mapping.md` as the temp file.
+> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Re-fetch the body (do not reuse the temp file from step 6). Use `/tmp/wtf-implement-task-<task_number>-test-mapping.md` as the temp file.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf-implement-task-test-mapping.md
+gh issue edit <task_number> --body-file /tmp/wtf-implement-task-<task_number>-test-mapping.md
 ```
 
 Print the updated Task issue URL.

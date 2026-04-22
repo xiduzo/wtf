@@ -151,7 +151,7 @@ Apply edits, then proceed immediately.
 # Ensure the label exists before creating the issue
 gh label create epic --color 5319e7 --description "Strategic initiative spanning multiple features" 2>/dev/null || true
 
-gh issue create --title "🎯 Epic: <title>" --body-file /tmp/wtf-epic-body.md --label "epic"
+gh issue create --title "🎯 Epic: <title>" --body-file /tmp/wtf-epic-$(date +%s)-body.md --label "epic"
 ```
 
 Print the issue URL and number.

@@ -154,7 +154,7 @@ Apply any edits, then proceed.
 ```bash
 gh pr review <pr_number> \
   --<approve|request-changes|comment> \
-  --body-file /tmp/wtf-pr-review-body.md
+  --body-file /tmp/wtf-pr-review-<pr_number>-body.md
 ```
 
 Use:

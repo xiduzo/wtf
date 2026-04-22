@@ -196,7 +196,7 @@ Apply edits, then proceed.
 Read the current issue body, replace only the **Design Handoff** section with the new content, preserve all other sections. Write to temp file and use `--body-file`:
 
 ```bash
-gh issue edit <feature_number> --body-file /tmp/wtf-design-feature-body.md
+gh issue edit <feature_number> --body-file /tmp/wtf-design-feature-<feature_number>-body.md
 ```
 
 Add the `designed` label when either:

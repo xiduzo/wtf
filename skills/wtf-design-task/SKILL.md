@@ -131,7 +131,7 @@ Apply edits, then proceed.
 > Note: read the current issue body first (`gh issue view <task_number>`), replace only the Design Reference section with the new content, and preserve all other sections unchanged. Write the full updated body to a temp file and use `--body-file`.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf-design-task-body.md
+gh issue edit <task_number> --body-file /tmp/wtf-design-task-<task_number>-body.md
 ```
 
 Add the `designed` lifecycle label to mark this step complete:
