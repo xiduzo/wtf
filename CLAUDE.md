@@ -1,14 +1,16 @@
 # WTF — Claude Code Instructions
 
+## Repo layout
+
+- `skills/` — **source of truth** for all skill definitions. Always edit here.
+- `skills/references/` — cross-skill reference docs (see below).
+- `hooks/` — plugin hooks (intervention tracker + `hooks.json` manifest).
+- `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN) and `docs/spikes/`.
+- `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
+
 ## Canonical skill location
 
-**Always edit skill files in `skills/`** — this is the source of truth.
-
-The `.agents/skills/` and `.claude/skills/` directories are copies or symlinks used by the plugin runtime. Changes made there will not persist correctly. When modifying or creating a skill, always target:
-
-```
-skills/<skill-name>/SKILL.md
-```
+Edit skill files in `skills/<skill-name>/SKILL.md`. Any other path is a runtime artifact.
 
 ## Skill inventory
 
@@ -40,10 +42,29 @@ skills/<skill-name>/SKILL.md
 | wtf.write-feature | `skills/wtf.write-feature/SKILL.md` |
 | wtf.write-task | `skills/wtf.write-task/SKILL.md` |
 
+Keep this table in sync with `skills/` when adding/removing skills.
+
 ## Skill invocation policy
 
-**Never invoke wtf skills automatically.** Skills in this project are only activated when the user explicitly triggers them via a `/` slash command (e.g. `/wtf.loop`, `/wtf.write-task`). Do not auto-trigger any wtf skill based on inferred intent, conversation context, or keywords.
+**Never invoke wtf skills automatically.** Only activate on explicit `/` slash command (e.g. `/wtf.loop`, `/wtf.write-task`). Do not auto-trigger from inferred intent, conversation context, or keywords — even when the user's phrasing matches a skill's description.
 
 ## Shared references
 
-Cross-skill references (gh-setup, issue templates, DDD rules, etc.) live in `skills/references/`.
+Cross-skill references live in `skills/references/`:
+
+| File | Purpose |
+|---|---|
+| `commit-conventions.md` | Commit message format used across skills |
+| `conflict-graph.md` | Dependency / file-conflict model for parallel task execution |
+| `ddd-writing-rules.md` | Ubiquitous-language rules for issue/Gherkin authoring |
+| `gh-setup.md` | `gh` CLI + extension install + template scaffolding |
+| `questioning-style.md` | How skills should prompt the user |
+| `scope-gates.md` | Definition-of-Ready / Definition-of-Done gates |
+| `steering-doc-process.md` | How steering docs are created and refined |
+| `subagent-protocol.md` | Contract for subagent delegation |
+
+Reference these from skills rather than duplicating content.
+
+## Hooks
+
+`hooks/track-interventions.sh` (wired via `hooks/hooks.json` on `UserPromptSubmit` + `Stop`) counts user corrections and nudges toward `/wtf.reflect` when they accumulate. Do not bypass.

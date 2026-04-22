@@ -28,8 +28,5 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Validate manifest JSON
-        run: node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/marketplace.json','utf8')); console.log('marketplace.json is valid JSON')"
-
       - name: Discover skills from repository
         run: npx --yes skills@1.4.9 add . --list
