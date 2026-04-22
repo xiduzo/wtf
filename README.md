@@ -209,12 +209,14 @@ npx skills update
 | --- | --- |
 | [`yahsan2/gh-sub-issue`](https://github.com/yahsan2/gh-sub-issue) | Epic → Feature → Task sub-issue hierarchy |
 | [`xiduzo/gh-issue-dependency`](https://github.com/xiduzo/gh-issue-dependency) | Native `Blocks` / `Blocked-by` links |
+| Intervention-tracker hook | Registers `UserPromptSubmit` + `Stop` entries in `settings.json` to nudge you toward `/wtf.reflect` after repeated corrections. Asks scope (global `~/.claude/settings.json` or per-repo `.claude/settings.json`). |
 
 **Optional:**
 
 | Requirement | Needed for |
 | --- | --- |
 | [Figma](https://figma.com) account | `wtf.design-feature`, `wtf.design-task` — only when linking Figma frames; both skills can scaffold without it |
+| `python3` in `PATH` | Hook auto-registration in `settings.json`. If missing, `wtf.setup` prints the JSON snippet for manual paste. The hook itself only needs POSIX `sh`. |
 
 ## Skill reference
 
@@ -224,7 +226,7 @@ npx skills update
 | -------------- | ---------------- | -------------------------------------------------------------- |
 | `wtf.setup`   | "set up wtf"     | Pre-flight check and installer — run once per repo on onboard  |
 
-Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, creates all lifecycle labels (`epic`, `feature`, `task`, `bug`, `implemented`, `designed`, `verified`), and prints a status report. Offers to kick off steering doc creation at the end.
+Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, creates all lifecycle labels (`epic`, `feature`, `task`, `bug`, `implemented`, `designed`, `verified`), registers the intervention-tracker hook (asks global vs per-repo), and prints a status report. Offers to kick off steering doc creation at the end.
 
 ### Pre-planning
 

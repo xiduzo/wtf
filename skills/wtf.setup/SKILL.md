@@ -125,7 +125,63 @@ If any label creation fails (e.g. insufficient permissions), warn the user — n
 
 > **Closing convention:** GitHub has no native setting to require PR-based closure, so this is enforced by skill behavior. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (won't implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
-### 8. Report status
+### 8. Install intervention-tracker hook
+
+The tracker hook counts user corrections and nudges toward `/wtf.reflect`. skills.sh copies the hook script into the skill dir, but the hook must be registered in Claude Code's `settings.json` manually.
+
+**Step A — locate the installed hook script.** Probe, in order, and keep the first that exists:
+
+```bash
+for cand in \
+  "$HOME/.claude/skills/wtf.setup/hooks/track-interventions.sh" \
+  "$PWD/.claude/skills/wtf.setup/hooks/track-interventions.sh" \
+  "$PWD/skills/wtf.setup/hooks/track-interventions.sh"; do
+  [ -f "$cand" ] && HOOK_PATH="$cand" && break
+done
+```
+
+If none exist: warn the user that the hook script could not be found and skip hook registration.
+
+**Step B — ask scope** via `AskUserQuestion`:
+
+- `question`: "Install the WTF intervention-tracker hook globally or only for this repo?"
+- `header`: "Hook scope"
+- `options`: `[{label: "Global (~/.claude/settings.json)", description: "Runs in every repo that has docs/steering/"}, {label: "This repo only (.claude/settings.json)", description: "Scoped to this project"}, {label: "Skip", description: "Don't install the hook"}]`
+
+Set `SETTINGS_FILE` accordingly:
+- Global → `$HOME/.claude/settings.json`
+- Per-repo → `.claude/settings.json`
+- Skip → jump to step 9.
+
+**Step C — patch settings.json idempotently.** Create the file if missing (`echo '{}' > "$SETTINGS_FILE"`). Then merge the two hook entries using `python3` (available on macOS/Linux; git-bash on Windows ships it via the installer or can be swapped for `py`):
+
+```bash
+HOOK_CMD="sh $HOOK_PATH"
+python3 - "$SETTINGS_FILE" "$HOOK_CMD" <<'PY'
+import json, sys, pathlib
+path, cmd = sys.argv[1], sys.argv[2]
+p = pathlib.Path(path)
+data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
+hooks = data.setdefault("hooks", {})
+for event in ("UserPromptSubmit", "Stop"):
+    arr = hooks.setdefault(event, [])
+    exists = any(
+        any(h.get("command") == cmd for h in entry.get("hooks", []))
+        for entry in arr
+    )
+    if not exists:
+        arr.append({"matcher": "", "hooks": [{"type": "command", "command": cmd}]})
+p.write_text(json.dumps(data, indent=2))
+PY
+```
+
+Re-running is safe — existing entries are detected by exact `command` string and not duplicated.
+
+**Windows note:** if the user is on Windows without `python3`, skip the patch and print the JSON snippet for manual paste. Detect via `command -v python3 >/dev/null || echo 'manual'`.
+
+Record `hook-installed: true|false|skipped` for the status report.
+
+### 9. Report status
 
 Print a clear status summary covering every check:
 
@@ -144,13 +200,14 @@ Issue templates
   TASK.md                 ✅  (or ✅ installed from references)
 PR template               ✅  (or ✅ installed from references)
 GitHub labels             ✅  epic, feature, task, bug, implemented, designed, verified
+Intervention hook         ✅  installed (global)  (or  ✅ installed (repo)  /  ⚪ skipped  /  ⚠️ manual paste required)
 ─────────────────────────
 Ready to use WTF. Start with `wtf.write-epic` to plan your first initiative.
 ```
 
 If any item failed (gh not installed, not authenticated), replace the closing line with a clear "Fix the issues above before proceeding." and do not suggest next steps.
 
-### 9. Offer to set up steering docs
+### 10. Offer to set up steering docs
 
 If setup completed without fatal errors, call `AskUserQuestion` with:
 

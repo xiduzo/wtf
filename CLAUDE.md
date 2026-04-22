@@ -4,7 +4,7 @@
 
 - `skills/` — **source of truth** for all skill definitions. Always edit here.
 - `skills/references/` — cross-skill reference docs (see below).
-- `hooks/` — plugin hooks (intervention tracker + `hooks.json` manifest).
+- `skills/wtf.setup/hooks/` — shipped hook scripts (installed into `settings.json` by `wtf.setup`).
 - `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN) and `docs/spikes/`.
 - `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
 
@@ -67,4 +67,4 @@ Reference these from skills rather than duplicating content.
 
 ## Hooks
 
-`hooks/track-interventions.sh` (wired via `hooks/hooks.json` on `UserPromptSubmit` + `Stop`) counts user corrections and nudges toward `/wtf.reflect` when they accumulate. Do not bypass.
+`skills/wtf.setup/hooks/track-interventions.sh` rides along inside the `wtf.setup` skill payload. The `wtf.setup` skill registers it into the user's `~/.claude/settings.json` or the repo's `.claude/settings.json` for `UserPromptSubmit` + `Stop` events. Counts user corrections and nudges toward `/wtf.reflect` when they accumulate. Do not bypass.
