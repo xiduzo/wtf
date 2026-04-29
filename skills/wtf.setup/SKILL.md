@@ -62,6 +62,45 @@ gh repo view --json nameWithOwner -q .nameWithOwner
 
 If this fails (not inside a git repo, or no GitHub remote), warn the user and note that issue creation will not work until the repo is connected to GitHub. Continue to the template check regardless.
 
+### 4b. Verify GitHub permissions
+
+The workflow requires the authenticated user to manage labels and create issue relationships (sub-issues, dependencies). Both need **write access** to the repo and a token with the `repo` scope (or `public_repo` for public repos).
+
+**Check token scopes:**
+
+```bash
+gh auth status 2>&1 | grep -i "token scopes"
+```
+
+Required scopes (any of):
+- `repo` — full control (private + public repos)
+- `public_repo` — sufficient for public repos only
+
+If neither scope is present, instruct the user to refresh auth with the right scopes:
+
+```bash
+gh auth refresh -h github.com -s repo
+```
+
+…and stop until re-run.
+
+**Check repo write permission:**
+
+```bash
+gh api "repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)" \
+  --jq '.permissions | {admin, maintain, push, triage, pull}'
+```
+
+The user must have `admin: true`, `maintain: true`, or `push: true`. If only `triage` or `pull`, warn:
+
+> ⚠️ You have read-only access to this repo. Label creation and issue linking will fail. Ask a maintainer for write access or fork the repo.
+
+Record two booleans for the final report:
+- `token-scopes-ok`: true if `repo` or `public_repo` scope present
+- `repo-write-ok`: true if `admin`, `maintain`, or `push` is true
+
+If either is false, skip label creation in step 7 and warn that sub-issue / dependency creation will fail at runtime.
+
 ### 5. Check issue templates
 
 Check whether `.github/ISSUE_TEMPLATE/` exists and contains all four required templates:
@@ -193,6 +232,8 @@ gh authenticated          ✅
 gh-sub-issue extension    ✅  (or ⚠️ not installed — relationship links unavailable)
 gh-issue-dependency ext   ✅  (or ⚠️ not installed — dependency links unavailable)
 Repo context              ✅  owner/repo  (or ⚠️ not detected)
+Token scopes              ✅  repo  (or ⚠️ missing — run `gh auth refresh -s repo`)
+Repo write permission     ✅  push/maintain/admin  (or ⚠️ read-only — labels & links will fail)
 Issue templates
   BUG.md                  ✅  (or ✅ installed from references)
   EPIC.md                 ✅  (or ✅ installed from references)
