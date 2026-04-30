@@ -91,7 +91,9 @@ List each file found with a one-line description of what it covers. These become
 
 ### 6. Draft the Bug report
 
-Read the BUG template first:
+Before drafting, verify `.github/ISSUE_TEMPLATE/BUG.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
+
+Read the BUG template:
 
 ```bash
 # Read .github/ISSUE_TEMPLATE/BUG.md

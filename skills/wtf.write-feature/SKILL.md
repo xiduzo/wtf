@@ -96,6 +96,8 @@ Evaluate:
 
 Acceptance Criteria must map 1:1 to user stories. Edge Cases must name at least 2 explicit failure or boundary scenarios.
 
+Before drafting, verify `.github/ISSUE_TEMPLATE/FEATURE.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
+
 Use the issue body structure from @.github/ISSUE_TEMPLATE/FEATURE.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context.
 
 **DDD writing rules for this draft** (see `../references/ddd-writing-rules.md` for full rules):

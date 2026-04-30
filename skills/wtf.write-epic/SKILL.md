@@ -85,7 +85,9 @@ Evaluate:
 
 Produce a complete draft. Success Metrics must be specific and measurable. Feature Breakdown stays as empty placeholders.
 
-Use the issue body structure from @.github/ISSUE_TEMPLATE/EPIC.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context. If the file is missing or the reference cannot be resolved, use the following minimal structure: `## Context`, `## Goal`, `## Success Metrics`, `## Feature Breakdown`, `## Risks`, `## Bounded Context`.
+Before drafting, verify `.github/ISSUE_TEMPLATE/EPIC.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
+
+Use the issue body structure from @.github/ISSUE_TEMPLATE/EPIC.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context.
 
 **DDD writing rules for this draft:**
 

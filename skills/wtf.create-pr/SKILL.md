@@ -95,7 +95,9 @@ This avoids including unrelated merged commits when the branch has a long histor
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a PR title per `../references/commit-conventions.md`. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly following the same rules. Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
 
-**Body:** Use the structure from @.github/pull_request_template.md. Fill in all sections:
+**Body:** Before drafting, verify `.github/pull_request_template.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
+
+Use the structure from @.github/pull_request_template.md. Fill in all sections:
 
 - **Summary**: derived from the Task's Intent + Functional Description (or commit messages if no Task). Explain the _why_.
 - **Changes**: grouped logical summary of `git diff --stat` output — not a file list.

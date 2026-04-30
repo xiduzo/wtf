@@ -142,6 +142,8 @@ Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 
 ### 8. Draft the Task
 
+Before drafting, verify `.github/ISSUE_TEMPLATE/TASK.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
+
 Use the issue body structure from @.github/ISSUE_TEMPLATE/TASK.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
 
 Section-specific guidance:
