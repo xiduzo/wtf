@@ -31,11 +31,10 @@ Check whether a PR already exists for this branch:
 gh pr list --head <branch_name> --state open
 ```
 
-If an open PR already exists, print its URL and call `AskUserQuestion` with:
+If an open PR already exists, print its URL and ask "A PR already exists for this branch. Would you like me to update its description instead?" — header `Existing PR`:
 
-- `question`: "A PR already exists for this branch. Would you like me to update its description instead?"
-- `header`: "Existing PR"
-- `options`: `[{label: "Update description", description: "Edit the existing PR's description"}, {label: "Open a new one", description: "Create a new PR anyway"}]`
+- **Update description** → edit the existing PR's description
+- **Open a new one** → create a new PR anyway
 
 - **Update description** → skip to step 5, targeting the existing PR for update via `gh pr edit <pr_number>`.
 - **Open a new one** → continue.
@@ -44,9 +43,15 @@ If an open PR already exists, print its URL and call `AskUserQuestion` with:
 
 Try to extract a task number from the branch name (e.g. `task/42-date-range-filter` → `#42`).
 
-If found, call `AskUserQuestion` with `question: "I found Task #<n> linked to this branch. Is that the right task?"`, `header: "Linked task"`, and `options: [{label: "Yes, that's correct", description: "Use Task #<n>"}, {label: "No, use a different task", description: "I'll provide the correct issue number"}]`.
+If found, ask "I found Task #<n> linked to this branch. Is that the right task?" — header `Linked task`:
 
-If not found or the user says no, call `AskUserQuestion` with `question: "Is there a Task issue linked to this work?"`, `header: "Linked task"`, and `options: [{label: "No linked task", description: "Proceed without a task link"}, {label: "Yes — I'll provide the number", description: "Enter the task issue number"}]`.
+- **Yes, that's correct** → use Task #<n>
+- **No, use a different task** → I'll provide the correct issue number
+
+If not found or the user says no, ask "Is there a Task issue linked to this work?" — header `Linked task`:
+
+- **No linked task** → proceed without a task link
+- **Yes — I'll provide the number** → enter the task issue number
 
 ### 3. Lifecycle check (if Task linked)
 
@@ -56,11 +61,10 @@ If a Task issue is known, check its labels:
 gh issue view <task_number> --json labels --jq '.labels[].name'
 ```
 
-If the `verified` label is **absent**, warn the user that the task hasn't been verified yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task → create-pr**. Then call `AskUserQuestion` with:
+If the `verified` label is **absent**, warn the user that the task hasn't been verified yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task → create-pr**. Then ask "This task hasn't been verified yet. How would you like to proceed?" — header `Verify first?`:
 
-- `question`: "This task hasn't been verified yet. How would you like to proceed?"
-- `header`: "Verify first?"
-- `options`: `[{label: "Verify first", description: "Run `wtf.verify-task` before opening the PR (default)"}, {label: "Open PR anyway", description: "Skip verification and open the PR now"}]`
+- **Verify first** → run `wtf.verify-task` before opening the PR (default)
+- **Open PR anyway** → skip verification and open the PR now
 
 - **Verify first** → follow the `wtf.verify-task` process, passing the Task number in as context.
 - **Open PR anyway** → proceed.
@@ -106,7 +110,10 @@ Use the structure from @.github/pull_request_template.md. Fill in all sections:
 
 ### 7. Review with user
 
-Show the draft title and body. Then call `AskUserQuestion` with `question: "Does this look right?"`, `header: "Review"`, and `options: [{label: "Looks good — create the PR", description: "Proceed with PR creation"}, {label: "I have changes", description: "I want to adjust something first"}]`.
+Show the draft title and body. Then ask "Does this look right?" — header `Review`:
+
+- **Looks good — create the PR** → proceed with PR creation
+- **I have changes** → adjust first
 
 Apply edits, then proceed.
 
@@ -116,7 +123,7 @@ Determine the base branch from the current branch name:
 
 - `task/*` branch → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
 - `feature/*` branch → target `main`
-- Other → call `AskUserQuestion` with `question: "What branch should this PR target?"`, `header: "Base branch"`, options derived from `git branch -r`.
+- Other → ask "What branch should this PR target?" — header `Base branch`, options from `git branch -r`.
 
 Write the body to a temp file, then create the PR:
 
@@ -149,13 +156,12 @@ gh issue comment <task_number> --body "PR opened: <pr_url>"
 
 ### 10. Offer next steps
 
-Call `AskUserQuestion` with:
+Ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`: `[{label: "Request a review", description: "Add reviewers to this PR now (default)"}, {label: "Done", description: "Exit — no further action"}]`
+- **Request a review** → add reviewers to this PR now (default)
+- **Done** → exit, no further action
 
-- **Request a review** → call `AskUserQuestion` with `question: "Who should review this?"`, `header: "Reviewer"`, and `options` pre-filled with team member usernames inferred from recent git log authors or the repository's CODEOWNERS file. Then:
+On **Request a review** → ask "Who should review this?" — header `Reviewer`, options from team member usernames inferred from recent git log authors or the repository's CODEOWNERS file. Then:
   ```bash
   gh pr edit <pr_number> --add-reviewer <username>
   ```

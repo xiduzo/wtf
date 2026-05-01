@@ -44,14 +44,13 @@ If any are missing, install them before proceeding.
 
 ### 1. Identify the target and build the dependency graph
 
-Call `AskUserQuestion` with:
+Apply `../references/questioning-style.md` for every question in this skill.
 
-- `question`: "What do you want to execute?"
-- `header`: "Target"
-- `options` pre-filled from open issues labeled `epic` or `feature`:
-  - `[{label: "Feature #<n> — <title>", description: "Execute all Tasks under this Feature"}, ...]`
-  - Include an "Epic — all features" option if an Epic is available.
-  - Include `{label: "Resume a previous run", description: "Pick up where the loop left off for an in-progress Feature"}` — when selected, fetch open tasks under the chosen Feature that are **not** labeled `implemented` or `verified`, and skip straight to step 4 starting from the first unfinished task. Print which tasks will be skipped (already done) and which will run.
+Ask "What do you want to execute?" — header `Target`:
+
+- One option per open Feature (e.g. **Feature #<n> — <title>** → execute all Tasks under this Feature)
+- One **Epic — all features** option if an Epic is available
+- **Resume a previous run** → pick up where the loop left off for an in-progress Feature; fetch open tasks under the chosen Feature that are not labeled `implemented` or `verified`, and skip straight to step 4 starting from the first unfinished task. Print which tasks will be skipped (already done) and which will run.
 
 **Fetch the hierarchy:**
 
@@ -177,14 +176,11 @@ Pre-flight findings:
   Circular deps:     [list — HARD STOP if any]
 ```
 
-Call `AskUserQuestion` with:
+Ask "Pre-flight found [n] issue(s). How would you like to proceed?" — header `Pre-flight`:
 
-- `question`: "Pre-flight found [n] issue(s). How would you like to proceed?"
-- `header`: "Pre-flight"
-- `options`:
-  - `{label: "Fix before running", description: "Resolve the issues above, then re-run the loop"}`
-  - `{label: "Proceed with warnings", description: "Acknowledge the issues and run anyway (not recommended for contradictions)"}` — only if no circular deps
-  - `{label: "Stop", description: "Exit — I'll address these manually"}`
+- **Fix before running** → resolve the issues above, then re-run the loop
+- **Proceed with warnings** → acknowledge the issues and run anyway (not recommended for contradictions; only available if no circular deps)
+- **Stop** → exit; I'll address these manually
 
 If **no findings**: continue silently.
 
@@ -224,15 +220,12 @@ Feature #5 — Payment Settlement   (no feature-level blockers)
 Feature #6 — Reporting            blocked by Feature #5
 ```
 
-Call `AskUserQuestion` with:
+Ask "Here's the suggested execution plan based on the dependency graph. Does this look right?" — header `Plan review`:
 
-- `question`: "Here's the suggested execution plan based on the dependency graph. Does this look right?"
-- `header`: "Plan review"
-- `options`:
-  - `{label: "Approve — start the loop", description: "Execute tasks in this order"}`
-  - `{label: "Remove a task", description: "Drop one or more tasks from this run — I'll specify which"}`
-  - `{label: "Change the order", description: "Override the suggested phase ordering — I'll describe the change"}`
-  - `{label: "Decline — stop", description: "Exit without executing anything"}`
+- **Approve — start the loop** → execute tasks in this order
+- **Remove a task** → drop one or more tasks from this run; specify which
+- **Change the order** → override the suggested phase ordering; describe the change
+- **Decline — stop** → exit without executing anything
 
 **If "Remove a task":** ask which tasks to drop, remove them from the graph (and re-evaluate whether any remaining tasks lose all their blockers and can move to an earlier phase), then re-present the updated plan and ask again.
 
@@ -292,13 +285,10 @@ gh issue view <blocker_number> --json state,stateReason \
   --jq '"#\(.number) \(.state) (\(.stateReason))"'
 ```
 
-A blocker is resolved only when its PR is merged (preferred signal) or the issue is `CLOSED` / `COMPLETED`. If a blocker is unresolved, pause:
+A blocker is resolved only when its PR is merged (preferred signal) or the issue is `CLOSED` / `COMPLETED`. If a blocker is unresolved, pause and ask "Task #<blocker> (an internal blocker) hasn't been merged yet. How do you want to proceed?" — header `Blocked`:
 
-- `question`: "Task #<blocker> (an internal blocker) hasn't been merged yet. How do you want to proceed?"
-- `header`: "Blocked"
-- `options`:
-  - `{label: "Wait — I'll merge it now", description: "Pause here. Re-run the loop from this task after merging."}`
-  - `{label: "Skip this task", description: "Skip Task #<current_task> and continue with tasks that aren't blocked"}`
+- **Wait — I'll merge it now** → pause here; re-run the loop from this task after merging
+- **Skip this task** → skip Task #<current_task> and continue with tasks that aren't blocked
 
 If all internal blockers are resolved, continue silently.
 
@@ -323,16 +313,11 @@ If **all** scenarios are test-suite covered and the suite passes → proceed to 
 
 If **any** scenario is not covered by the test suite → pause and present only those uncovered scenarios for human verification. Do not re-verify covered scenarios.
 
-If a covered scenario's tests **fail**:
+If a covered scenario's tests **fail**, ask "Task #<n> — [n] test(s) failed. How do you want to proceed?" — header `Tests failed`:
 
-Call `AskUserQuestion` with:
-
-- `question`: "Task #<n> — [n] test(s) failed. How do you want to proceed?"
-- `header`: "Tests failed"
-- `options`:
-  - `{label: "Fix and re-verify", description: "Pause the loop — fix the implementation, then re-run from this task"}`
-  - `{label: "Skip and continue", description: "Skip this task for now and proceed to the next"}`
-  - `{label: "Stop loop", description: "Exit the loop entirely"}`
+- **Fix and re-verify** → pause the loop; fix the implementation, then re-run from this task
+- **Skip and continue** → skip this task for now and proceed to the next
+- **Stop loop** → exit the loop entirely
 
 **d. Open PR and wait for pipeline**
 
@@ -359,16 +344,11 @@ gh pr merge <pr_number> --merge --delete-branch
 
 Then continue to the next task.
 
-**If any check fails** (`conclusion: FAILURE` or `conclusion: ACTION_REQUIRED`):
+**If any check fails** (`conclusion: FAILURE` or `conclusion: ACTION_REQUIRED`), ask "Task #<n> PR pipeline failed — [list failing check names]. How do you want to proceed?" — header `Pipeline failed`:
 
-Call `AskUserQuestion` with:
-
-- `question`: "Task #<n> PR pipeline failed — [list failing check names]. How do you want to proceed?"
-- `header`: "Pipeline failed"
-- `options`:
-  - `{label: "Fix and re-run", description: "Pause the loop — push a fix, then re-run the pipeline"}`
-  - `{label: "Skip this task", description: "Leave the PR open and continue with remaining tasks"}`
-  - `{label: "Stop loop", description: "Exit the loop entirely"}`
+- **Fix and re-run** → pause the loop; push a fix, then re-run the pipeline
+- **Skip this task** → leave the PR open and continue with remaining tasks
+- **Stop loop** → exit the loop entirely
 
 **If the pipeline times out or returns no checks** (repo has no CI configured) → merge automatically, as there is nothing to wait on.
 
@@ -393,13 +373,10 @@ gh sub-issue list <feature_number>
 
 If both checks show all work is complete (no open sub-issues, all task PRs merged), open the feature PR automatically — no confirmation needed.
 
-If either check shows pending work, list the outstanding tasks and call `AskUserQuestion` with:
+If either check shows pending work, list the outstanding tasks and ask "Not all task PRs are merged yet. Open the feature PR anyway?" — header `Feature PR`:
 
-- `question`: "Not all task PRs are merged yet. Open the feature PR anyway?"
-- `header`: "Feature PR"
-- `options`:
-  - `{label: "Wait — I'll merge them first", description: "Pause here"}`
-  - `{label: "Open it now", description: "Open feature → main PR with unmerged tasks noted in description"}`
+- **Wait — I'll merge them first** → pause here
+- **Open it now** → open feature → main PR with unmerged tasks noted in description
 
 Open the feature PR by spawning a sub-agent running the inlined `wtf.create-pr` steps targeting `main`. The body must include `Closes #<feature_number>` and one `Closes #<task_number>` per task on separate lines per `../references/commit-conventions.md`.
 

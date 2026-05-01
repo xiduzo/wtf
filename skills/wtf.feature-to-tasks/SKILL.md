@@ -17,7 +17,7 @@ Skip this step if gh-setup was already confirmed this session (e.g. when chained
 
 ### 1. Identify the Feature
 
-If a Feature number was passed in as context, use it directly. Otherwise search for recent open issues with label `feature` to populate options and call `AskUserQuestion` with `question: "Which Feature are you breaking into Tasks?"`, `header: "Feature"`, and `options` pre-filled with 1–2 likely open Feature issue references inferred from GitHub search (e.g. recent open issues labeled `feature`).
+If a Feature number was passed in as context, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Feature are you breaking into Tasks?" — header `Feature`, options from recent open issues labeled `feature`.
 
 Fetch the Feature, then find its parent Epic via the sub-issue hierarchy:
 
@@ -48,11 +48,10 @@ Present the list as plain numbered text, for example:
 > 3. Display settlement status in the merchant dashboard UI
 > 4. Send settlement notification email when status changes
 
-Then call `AskUserQuestion` with:
+Then ask "Does this list look complete? You can add, remove, or rename any Task before we start." — header `Task list`:
 
-- `question`: "Does this list look complete? You can add, remove, or rename any Task before we start."
-- `header`: "Task list"
-- `options`: `[{label: "Looks good", description: "Proceed with this list"}, {label: "Make changes", description: "I want to add, remove, or rename a Task"}]`
+- **Looks good** → proceed with this list
+- **Make changes** → add, remove, or rename a Task
 
 Wait for the user to confirm or adjust the list. Apply any changes.
 
@@ -65,15 +64,11 @@ For each Task in the confirmed list, in order:
    - The Feature number (skip step 1 of write-task — Feature already fetched)
    - The task description as the pre-filled proposal in step 2 of write-task (user can confirm or adjust)
    - Skip write-task clarification questions already answered by the loaded Feature context (ACs, user stories, edge cases). Only ask about scope or contract details that cannot be derived from the Feature.
-3. Before moving to the next Task, call `AskUserQuestion` with:
-   - `question`: "Task [N] created. Ready to continue to Task [N+1]: _[next task description]_?" _(replace [N] and [N+1] with actual numbers and description)_
-   - `header`: "Continue?"
-   - `options`: `[{label: "Yes, continue", description: "Proceed to the next Task (default)"}, {label: "Pause here", description: "Exit — I'll continue later"}, {label: "Skip this task", description: "Mark as skipped and move on"}, {label: "Add a new task", description: "Insert a new task into the list before continuing"}]`
-
-   - **Yes, continue** → continue.
-   - **Pause here** → exit. Print a summary of which Tasks were created and which remain. Suggest `/clear` before resuming.
-   - **Skip this task** → mark as skipped in the list and move to the next.
-   - **Add a new task** → call `AskUserQuestion` with `question: "What is the new task?"`, `header: "New task"`, and `options` pre-filled with 1–2 plausible tasks inferred from the remaining Feature ACs not yet covered. Add the confirmed task to the list, then continue.
+3. Before moving to the next Task, ask "Task [N] created. Ready to continue to Task [N+1]: _[next task description]_?" — header `Continue?` (replace [N] and [N+1] with actual numbers and description):
+   - **Yes, continue** → proceed to the next Task (default)
+   - **Pause here** → exit; print a summary of which Tasks were created and which remain; suggest `/clear` before resuming
+   - **Skip this task** → mark as skipped in the list and move to the next
+   - **Add a new task** → ask "What is the new task?" — header `New task`, options from plausible tasks inferred from the remaining Feature ACs not yet covered. Add the confirmed task to the list, then continue.
 
 ### 4. Completion
 
@@ -83,11 +78,11 @@ When all Tasks have been created (or skipped), print a summary:
 > Created: [list with issue numbers]
 > Skipped: [list if any]"
 
-Then call `AskUserQuestion` with:
+Then ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`: `[{label: "Implement first Task", description: "Start implementing the first created Task (default)"}, {label: "Tasks for next Feature", description: "Plan Tasks for the next Feature in the Epic"}, {label: "Stop here", description: "Exit — no further action"}]`
+- **Implement first Task** → start implementing the first created Task (default)
+- **Tasks for next Feature** → plan Tasks for the next Feature in the Epic
+- **Stop here** → exit, no further action
 
 - **Implement first Task** → follow the `wtf.implement-task` process with the first created Task number.
 - **Tasks for next Feature** → follow the `wtf.feature-to-tasks` process with the next Feature from the `gh sub-issue list` result fetched in step 1 that does not yet have child tasks.

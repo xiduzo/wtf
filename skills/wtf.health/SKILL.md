@@ -15,11 +15,13 @@ Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or
 
 ### 1. Choose the scope
 
-Call `AskUserQuestion` with:
+Apply `../references/questioning-style.md` for every question in this skill.
 
-- `question`: "What scope do you want to check?"
-- `header`: "Scope"
-- `options`: `[{label: "Full project", description: "All open Epics, Features, and Tasks"}, {label: "One Epic", description: "All work under a specific Epic"}, {label: "One Feature", description: "All Tasks under a specific Feature"}]`
+Ask "What scope do you want to check?" — header `Scope`:
+
+- **Full project** → all open Epics, Features, and Tasks
+- **One Epic** → all work under a specific Epic
+- **One Feature** → all Tasks under a specific Feature
 
 For Epic or Feature scope, prompt for the issue number with options pre-filled from recent open issues.
 
@@ -122,10 +124,9 @@ If everything is clean, print: "All open issues are in a healthy state. Nothing 
 
 ### 5. Offer to act on findings
 
-If findings exist, call `AskUserQuestion` with:
+If findings exist, ask "Would you like to act on any of these findings now?" — header `Next action`:
 
-- `question`: "Would you like to act on any of these findings now?"
-- `header`: "Next action"
-- `options`: one option per ⚠️ finding (e.g. `{label: "Verify Task #42", description: "Run verify-task"}`), plus `{label: "Done — just the report", description: "Exit"}`.
+- One option per ⚠️ finding (e.g. **Verify Task #42** → run `verify-task`)
+- **Done — just the report** → exit
 
 Route each selection to the appropriate skill with the issue number pre-loaded as context.

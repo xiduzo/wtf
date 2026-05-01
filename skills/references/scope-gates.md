@@ -29,10 +29,10 @@ If one or more split signals fire:
 1. State which signals you found.
 2. Explain the risk in concrete terms — review friction, merge conflict surface, rollback complexity.
 3. Propose a concrete split (two or three focused candidate titles, one sentence each, in the right shape for the level — e.g. `[Actor] can [verb] [object]` for Features).
-4. Call `AskUserQuestion` with:
-   - `{label: "Keep the original draft", description: "Proceed with the current draft without splitting"}`
-   - `{label: "Split it", description: "Start over with one of the proposed smaller units"}`
-   - `{label: "Stop here", description: "Exit without creating"}`
+4. Ask "How do you want to handle this?" — header `Scope`:
+   - **Keep the original draft** → proceed with the current draft without splitting
+   - **Split it** → start over with one of the proposed smaller units
+   - **Stop here** → exit without creating
 
 On **Split it**, return to the earliest step where the seed was chosen, carrying forward already-gathered research so only narrowed-scope clarification needs re-asking.
 

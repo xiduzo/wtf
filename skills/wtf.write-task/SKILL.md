@@ -17,7 +17,7 @@ Skip this step if invoked from `wtf.feature-to-tasks` or `wtf.write-feature` (th
 
 ### 1. Identify the parent Feature
 
-Search for recent open issues with label `feature` to populate options. Call `AskUserQuestion` with `question: "Which Feature does this Task belong to?"`, `header: "Feature"`, and `options` pre-filled with 1–2 likely open Feature issue references inferred from GitHub search (e.g. recent open issues labeled `feature`).
+Apply `../references/questioning-style.md` and ask "Which Feature does this Task belong to?" — header `Feature`, options from recent open issues labeled `feature`.
 
 Fetch the Feature, then find its parent Epic via the sub-issue hierarchy:
 
@@ -35,14 +35,10 @@ If the Epic number was passed in as context (e.g. from an orchestrator), skip th
 
 > "Here's the task I'll write: _[task description]_. Does this look right, or would you like to adjust it?"
 
-**If invoked from `wtf.write-feature` or `wtf.feature-to-tasks` context but no description was pre-filled**, call `AskUserQuestion` with:
+**If invoked from `wtf.write-feature` or `wtf.feature-to-tasks` context but no description was pre-filled**, ask "How would you like to define this task?" — header `Task source`:
 
-- `question`: "How would you like to define this task?"
-- `header`: "Task source"
-- `options`: `[{label: "Propose from ACs", description: "Let me propose a task based on the Feature ACs (default)"}, {label: "Describe myself", description: "I'll describe the task myself"}]`
-
-- **Propose from ACs** → based on the Feature's Acceptance Criteria, existing tasks, and the Proposed Tasks checklist from the Feature body, propose the next concrete unimplemented task. State it clearly and ask: "Does this task look right, or would you like to adjust it?"
-- **Describe myself** → ask: "What is this task implementing?" (one sentence)
+- **Propose from ACs** → based on the Feature's Acceptance Criteria, existing tasks, and the Proposed Tasks checklist from the Feature body, propose the next concrete unimplemented task; state it clearly and ask "Does this task look right, or would you like to adjust it?" (default)
+- **Describe myself** → ask "What is this task implementing?" (one sentence)
 
 **If invoked standalone** (no Feature context), ask directly: "What is this task implementing?" (one sentence — e.g. "Add date range filter to search API")
 
@@ -117,7 +113,10 @@ Document all dependencies in the draft with GitHub issue references. For cross-f
 
 ### 6. Ask about contracts
 
-Call `AskUserQuestion` with `question: "Are there specific API contracts, events, or data schemas I should know about?"`, `header: "Contracts"`, and `options` pre-filled with 1–2 contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4). Include `{label: "None — proceed without", description: "Skip this section"}` as an option if nothing was found.
+Ask "Are there specific API contracts, events, or data schemas I should know about?" — header `Contracts`:
+
+- Candidates from contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4)
+- **None — proceed without** — skip this section (include only if nothing was found)
 
 Use the answer to fill Contracts & Interfaces. Apply domain event naming rules from `../references/ddd-writing-rules.md` — past-tense domain names, named from the domain's perspective. If "none", stub events with the domain Event names derived in step 3 rather than leaving them blank.
 
@@ -169,13 +168,17 @@ Run Stage 2 of `../references/scope-gates.md` on the written draft. Step 5 catch
 - Broad modules → split along deployment boundaries (backend task + frontend task, or data-layer + service-layer).
 - Too many Gherkin scenarios → split by user journey, keeping each task's scenarios tightly grouped around one observable outcome.
 
-If no signals fire, proceed to user review. If one or more fire, follow the Stage 2 procedure: state the signals, explain the risk (large tasks increase review friction, merge conflict surface, and rollback complexity), propose a concrete split using the matching strategy, and call `AskUserQuestion` with the keep/split/stop options.
+If no signals fire, proceed to user review. If one or more fire, follow the Stage 2 procedure: state the signals, explain the risk (large tasks increase review friction, merge conflict surface, and rollback complexity), propose a concrete split using the matching strategy, and use the keep/split/stop ask from `../references/scope-gates.md`.
 
 On **Split it** → return to step 2 with the chosen focused task description as the seed, reusing the same parent Feature. Carry forward codebase findings from step 4.
 
 ### 10. Review with user
 
-Show the draft. Pay specific attention to Gherkin. Then call `AskUserQuestion` with `question: "Do the scenarios cover everything from the Feature ACs?"`, `header: "Review"`, and `options: [{label: "Yes — looks complete", description: "Proceed with issue creation"}, {label: "Missing edge cases", description: "I want to add more scenarios"}, {label: "Other changes", description: "I want to adjust something else"}]`.
+Show the draft. Pay specific attention to Gherkin. Then ask "Do the scenarios cover everything from the Feature ACs?" — header `Review`:
+
+- **Yes — looks complete** → proceed with issue creation
+- **Missing edge cases** → add more scenarios
+- **Other changes** → adjust something else
 
 Apply edits, then proceed.
 
@@ -221,13 +224,12 @@ gh sub-issue list <feature_number>
 
 Subtract created task count from total named items in the Proposed Tasks list to get remaining. Mention how many remain.
 
-Call `AskUserQuestion` with:
+Ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`: `[{label: "Design this Task", description: "Add design coverage for this Task now (default)"}, {label: "Write next Task", description: "Write the next Task for this Feature (N remaining)"}, {label: "Write a Feature", description: "Write a new Feature for the same Epic"}, {label: "Stop here", description: "Exit — no further action"}]`
-
-_(Replace N with actual count.)_
+- **Design this Task** → add design coverage for this Task now (default)
+- **Write next Task** → write the next Task for this Feature (N remaining — replace N with actual count)
+- **Write a Feature** → write a new Feature for the same Epic
+- **Stop here** → exit, no further action
 
 - **Design this Task** → follow the `wtf.design-task` process, opening with: "Continue with task #<task_number>".
 - **Write next Task** → restart from step 2, reusing the same Feature. If the Feature's Proposed Tasks list has named-but-uncreated items, propose the next one as the default.

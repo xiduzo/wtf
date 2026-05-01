@@ -38,11 +38,10 @@ Check whether the task has been designed:
 gh issue view <task_number> --json labels --jq '.labels[].name'
 ```
 
-If the `designed` label is **absent**, warn the user that the task hasn't been designed yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task**. Then call `AskUserQuestion` with:
+If the `designed` label is **absent**, warn the user that the task hasn't been designed yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task**. Then apply `../references/questioning-style.md` and ask "This task doesn't have a `designed` label yet. How would you like to proceed?" — header `Design check`:
 
-- `question`: "This task doesn't have a `designed` label yet. How would you like to proceed?"
-- `header`: "Design check"
-- `options`: `[{label: "Design it first", description: "Go back and run `wtf.design-task` (default)"}, {label: "Skip design", description: "Proceed to implementation anyway"}]`
+- **Design it first** → run `wtf.design-task` (default)
+- **Skip design** → proceed to implementation anyway
 
 - **Design it first** → follow the `wtf.design-task` process, passing the Task number in as context.
 - **Skip design** → proceed.
@@ -55,11 +54,10 @@ Use the Read tool to attempt reading `docs/steering/TECH.md`.
 
 If the file **exists**: keep its content in context. Use its stack, architecture patterns, key constraints, commands, and ADRs to inform the technical approach and implementation in this session. Do not surface it to the user — just apply it silently.
 
-If the file **does not exist**, call `AskUserQuestion` with:
+If the file **does not exist**, ask "docs/steering/TECH.md doesn't exist yet. This document captures your stack, architecture patterns, and technical constraints. Would you like to create it now?" — header `Tech steering doc missing`:
 
-- `question`: "docs/steering/TECH.md doesn't exist yet. This document captures your stack, architecture patterns, and technical constraints. Would you like to create it now?"
-- `header`: "Tech steering doc missing"
-- `options`: `[{label: "Create it now", description: "Run `wtf.steer-tech` before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — technical decisions won't reference project standards"}]`
+- **Create it now** → run `wtf.steer-tech` (recommended), then return here and continue from step 4
+- **Skip for this session** → continue without it; technical decisions won't reference project standards
 
 - **Create it now** → follow the `wtf.steer-tech` process, then return to this skill and continue from step 4.
 - **Skip for this session** → continue without it.
@@ -135,7 +133,11 @@ Produce a concrete Technical Approach with actual file paths (not generic layer 
 
 ### 7. Review approach with user
 
-Show the Technical Approach. Then call `AskUserQuestion` with `question: "Does this align with how you'd approach it?"`, `header: "Approach review"`, and `options: [{label: "Yes — looks good, proceed", description: "Continue with implementation"}, {label: "I have constraints to share", description: "I want to adjust the approach first"}, {label: "Suggest an alternative", description: "Let me describe a different approach"}]`.
+Show the Technical Approach. Then ask "Does this align with how you'd approach it?" — header `Approach review`:
+
+- **Yes — looks good, proceed** → continue with implementation
+- **I have constraints to share** → adjust the approach first
+- **Suggest an alternative** → describe a different approach
 
 Apply changes. Then update the Task issue with the Technical Approach and Impacted Areas.
 
@@ -206,13 +208,13 @@ Add the `implemented` lifecycle label — this is mandatory regardless of invoca
 gh issue edit <task_number> --add-label "implemented"
 ```
 
-If invoked from the loop (non-interactive mode), skip the AskUserQuestion below and return control to the loop.
+If invoked from the loop (non-interactive mode), skip the ask below and return control to the loop.
 
-Call `AskUserQuestion` with:
+Ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`: `[{label: "Verify this Task", description: "Run QA against the Gherkin scenarios (recommended next step, default)"}, {label: "Open a pull request", description: "Create a PR for this branch"}, {label: "Implement another Task", description: "Implement another Task for the same Feature"}]`
+- **Verify this Task** → run QA against the Gherkin scenarios (recommended next step, default)
+- **Open a pull request** → create a PR for this branch
+- **Implement another Task** → implement another Task for the same Feature
 
 - **Verify this Task** → follow the `wtf.verify-task` process, passing the Task number in as context so the user is not asked for it again.
 - **Open a pull request** → follow the `wtf.create-pr` process, passing the Task number and branch in as context.

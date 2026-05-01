@@ -16,9 +16,41 @@ How any wtf skill should use `AskUserQuestion` when gathering context from the u
 
 6. **Acknowledge briefly between answers.** One sentence max. Do not re-explain the prior answer — move on.
 
-## Example shapes
+## Compact notation in skill files
 
-Closed question with research-inferred options:
+Skill files describe asks in a compact form. The runtime translates them to `AskUserQuestion` calls — the tool name and field names (`question:`, `header:`, `options:`) do not need to repeat.
+
+**Form 1 — inline** (inferred options, source-driven):
+
+> Ask "Which Feature does this belong to?" — header `Feature`, options from recent open issues labeled `feature`.
+
+**Form 2 — sub-list** (explicit options or branching):
+
+> Ask "Does this look right?" — header `Review`:
+> - **Looks good** → proceed with creation
+> - **I have changes** → revise first
+
+**Form 3 — mixed** (inferred candidates plus a static fallback):
+
+> Ask "Which Epic does this Feature belong to?" — header `Epic`:
+> - Candidates from recent open issues labeled `epic`
+> - **None** — no parent Epic exists yet
+
+### Operators
+
+- `→` — branch action ("what the skill does next on this answer"). Use for routing decisions.
+- `—` — description ("what this option means"). Use when the option needs clarification but does not branch the flow.
+
+### Conventions
+
+- Wrap the question in straight double quotes — it is the literal user-facing text.
+- Wrap the header in backticks — it is the UI tag the user sees.
+- Drop the "1–2 likely options" boilerplate; rule 3 enforces it.
+- For conditional asks ("if X is present, ask…"), put the condition before the `Ask` clause.
+
+## Reference shapes
+
+The compact notation desugars to the underlying tool call. For reference, the canonical form:
 
 ```
 AskUserQuestion(
@@ -28,19 +60,6 @@ AskUserQuestion(
     {label: "User initiates", description: "Explicit button or form action"},
     {label: "System triggers", description: "Automatic event or schedule"},
     {label: "Both", description: "User-initiated and automatic"},
-  ]
-)
-```
-
-Open-ended question with plausible seeds:
-
-```
-AskUserQuestion(
-  question: "Who is the primary domain actor?",
-  header: "Actor",
-  options: [
-    {label: "Fulfilment Manager", description: "Found in src/fulfilment/*"},
-    {label: "Payment Auditor", description: "Named role in the Epic context"},
   ]
 )
 ```

@@ -19,11 +19,10 @@ ls docs/steering/ 2>/dev/null
 
 Build a map of which of the four docs are present: `TECH.md`, `QA.md`, `DESIGN.md`, `VISION.md`.
 
-**If none exist**, call `AskUserQuestion` with:
+**If none exist**, ask "No steering docs found. Would you like to create them first?" — header `No steering docs`:
 
-- `question`: "No steering docs found. Would you like to create them first?"
-- `header`: "No steering docs"
-- `options`: `[{label: "Create them now", description: "Run the steer-* skills to set up the docs"}, {label: "Skip — just capture notes", description: "Save all learnings to docs/steering/LEARNINGS.md instead"}]`
+- **Create them now** → run the `steer-*` skills to set up the docs
+- **Skip — just capture notes** → save all learnings to `docs/steering/LEARNINGS.md` instead
 
 If **Create them now** → invoke `wtf.steer-tech`. Note that `wtf.steer-tech` will offer to chain to the other steer-\* skills at the end — let the user complete that flow, then return here. When control returns, re-run the `ls` check to see which docs now exist.
 If **Skip** → set all four doc paths to the fallback: `docs/steering/LEARNINGS.md`.
@@ -44,29 +43,30 @@ Apply `../references/questioning-style.md` for every question.
 
 **Q1 — What was harder than expected?**
 
-- `question`: "What was harder or more painful than it should have been in this session?"
-- `header`: "Session friction"
-- `options`: pre-fill with 2–3 inferred options based on what was worked on (e.g. "Debugging X took too long", "Claude kept misunderstanding Y"), plus `{label: "Something else", description: "I'll type it"}` and `{label: "Nothing — skip", description: "Session went smoothly"}`
+Ask "What was harder or more painful than it should have been in this session?" — header `Session friction`:
+
+- 2–3 inferred options based on what was worked on (e.g. "Debugging X took too long", "Claude kept misunderstanding Y")
+- **Nothing — skip** — session went smoothly
 
 If **Nothing — skip** → skip to step 6 (reset counter) and exit with: "Great session — nothing to capture."
 
 **Q2 — Did Claude make a recurring mistake?**
 
-- `question`: "Did Claude keep making the same mistake you had to correct?"
-- `header`: "AI mistakes"
-- `options`: `[{label: "Yes — describe it", description: "I'll tell you what it kept doing"}, {label: "No recurring mistakes", description: "One-off issues only"}]`
+Ask "Did Claude keep making the same mistake you had to correct?" — header `AI mistakes`:
 
-If **Yes** → call `AskUserQuestion` with:
+- **Yes — describe it** → tell me what it kept doing
+- **No recurring mistakes** → one-off issues only
 
-- `question`: "Describe the mistake briefly. What rule would prevent it next time?"
-- `header`: "AI mistake — the rule"
-- `options`: `[{label: "I'll type the rule", description: "Free text"}, {label: "Skip", description: "Hard to articulate right now"}]`
+If **Yes** → ask "Describe the mistake briefly. What rule would prevent it next time?" — header `AI mistake — the rule`:
+
+- **Skip** — hard to articulate right now
 
 **Q3 — What is the one rule this session taught you?**
 
-- `question`: "If you had to write one rule that would have prevented the most wasted time today, what would it be?"
-- `header`: "The lesson"
-- `options`: pre-fill with 1–2 rules inferred from the session, plus `{label: "I'll write it", description: "Free text"}` and `{label: "Skip this one", description: "Nothing to add"}`
+Ask "If you had to write one rule that would have prevented the most wasted time today, what would it be?" — header `The lesson`:
+
+- 1–2 rules inferred from the session
+- **Skip this one** — nothing to add
 
 ### 4. Route each learning to the right steering doc
 

@@ -17,7 +17,7 @@ Skip this step if gh-setup was already confirmed this session.
 
 ### 1. Identify the issue and its hierarchy
 
-If an issue number was passed in as context or a CLI argument, use it directly. Otherwise call `AskUserQuestion` with `question: "Which issue are you refining?"`, `header: "Issue"`, and `options` pre-filled with recently-updated open issues across all WTF labels (epic, feature, task) inferred from:
+If an issue number was passed in as context or a CLI argument, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which issue are you refining?" — header `Issue`, options from recently-updated open issues across all WTF labels (epic, feature, task), inferred from:
 
 ```bash
 gh issue list --label "epic,feature,task" --state open --json number,title,labels --limit 10
@@ -33,7 +33,10 @@ gh issue view <issue_number> --json number,title,body,labels,comments,updatedAt
 - Has label `epic` → type = **Epic**
 - Has label `feature` → type = **Feature**
 - Has label `task` → type = **Task**
-- None of the above → call `AskUserQuestion` with `question: "I couldn't detect the type from the labels. What kind of issue is this?"`, `header: "Issue type"`, and `options: [{label: "Epic"}, {label: "Feature"}, {label: "Task"}]`.
+- None of the above → ask "I couldn't detect the type from the labels. What kind of issue is this?" — header `Issue type`:
+  - **Epic**
+  - **Feature**
+  - **Task**
 
 **Fetch the hierarchy** for context and cascade planning:
 
@@ -53,7 +56,7 @@ Merge insights from every available source into a single consolidated list. Proc
 
 **a. CLI argument / conversation context**
 
-If the user passed insight text in the invocation (e.g. `refine #42 "scope changed — exclude mobile"`), treat that as the primary insight. If nothing was passed, call `AskUserQuestion` with `question: "What changed or what new insight should I incorporate?"`, `header: "Insight"`, and `options` pre-filled with 1–2 plausible changes inferred from recent issue comments (e.g. the last comment's key point).
+If the user passed insight text in the invocation (e.g. `refine #42 "scope changed — exclude mobile"`), treat that as the primary insight. If nothing was passed, ask "What changed or what new insight should I incorporate?" — header `Insight`, options from plausible changes inferred from recent issue comments (e.g. the last comment's key point).
 
 **b. GitHub comments since last body edit**
 
@@ -84,7 +87,11 @@ Merge all signals into a numbered list of insights. Present them briefly to the 
 > 2. [insight summary]
 > ..."
 
-Call `AskUserQuestion` with `question: "Does this capture everything you want to incorporate?"`, `header: "Insights"`, and `options: [{label: "Yes — proceed", description: "Continue with these insights"}, {label: "Add more", description: "I have additional context to provide"}, {label: "Remove one", description: "Some of these aren't relevant"}]`.
+Ask "Does this capture everything you want to incorporate?" — header `Insights`:
+
+- **Yes — proceed** → continue with these insights
+- **Add more** → I have additional context to provide
+- **Remove one** → some of these aren't relevant
 
 Apply any adjustments before continuing.
 
@@ -128,7 +135,7 @@ Re-run both stages defined in `../references/scope-gates.md` on the refined inte
 - Feature → `wtf.write-feature` step 9
 - Task → `wtf.write-task` step 9
 
-If a split signal fires on the **refined** issue, present it as a refinement concern (not a blocker). Use the same `AskUserQuestion` shape the write-* skill uses: keep / split / stop.
+If a split signal fires on the **refined** issue, present it as a refinement concern (not a blocker). Use the same keep / split / stop ask the write-* skill uses (see `../references/scope-gates.md`).
 
 **Domain language changed → DDD Language Guard**
 
@@ -156,7 +163,11 @@ AFTER:
   [updated text]
 ```
 
-Then call `AskUserQuestion` with `question: "Does this diff look right?"`, `header: "Diff review"`, and `options: [{label: "Looks good — apply it", description: "Write the changes to the issue"}, {label: "I have corrections", description: "I want to adjust one or more sections"}, {label: "Start over", description: "The insights were wrong — let me re-describe what changed"}]`.
+Then ask "Does this diff look right?" — header `Diff review`:
+
+- **Looks good — apply it** → write the changes to the issue
+- **I have corrections** → adjust one or more sections
+- **Start over** → the insights were wrong; re-describe what changed
 
 Apply any corrections, then proceed.
 
@@ -177,11 +188,10 @@ gh issue view <issue_number> --json labels --jq '.labels[].name'
 | Contracts changed | `implemented`, `verified` | — |
 | Functional Description changed | — | — |
 
-If any stale labels are present, call `AskUserQuestion` with:
+If any stale labels are present, ask "The following labels may no longer be accurate after this refinement: [list]. How should I handle them?" — header `Stale labels`:
 
-- `question`: "The following labels may no longer be accurate after this refinement: [list]. How should I handle them?"
-- `header`: "Stale labels"
-- `options`: `[{label: "Strip stale labels", description: "Remove the labels that no longer reflect reality (recommended)"}, {label: "Keep labels as-is", description: "Leave labels unchanged — I'll manage them manually"}]`
+- **Strip stale labels** → remove the labels that no longer reflect reality (recommended)
+- **Keep labels as-is** → leave labels unchanged; I'll manage them manually
 
 Record the decision for the audit comment in step 8.
 
@@ -246,11 +256,11 @@ Using the hierarchy fetched in step 1, determine which children are affected by 
 - Tasks whose Gherkin scenarios directly test the changed ACs
 - Tasks whose Proposed Tasks checklist entry was modified or removed
 
-Present the affected children as a numbered list. Then call `AskUserQuestion` with:
+Present the affected children as a numbered list. Then ask "These child issues may be out of sync with the updated spec: [list]. How would you like to handle them?" — header `Cascade`:
 
-- `question`: "These child issues may be out of sync with the updated spec: [list]. How would you like to handle them?"
-- `header`: "Cascade"
-- `options`: `[{label: "Refine each one now", description: "Walk through `wtf.refine` for each affected child in order (default)"}, {label: "I'll handle them manually", description: "Exit — I'll open each child and update it myself"}, {label: "Skip", description: "Leave children as-is"}]`
+- **Refine each one now** → walk through `wtf.refine` for each affected child in order (default)
+- **I'll handle them manually** → exit; I'll open each child and update it myself
+- **Skip** → leave children as-is
 
 - **Refine each one now** → partition the affected children into conflict-free sub-groups using `../references/conflict-graph.md` (sub-groups here play the role of sub-phases). For each sub-group, spawn one sub-agent per child in parallel using the Agent tool, following `../references/subagent-protocol.md` — read `skills/wtf.refine/SKILL.md` at spawn time and paste steps 2 onward into each sub-agent prompt. Pass in the child issue number and the parent insight as pre-loaded context so the user is not re-asked. Wait for all sub-agents in a sub-group to complete (resolving any `NEEDS_INPUT` responses) before starting the next sub-group. After all sub-groups complete, summarise results.
 - **I'll handle them manually** / **Skip** → exit.

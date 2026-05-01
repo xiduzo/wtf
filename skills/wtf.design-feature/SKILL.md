@@ -17,7 +17,7 @@ Skip this step if invoked from another skill that already ran gh-setup this sess
 
 ### 1. Identify the Feature
 
-If the user provided an issue number in their request, use it directly. Otherwise search for recent open issues with label `feature` to populate options and call `AskUserQuestion` with `question: "Which Feature are you designing?"`, `header: "Feature"`, and `options` pre-filled with 1–2 likely open Feature issue references.
+If the user provided an issue number in their request, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Feature are you designing?" — header `Feature`, options from recent open issues labeled `feature`.
 
 Fetch the Feature and its parent Epic:
 
@@ -43,14 +43,10 @@ Check whether the feature already has a `designed` label:
 gh issue view <feature_number> --json labels --jq '.labels[].name'
 ```
 
-If `designed` is **present**, call `AskUserQuestion` with:
+If `designed` is **present**, ask "This Feature already has a `designed` label. Continuing will overwrite the existing Design Handoff. How would you like to proceed?" — header `Already designed`:
 
-- `question`: "This Feature already has a `designed` label. Continuing will overwrite the existing Design Handoff. How would you like to proceed?"
-- `header`: "Already designed"
-- `options`: `[{label: "Redesign it", description: "Overwrite the existing Design Handoff with a new one"}, {label: "Exit", description: "Leave the existing design as-is"}]`
-
-- **Redesign it** → continue.
-- **Exit** → exit immediately.
+- **Redesign it** → overwrite the existing Design Handoff with a new one and continue
+- **Exit** → leave the existing design as-is and exit immediately
 
 If absent, continue silently.
 
@@ -60,14 +56,10 @@ Use the Read tool to attempt reading `docs/steering/DESIGN.md`.
 
 If it **exists**: keep its content in context. Apply its design principles, tokens, component patterns, and accessibility standards silently throughout this session.
 
-If it **does not exist**, call `AskUserQuestion` with:
+If it **does not exist**, ask "docs/steering/DESIGN.md doesn't exist yet. This document captures your design principles, tokens, and component patterns. Would you like to create it now?" — header `Design steering doc missing`:
 
-- `question`: "docs/steering/DESIGN.md doesn't exist yet. This document captures your design principles, tokens, and component patterns. Would you like to create it now?"
-- `header`: "Design steering doc missing"
-- `options`: `[{label: "Create it now", description: "Run steer-design before continuing (recommended)"}, {label: "Skip for this session", description: "Continue without it — design decisions won't reference project standards"}]`
-
-- **Create it now** → follow the `wtf.steer-design` process, then return here and continue from step 4.
-- **Skip for this session** → continue without it.
+- **Create it now** → follow the `wtf.steer-design` process (recommended), then return here and continue from step 4
+- **Skip for this session** → continue without it; design decisions won't reference project standards
 
 ### 4. Explore the design system and codebase
 
@@ -98,15 +90,18 @@ Produce a journey map as a structured list — do not ask the user, derive from 
 
 ### 6. Ask about design assets
 
-Call `AskUserQuestion` with `question: "How would you like to handle designs for this feature?"`, `header: "Design assets"`, and `options`:
+Ask "How would you like to handle designs for this feature?" — header `Design assets`:
 
-- `{label: "I have Figma frames", description: "Provide frame URLs — I'll validate coverage against the full journey map"}`
-- `{label: "Generate designs for me", description: "I'll use Figma MCP to generate frames from the user stories and design system"}`
-- `{label: "Scaffold a brief only", description: "No Figma — produce a text screen inventory and component map"}`
-- `{label: "Partial — some screens designed", description: "Provide available frames; remaining screens go to generate or scaffold"}`
+- **I have Figma frames** → provide frame URLs; I'll validate coverage against the full journey map (Path A)
+- **Generate designs for me** → use Figma MCP to generate frames from the user stories and design system (Path B)
+- **Scaffold a brief only** → no Figma; produce a text screen inventory and component map (Path C)
+- **Partial — some screens designed** → provide available frames; remaining screens go to generate or scaffold
 
 **Path A — Human provides frames:**
-Collect the top-level Figma file URL plus individual frame URLs. For each screen in the journey map (step 5), check whether a frame covers it. Present a coverage matrix: screen → frame URL (or ⚠ gap). If gaps exist, call `AskUserQuestion` asking whether to generate missing frames (Path B) or leave them as pending.
+Collect the top-level Figma file URL plus individual frame URLs. For each screen in the journey map (step 5), check whether a frame covers it. Present a coverage matrix: screen → frame URL (or ⚠ gap). If gaps exist, ask "How should I handle the uncovered screens?" — header `Gaps`:
+
+- **Generate missing frames** → run Path B for the gaps
+- **Leave as pending** → record gaps in the Design Handoff and continue
 
 Also validate provided frames against spec:
 - Every user story has at least one matching frame
@@ -130,7 +125,10 @@ Collect the generated frame URLs and treat them as Path A frames for the coverag
 For each screen in the journey map, produce a text brief listing required UI elements, interactions, and relevant design tokens. This is a Figma-free design brief a designer or developer can execute against. Use `references/component-spec-template.md` as the structure if available.
 
 **Partial:**
-Collect available frame URLs, run Path A validation on covered screens. For uncovered screens, call `AskUserQuestion` asking whether to generate (Path B) or scaffold (Path C) the remainder.
+Collect available frame URLs, run Path A validation on covered screens. For uncovered screens, ask "How should I handle the remaining screens?" — header `Remainder`:
+
+- **Generate** → run Path B
+- **Scaffold** → run Path C
 
 ### 7. Identify shared components
 
@@ -183,11 +181,11 @@ Produce content for the **Design Handoff** section of the Feature issue:
 
 ### 9. Review with user
 
-Show the draft. Then call `AskUserQuestion` with `question: "Does this cover the full feature journey?"`, `header: "Review"`, and `options`:
+Show the draft. Then ask "Does this cover the full feature journey?" — header `Review`:
 
-- `{label: "Looks complete — update the issue", description: "Proceed"}`
-- `{label: "Missing screens or states", description: "I want to add coverage"}`
-- `{label: "Other changes", description: "I want to adjust something"}`
+- **Looks complete — update the issue** → proceed
+- **Missing screens or states** → add coverage
+- **Other changes** → adjust something else
 
 Apply edits, then proceed.
 
@@ -215,14 +213,11 @@ Print the updated Feature issue URL.
 
 ### 11. Offer to continue
 
-Call `AskUserQuestion` with:
+Ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`:
-  - `{label: "Break into Tasks", description: "Run feature-to-tasks — design context will inform task breakdown (default)"}`
-  - `{label: "Design another Feature", description: "Design another Feature for the same Epic"}`
-  - `{label: "Stop here", description: "Exit — no further action"}`
+- **Break into Tasks** → run `feature-to-tasks`; design context will inform task breakdown (default)
+- **Design another Feature** → design another Feature for the same Epic
+- **Stop here** → exit, no further action
 
 - **Break into Tasks** → follow the `wtf.feature-to-tasks` skill, passing the Feature number in as context. Note to the user that `wtf.design-task` will inherit the shared component map from this Design Handoff.
 - **Design another Feature** → restart from step 1, reusing the same Epic context.

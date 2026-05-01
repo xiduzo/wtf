@@ -23,7 +23,7 @@ If a PR number was passed in, use it directly. Otherwise:
 gh pr list --state open --json number,title,headRefName --limit 20
 ```
 
-Call `AskUserQuestion` with `question: "Which PR are you reviewing?"`, `header: "PR"`, and `options` pre-filled from open PRs.
+Apply `../references/questioning-style.md` and ask "Which PR are you reviewing?" — header `PR`, options from open PRs.
 
 Fetch the PR:
 
@@ -42,7 +42,10 @@ gh issue view <feature_number> # ACs, user stories
 gh issue view <epic_number>    # Goal, constraints
 ```
 
-If no Task number is found, call `AskUserQuestion` with `question: "Is there a Task issue linked to this PR?"`, `header: "Linked task"`, and `options: [{label: "No linked task", description: "Review from diff only"}, {label: "Yes — I'll provide the number", description: "Enter the task issue number"}]`.
+If no Task number is found, ask "Is there a Task issue linked to this PR?" — header `Linked task`:
+
+- **No linked task** → review from diff only
+- **Yes — I'll provide the number** → enter the task issue number
 
 If there is no linked Task, the review proceeds from diff context alone (step 4 will note the absence of a spec as a finding).
 
@@ -141,11 +144,11 @@ Verdicts:
 
 ### 7. Review with user
 
-Show the summary. Then call `AskUserQuestion` with:
+Show the summary. Then ask "Does this look right? Should I post this as a GitHub PR review?" — header `Post review`:
 
-- `question`: "Does this look right? Should I post this as a GitHub PR review?"
-- `header`: "Post review"
-- `options`: `[{label: "Post it", description: "Submit as a GitHub PR review comment"}, {label: "I have edits", description: "I want to adjust before posting"}, {label: "Don't post — just the summary", description: "Keep it in the conversation"}]`
+- **Post it** → submit as a GitHub PR review comment
+- **I have edits** → adjust before posting
+- **Don't post — just the summary** → keep it in the conversation
 
 Apply any edits, then proceed.
 

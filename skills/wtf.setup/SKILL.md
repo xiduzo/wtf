@@ -181,11 +181,13 @@ done
 
 If none exist: warn the user that the hook script could not be found and skip hook registration.
 
-**Step B — ask scope** via `AskUserQuestion`:
+**Step B — ask scope** (apply `../references/questioning-style.md`):
 
-- `question`: "Install the WTF intervention-tracker hook globally or only for this repo?"
-- `header`: "Hook scope"
-- `options`: `[{label: "Global (~/.claude/settings.json)", description: "Runs in every repo that has docs/steering/"}, {label: "This repo only (.claude/settings.json)", description: "Scoped to this project"}, {label: "Skip", description: "Don't install the hook"}]`
+Ask "Install the WTF intervention-tracker hook globally or only for this repo?" — header `Hook scope`:
+
+- **Global (~/.claude/settings.json)** → runs in every repo that has `docs/steering/`
+- **This repo only (.claude/settings.json)** → scoped to this project
+- **Skip** → don't install the hook
 
 Set `SETTINGS_FILE` accordingly:
 - Global → `$HOME/.claude/settings.json`
@@ -250,11 +252,7 @@ If any item failed (gh not installed, not authenticated), replace the closing li
 
 ### 10. Offer to set up steering docs
 
-If setup completed without fatal errors, call `AskUserQuestion` with:
+If setup completed without fatal errors, ask "Setup complete. The steering docs (VISION.md, TECH.md, DESIGN.md, QA.md) capture your project's principles and standards — every skill reads them automatically. Would you like to create them now?" — header `Steering docs`:
 
-- `question`: "Setup complete. The steering docs (VISION.md, TECH.md, DESIGN.md, QA.md) capture your project's principles and standards — every skill reads them automatically. Would you like to create them now?"
-- `header`: "Steering docs"
-- `options`: `[{label: "Yes — set them up now", description: "Run `wtf.steer-vision` (it will chain to the others)"}, {label: "Not now", description: "Skip — skills will prompt you to create them on first use"}]`
-
-- **Yes** → follow the `wtf.steer-vision` process (it will offer to chain to TECH, DESIGN, and QA at the end).
-- **Not now** → exit.
+- **Yes — set them up now** → run `wtf.steer-vision` (it will offer to chain to TECH, DESIGN, and QA at the end)
+- **Not now** → skip; skills will prompt you to create them on first use

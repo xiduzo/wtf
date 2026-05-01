@@ -49,7 +49,10 @@ gh issue view <feature_number> # ACs, user stories for expected behavior context
 
 ### 2. Identify the failing scenario(s)
 
-If the Task has Gherkin, present the full scenario list and call `AskUserQuestion` with `question: "Which scenarios failed?"`, `header: "Failing scenarios"`, and `options` pre-filled with the scenario names from the Task (one option per scenario), plus `{label: "New — not covered by existing scenarios", description: "This bug isn't covered by the current Gherkin"}`.
+If the Task has Gherkin, present the full scenario list and ask "Which scenarios failed?" — header `Failing scenarios`:
+
+- One option per scenario name from the Task
+- **New — not covered by existing scenarios** — this bug isn't covered by the current Gherkin
 
 For each failing scenario, note:
 
@@ -65,12 +68,16 @@ If no Gherkin exists for this bug, skip this step and rely on step 3.
 
 Otherwise, per `../references/questioning-style.md`, gather each unknown item below, omitting any already known:
 
-- **a. Observed behavior** — call `AskUserQuestion` with `question: "What was the exact behavior you observed?"`, `header: "Actual behavior"`, and `options` pre-filled with 1–2 plausible failure descriptions inferred from the scenario context.
-- **b. Expected behavior** — call `AskUserQuestion` with `question: "What did you expect to happen instead?"`, `header: "Expected behavior"`, and `options` pre-filled with the relevant Gherkin `Then` step or AC text if available.
-- **c. Reproduction steps** — call `AskUserQuestion` with `question: "What are the reproduction steps?"`, `header: "Repro steps"`, and `options: [{label: "I'll type them out", description: "Enter numbered steps"}]`.
-- **d. Contract violation** — call `AskUserQuestion` with `question: "Is any contract violated?"`, `header: "Contract"`, and `options` pre-filled with contract names from the Task (e.g. API schema name, event name), plus `{label: "None identified"}`.
-- **e. Regression risk** — call `AskUserQuestion` with `question: "What else might break if we fix this?"`, `header: "Regression risk"`, and `options` pre-filled with adjacent areas found in the codebase or related Aggregates.
-- **f. Suggested fix** — call `AskUserQuestion` with `question: "Do you have a suggested fix in mind?"`, `header: "Suggested fix"`, and `options: [{label: "No suggestion", description: "Leave blank"}]`.
+- **a. Observed behavior** — ask "What was the exact behavior you observed?" — header `Actual behavior`, options from plausible failure descriptions inferred from the scenario context.
+- **b. Expected behavior** — ask "What did you expect to happen instead?" — header `Expected behavior`, options from the relevant Gherkin `Then` step or AC text if available.
+- **c. Reproduction steps** — ask "What are the reproduction steps?" — header `Repro steps`:
+  - **I'll type them out** — enter numbered steps
+- **d. Contract violation** — ask "Is any contract violated?" — header `Contract`:
+  - Candidates from contract names in the Task (e.g. API schema name, event name)
+  - **None identified**
+- **e. Regression risk** — ask "What else might break if we fix this?" — header `Regression risk`, options from adjacent areas found in the codebase or related Aggregates.
+- **f. Suggested fix** — ask "Do you have a suggested fix in mind?" — header `Suggested fix`:
+  - **No suggestion** — leave blank
 
 ### 4. Map to Ubiquitous Language
 
@@ -129,7 +136,10 @@ List other behaviors, Aggregates, or integration points that touch the same code
 
 ### 7. Review with user
 
-Show the draft. Then call `AskUserQuestion` with `question: "Does this accurately capture the bug and its impact?"`, `header: "Review"`, and `options: [{label: "Yes — create the issue", description: "Proceed with bug creation"}, {label: "I have changes", description: "I want to adjust something first"}]`.
+Show the draft. Then ask "Does this accurately capture the bug and its impact?" — header `Review`:
+
+- **Yes — create the issue** → proceed with bug creation
+- **I have changes** → adjust first
 
 Apply edits, then proceed.
 
@@ -160,11 +170,11 @@ rm "$BUG_TMP"
 
 ### 9. Offer next steps
 
-Call `AskUserQuestion` with:
+Ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`: `[{label: "Report another bug", description: "File another bug from this QA session (default if more failures remain)"}, {label: "Mark Task blocked", description: "Reopen the Task and mark it blocked by this bug"}, {label: "Done", description: "Exit — no further action (default if no more failures remain)"}]`
+- **Report another bug** → file another bug from this QA session (default if more failures remain)
+- **Mark Task blocked** → reopen the Task and mark it blocked by this bug
+- **Done** → exit, no further action (default if no more failures remain)
 
 - **Report another bug** → restart from step 2 with the same Task context. Use as default only when the caller (e.g. `wtf.verify-task` step 8) has indicated more failures are pending.
 - **Mark Task blocked** → reopen the Task and add a blocking comment:

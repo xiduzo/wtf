@@ -108,13 +108,16 @@ Run Stage 2 of `../references/scope-gates.md` on the written draft. Even if step
 - Success Metrics describe outcomes that belong to completely different user journeys.
 - The epic's beneficiary cannot be stated in a single sentence without using "and" to cover unrelated groups.
 
-If no signals fire, proceed to creation. If one or more fire, follow the Stage 2 procedure: state the signals, explain the risk, propose a concrete split (two or three focused epic titles with a one-line goal each), and call `AskUserQuestion` with the keep/split/stop options from the shared doc.
+If no signals fire, proceed to creation. If one or more fire, follow the Stage 2 procedure: state the signals, explain the risk, propose a concrete split (two or three focused epic titles with a one-line goal each), and use the keep/split/stop ask from `../references/scope-gates.md`.
 
 On **Split it** → return to step 3 with the chosen focused Epic as the seed. Carry forward all research and codebase findings already gathered — only re-ask stakeholder questions that the narrowed scope makes ambiguous. Note the remaining proposed sub-epics to the user as follow-on work.
 
 ### 8. Review with user
 
-Show the draft. Then call `AskUserQuestion` with `question: "Does this look right?"`, `header: "Review"`, and `options: [{label: "Looks good — create the issue", description: "Proceed with issue creation"}, {label: "I have changes", description: "I want to adjust something first"}]`.
+Show the draft. Then ask "Does this look right?" — header `Review`:
+
+- **Looks good — create the issue** → proceed with issue creation
+- **I have changes** → adjust first
 
 Apply edits, then proceed immediately.
 
@@ -154,21 +157,11 @@ Skip without comment if no terms were introduced. Report only the page name and 
 
 ### 11. Offer to continue
 
-Use the `AskUserQuestion` tool with the following question and options:
+Ask "What's next?" — header `Next step`:
 
-- **question:** "What's next?"
-- **header:** "Next step"
-- **options:**
-  1. label: "Plan all Features" · description: "Propose the full Feature list for this Epic and create them one by one (default)"
-  2. label: "Write one Feature" · description: "Write a single Feature for this Epic now"
-  3. label: "Write another Epic" · description: "Start a new Epic from scratch"
-  4. label: "Stop here" · description: "Exit — no further action"
-
-Route based on the answer:
-
-- **Plan all Features** → invoke the `wtf.epic-to-features` skill, passing the Epic number in as context.
-- **Write one Feature** → proceed with the `wtf.write-feature` skill, passing the Epic number in as context so the user is not asked for it again.
-- **Write another Epic** → restart this skill from step 1.
-- **Stop here** → exit.
+- **Plan all Features** → invoke `wtf.epic-to-features`, passing the Epic number in as context (default)
+- **Write one Feature** → proceed with `wtf.write-feature`, passing the Epic number in as context so the user is not asked for it again
+- **Write another Epic** → restart this skill from step 1
+- **Stop here** → exit, no further action
 
 > Suggest clearing context before continuing to features if the conversation has grown long: "The context is getting long — you may want to `/clear` before continuing."

@@ -17,23 +17,24 @@ Skip this step if gh-setup was already confirmed this session.
 
 ### 1. Define the question
 
-If the user described the investigation in their request, extract the core question from it. Otherwise call `AskUserQuestion` with:
+Apply `../references/questioning-style.md` for every question in this skill.
 
-- `question`: "What question should this spike answer?"
-- `header`: "Spike question"
-- `options`: pre-filled with 1–2 specific questions inferred from any context provided (e.g. linked Epic, conversation)
+If the user described the investigation in their request, extract the core question from it. Otherwise ask "What question should this spike answer?" — header `Spike question`, options from specific questions inferred from any context provided (e.g. linked Epic, conversation).
 
 The question must be specific and answerable — not "how does caching work?" but "is Redis or in-memory caching the right choice for our session store given our deployment constraints?" — and scoped to a decision the team actually needs to make.
 
-Then call `AskUserQuestion` with:
+Then ask "How much time should this spike take?" — header `Time box`:
 
-- `question`: "How much time should this spike take?"
-- `header`: "Time box"
-- `options`: `[{label: "1 hour", description: "Quick feasibility check"}, {label: "Half day", description: "Moderate investigation"}, {label: "1 day", description: "Deep dive with proof of concept"}]`
+- **1 hour** → quick feasibility check
+- **Half day** → moderate investigation
+- **1 day** → deep dive with proof of concept
 
 ### 2. Identify the linked issue (optional)
 
-Call `AskUserQuestion` with `question: "Is this spike linked to an existing issue?"`, `header: "Linked issue"`, and `options` pre-filled with recent open Epics and Features from `gh issue list --label "epic,feature" --state open --limit 5`, plus `{label: "No linked issue", description: "Standalone investigation"}`.
+Ask "Is this spike linked to an existing issue?" — header `Linked issue`:
+
+- Candidates from `gh issue list --label "epic,feature" --state open --limit 5`
+- **No linked issue** — standalone investigation
 
 If linked: fetch the issue to extract domain context, constraints, and success metrics that inform the investigation scope.
 
@@ -72,11 +73,11 @@ If evidence is genuinely ambiguous or the spike revealed the question is harder 
 
 ### 6. Review with user
 
-Show the full analysis (approaches + recommendation). Then call `AskUserQuestion` with:
+Show the full analysis (approaches + recommendation). Then ask "Does this answer the question well enough to proceed?" — header `Spike review`:
 
-- `question`: "Does this answer the question well enough to proceed?"
-- `header`: "Spike review"
-- `options`: `[{label: "Yes — record the findings", description: "Write the spike doc"}, {label: "Need more depth on one approach", description: "Explore a specific area further"}, {label: "Question changed", description: "The investigation revealed a different question"}]`
+- **Yes — record the findings** → write the spike doc
+- **Need more depth on one approach** → explore a specific area further
+- **Question changed** → the investigation revealed a different question
 
 Apply any adjustments, then proceed.
 
@@ -138,11 +139,11 @@ gh issue comment <issue_number> --body "🔬 Spike concluded: **<question>** →
 
 ### 9. Offer next steps
 
-Call `AskUserQuestion` with:
+Ask "What's next?" — header `Next step`:
 
-- `question`: "What's next?"
-- `header`: "Next step"
-- `options`: `[{label: "Write an Epic from this", description: "Turn the recommendation into an Epic issue (default)"}, {label: "Write a Task from this", description: "The spike uncovered a specific narrow change"}, {label: "Stop here", description: "Exit — the team will decide separately"}]`
+- **Write an Epic from this** → turn the recommendation into an Epic issue (default)
+- **Write a Task from this** → the spike uncovered a specific narrow change
+- **Stop here** → exit; the team will decide separately
 
 - **Write an Epic** → follow the `wtf.write-epic` process, seeding it with the spike's recommendation and findings as context.
 - **Write a Task** → follow the `wtf.write-task` process with the spike recommendation as the task description.

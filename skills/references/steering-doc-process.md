@@ -8,14 +8,10 @@ Every steering doc lives at `docs/steering/<NAME>.md`. The docs are treated as l
 
 Use the Read tool to attempt reading `docs/steering/<DOC>.md`.
 
-If the file **exists**, call `AskUserQuestion` with:
-
-- `question`: "docs/steering/<DOC>.md already exists. What would you like to do?"
-- `header`: "<Doc> found"
-- `options`: `[{label: "Refine it", description: "Review and improve the existing document"}, {label: "Exit", description: "Leave it as-is"}]`
+If the file **exists**, ask "docs/steering/<DOC>.md already exists. What would you like to do?" — header `<Doc> found`:
 
 - **Refine it** → read the current doc, then skip to step 4 (use the existing doc as context; only ask about gaps or outdated sections).
-- **Exit** → exit immediately.
+- **Exit** → leave it as-is and exit immediately.
 
 If the file does not exist, continue to step 2.
 
@@ -35,7 +31,10 @@ Using the skill's reference template as the shape, fill in all sections with gat
 
 ## Step 5. Review with user
 
-Show the draft. Call `AskUserQuestion` with `question: "Does this accurately reflect <the focus>?"`, `header: "Review"`, and `options: [{label: "Looks good — save it", description: "Write to docs/steering/<DOC>.md"}, {label: "I have changes", description: "I want to adjust something first"}]`.
+Show the draft. Ask "Does this accurately reflect <the focus>?" — header `Review`:
+
+- **Looks good — save it** → write to `docs/steering/<DOC>.md`
+- **I have changes** → adjust first
 
 Apply edits, then proceed.
 
@@ -52,11 +51,10 @@ Print the file path.
 
 ## Step 7. Offer wiki sync
 
-Call `AskUserQuestion` with:
+Ask "Would you like to sync this to the GitHub wiki?" — header `Wiki sync`:
 
-- `question`: "Would you like to sync this to the GitHub wiki?"
-- `header`: "Wiki sync"
-- `options`: `[{label: "Yes — push to wiki", description: "Publish <DOC>.md as a wiki page"}, {label: "Not now", description: "Skip wiki sync"}]`
+- **Yes — push to wiki** → publish `<DOC>.md` as a wiki page
+- **Not now** → skip wiki sync
 
 If **yes**:
 
@@ -73,4 +71,7 @@ Substitute `<slug>` with a lowercase word matching the doc (e.g. `tech`, `design
 
 ## Step 8. Offer to continue
 
-Call `AskUserQuestion` with options routing to the remaining `steer-*` skills not yet created (excluding this skill), plus `{label: "Stop here", description: "Exit — no further action"}`.
+Ask "Continue with another steering doc?" — header `Next steering doc`:
+
+- One option per remaining `steer-*` skill not yet created (excluding this skill) → run that skill
+- **Stop here** → exit, no further action

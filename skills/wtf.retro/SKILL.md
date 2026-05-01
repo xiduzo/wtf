@@ -15,7 +15,9 @@ Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or
 
 ### 1. Identify the Epic
 
-If an Epic number was passed in, use it directly. Otherwise call `AskUserQuestion` with `question: "Which Epic are you closing out?"`, `header: "Epic"`, and `options` pre-filled from open Epics via `gh issue list --label epic --state open --limit 10`.
+Apply `../references/questioning-style.md` for every question in this skill.
+
+If an Epic number was passed in, use it directly. Otherwise ask "Which Epic are you closing out?" — header `Epic`, options from open Epics via `gh issue list --label epic --state open --limit 10`.
 
 Fetch the Epic and its full hierarchy:
 
@@ -44,11 +46,10 @@ Verify all work is actually done before running a retro:
 - All child Tasks are closed (or explicitly marked `won't implement`)
 - No open PRs targeting feature branches under this Epic
 
-If anything is still open, call `AskUserQuestion` with:
+If anything is still open, ask "Not all work is closed yet — [list open items]. Run the retro anyway?" — header `Incomplete work`:
 
-- `question`: "Not all work is closed yet — [list open items]. Run the retro anyway?"
-- `header`: "Incomplete work"
-- `options`: `[{label: "Run retro anyway", description: "Some items are open — I'll note them as incomplete"}, {label: "Wait until complete", description: "Exit — finish the remaining work first"}]`
+- **Run retro anyway** → some items are open; note them as incomplete
+- **Wait until complete** → exit; finish the remaining work first
 
 ### 3. Compare planned vs. shipped
 
@@ -73,25 +74,27 @@ Identify deviations:
 
 ### 4. Gather learnings
 
-Use `AskUserQuestion` for each question. Only ask what isn't already evident from the issue history.
+Only ask what isn't already evident from the issue history.
 
 **Q1 — What was harder than expected?**
 
-- `question`: "What was harder or took longer than planned in this Epic?"
-- `header`: "Friction points"
-- `options`: pre-filled with 2–3 inferences from the deviation analysis (e.g. "Feature #X needed 3 verify cycles", "Task #Y was unscoped after implementation started")
+Ask "What was harder or took longer than planned in this Epic?" — header `Friction points`, options from 2–3 inferences from the deviation analysis (e.g. "Feature #X needed 3 verify cycles", "Task #Y was unscoped after implementation started").
 
 **Q2 — What should we do differently next time?**
 
-- `question`: "If you ran this Epic again, what would you change about how it was planned or executed?"
-- `header`: "Process improvements"
-- `options`: `[{label: "Better scoping upfront", description: "Scope drift was the main issue"}, {label: "Earlier design", description: "Design gaps caused implementation rework"}, {label: "Clearer contracts", description: "Interface ambiguity caused re-work"}, {label: "Nothing significant", description: "Execution was smooth"}, {label: "I'll describe it", description: "Free text"}]`
+Ask "If you ran this Epic again, what would you change about how it was planned or executed?" — header `Process improvements`:
+
+- **Better scoping upfront** → scope drift was the main issue
+- **Earlier design** → design gaps caused implementation rework
+- **Clearer contracts** → interface ambiguity caused re-work
+- **Nothing significant** → execution was smooth
 
 **Q3 — Any domain model insights?**
 
-- `question`: "Did this Epic reveal anything new about the domain model — new concepts, corrected names, missing bounded contexts?"
-- `header`: "Domain insights"
-- `options`: `[{label: "Yes — describe them", description: "New terms or corrections to capture"}, {label: "No domain changes", description: "Model held up well"}]`
+Ask "Did this Epic reveal anything new about the domain model — new concepts, corrected names, missing bounded contexts?" — header `Domain insights`:
+
+- **Yes — describe them** → new terms or corrections to capture
+- **No domain changes** → model held up well
 
 ### 5. Route learnings to steering docs
 
@@ -162,11 +165,10 @@ The retro summary must include:
 
 ### 7. Offer to generate a changelog
 
-Call `AskUserQuestion` with:
+Ask "Would you like to generate a changelog entry or GitHub Release for this Epic?" — header `Changelog`:
 
-- `question`: "Would you like to generate a changelog entry or GitHub Release for this Epic?"
-- `header`: "Changelog"
-- `options`: `[{label: "Yes — run changelog", description: "Run wtf.changelog for this Epic (recommended)"}, {label: "Not now", description: "Skip — I'll handle the release notes separately"}]`
+- **Yes — run changelog** → run `wtf.changelog` for this Epic (recommended)
+- **Not now** → skip; I'll handle the release notes separately
 
 If yes → follow the `wtf.changelog` process with the Epic number pre-loaded as context.
 
@@ -182,11 +184,10 @@ If the Epic is already `CLOSED` → print: "Epic #<n> is already closed via merg
 
 If still open (e.g. auto-close chain didn't fire): ask the user whether to close it via a merged PR reference or directly:
 
-Call `AskUserQuestion` with:
+Ask "Epic #<n> is still open. How would you like to close it?" — header `Close Epic`:
 
-- `question`: "Epic #<n> is still open. How would you like to close it?"
-- `header`: "Close Epic"
-- `options`: `[{label: "Close as completed", description: "Mark as closed — all work is done"}, {label: "Leave open", description: "I'll close it separately"}]`
+- **Close as completed** → mark as closed; all work is done
+- **Leave open** → I'll close it separately
 
 If "Close as completed":
 ```bash
