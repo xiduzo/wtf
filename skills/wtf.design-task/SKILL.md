@@ -21,39 +21,15 @@ Skip this step if invoked from `wtf.write-task` or another skill that already ra
 
 If the user provided an issue number in their request, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Task are you designing?" — header `Task`, options from recent open issues labeled `task`.
 
-Fetch the Task first, extract the Feature number from its Context section, then fetch the Feature:
-
-```bash
-gh issue view <task_number>    # Functional Description, Gherkin, Design Reference — also yields feature number
-# Extract feature number, then:
-gh issue view <feature_number> # User stories, ACs, visual context
-```
+Walk Task → Feature per `../references/spec-hierarchy.md` to extract Functional Description, Gherkin, Design Reference (Task) and user stories / ACs / visual context (Feature).
 
 ### 2. Lifecycle check
 
-Check whether the task already has a `designed` label:
-
-```bash
-gh issue view <task_number> --json labels --jq '.labels[].name'
-```
-
-If the `designed` label is **present**, ask "This task already has a `designed` label. Continuing will overwrite the existing Design Reference. How would you like to proceed?" — header `Already designed`:
-
-- **Redesign it** → overwrite the existing Design Reference and continue
-- **Exit** → leave the existing design as-is and exit immediately
-
-If the `designed` label is **absent**, continue silently.
+Apply the **present-label overwrite gate** from `../references/lifecycle-labels.md` for the `designed` label on the Task — output is "Design Reference", re-run verb is "Redesign". If absent, continue silently.
 
 ### 3. Load the design steering document
 
-Use the Read tool to attempt reading `docs/steering/DESIGN.md`.
-
-If the file **exists**: keep its content in context. Use its design principles, tokens, component patterns, and accessibility standards to inform every decision in this session. Do not surface it to the user — just apply it silently.
-
-If the file **does not exist**, ask "docs/steering/DESIGN.md doesn't exist yet. This document captures your design principles, tokens, and component patterns. Would you like to create it now?" — header `Design steering doc missing`:
-
-- **Create it now** → run `wtf.steer-design` (recommended), then return here and continue from step 4
-- **Skip for this session** → continue without it; design decisions won't reference project standards
+Load `docs/steering/DESIGN.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-design`). Apply its design principles, tokens, component patterns, and accessibility standards silently throughout this session.
 
 ### 4. Explore the design system
 

@@ -22,7 +22,7 @@ Apply `../references/questioning-style.md` and ask "Which Epic does this Feature
 - Candidates from recent open issues labeled `epic`
 - **None** — no parent Epic exists yet
 
-- If an Epic number is given: fetch it immediately — `gh issue view <number>` — extract Goal, Context, and Success Metrics.
+- If an Epic number is given: fetch it per `../references/spec-hierarchy.md` and extract Goal, Context, and Success Metrics.
 - If "none": note there is no parent Epic. Proceed, but flag the gap at the end — a Feature without an Epic is a planning debt.
 
 **Wiki / glossary fetch:** After fetching the Epic (or immediately if no Epic), search for any wiki pages or in-repo glossary docs relevant to this Feature's domain area. Use these to identify existing Ubiquitous Language terms before naming anything new.
@@ -87,21 +87,13 @@ Evaluate:
 
 - **Passes** → proceed to draft.
 - **Too broad** → propose smaller capability slices and confirm with the user.
-- **Has dependencies** → identify them against sibling Features already under this Epic:
-
-  ```bash
-  gh sub-issue list <epic_number>
-  ```
-
-  Decide which Features this one depends on (must ship first) and which depend on it (will be blocked until this ships). Record each dependency issue number for step 10; do not write them into the body yet.
+- **Has dependencies** → identify them against sibling Features already under this Epic. Use `gh sub-issue list <epic_number>` per the cookbook in `../references/gh-setup.md`. Decide which Features this one depends on (must ship first) and which depend on it (will be blocked until this ships). Record each dependency issue number for step 10; do not write them into the body yet.
 
 ### 7. Draft the Feature
 
 Acceptance Criteria must map 1:1 to user stories. Edge Cases must name at least 2 explicit failure or boundary scenarios.
 
-Before drafting, verify `.github/ISSUE_TEMPLATE/FEATURE.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
-
-Use the issue body structure from @.github/ISSUE_TEMPLATE/FEATURE.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context.
+Load the FEATURE template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context.
 
 **DDD writing rules for this draft** (see `../references/ddd-writing-rules.md` for full rules):
 

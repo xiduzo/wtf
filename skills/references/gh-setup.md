@@ -184,3 +184,65 @@ gh repo view --json nameWithOwner -q .nameWithOwner
 ```
 
 Store the result as `<owner>/<repo>` for use in all subsequent extension calls in this session.
+
+## Appendix — Sub-issue and dependency cookbook
+
+Canonical call shapes for the two extensions installed above. Skills cite this section rather than re-documenting the patterns. All commands assume `gh-sub-issue-available` / `gh-issue-dependency-available` is true — when false, do not write `Depends on #X` / `Blocks #Y` into issue bodies, warn the user that relationship tracking is unavailable.
+
+### Hierarchy — `gh sub-issue`
+
+```bash
+# List child sub-issues of a parent (default relation: children):
+gh sub-issue list <parent_number>
+
+# Find the parent of a sub-issue:
+gh sub-issue list <child_number> --relation parent --json number --jq '.[0].number'
+
+# List siblings:
+gh sub-issue list <issue_number> --relation siblings
+
+# Filter by state, JSON-shaped output:
+gh sub-issue list <parent_number> --state closed --json number,title,state
+
+# Link an existing issue as a child:
+gh sub-issue add <parent_number> <child_number>
+```
+
+Typical wtf usage:
+
+| Caller | Call | Purpose |
+|---|---|---|
+| `wtf.write-feature` | `gh sub-issue add <epic> <feature>` | Link new Feature under Epic |
+| `wtf.write-task` | `gh sub-issue add <feature> <task>` | Link new Task under Feature |
+| `wtf.feature-to-tasks` | `gh sub-issue list <feature> --relation parent` | Find parent Epic |
+| `wtf.epic-to-features` | `gh sub-issue list <epic>` | List existing Features |
+| `wtf.verify-task` Full Feature | `gh sub-issue list <feature>` | Authoritative Task list |
+| `wtf.loop` | `gh sub-issue list <epic>` then per-Feature | Walk the full DAG |
+| `wtf.changelog` | `gh sub-issue list <epic>` then per-Feature | Walk closed work |
+
+### Dependencies — `gh issue-dependency`
+
+```bash
+# Mark <issue> as blocked by one or more issues:
+gh issue-dependency add <issue_number> --blocked-by <blocker1>,<blocker2>
+
+# Mark <issue> as blocking one or more issues:
+gh issue-dependency add <issue_number> --blocks <blocked1>,<blocked2>
+
+# List dependency edges in both directions:
+gh issue-dependency list <issue_number>
+
+# Cross-repository dependency:
+gh issue-dependency add <issue_number> --blocked-by owner/other-repo#<n>
+```
+
+Typical wtf usage:
+
+| Caller | Call | Purpose |
+|---|---|---|
+| `wtf.write-epic` | `gh issue-dependency add <epic> --blocked-by <n>` | Record Epic-level dependency |
+| `wtf.write-feature` | `gh issue-dependency add <feature> --blocked-by <n>` | Record sibling-feature dep |
+| `wtf.write-task` | `gh issue-dependency add <task> --blocked-by <n>` | Cross-feature task dep |
+| `wtf.loop` step 1 | `gh issue-dependency list <n>` per node | Build DAG for topo sort |
+
+For the full traversal pattern (Task → Feature → Epic walk), see `./spec-hierarchy.md` rather than reimplementing per skill.

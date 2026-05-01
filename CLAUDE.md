@@ -54,13 +54,17 @@ Cross-skill references live in `skills/references/`:
 
 | File | Purpose |
 |---|---|
+| `branch-setup.md` | Trunk-based branch hierarchy, slug rules, worktree policy |
 | `commit-conventions.md` | Commit message format used across skills |
 | `conflict-graph.md` | Dependency / file-conflict model for parallel task execution |
 | `ddd-writing-rules.md` | Ubiquitous-language rules for issue/Gherkin authoring |
-| `gh-setup.md` | `gh` CLI + extension install + template scaffolding |
+| `gh-setup.md` | `gh` CLI + extension install + sub-issue/dependency cookbook |
+| `issue-template-loading.md` | Template verify + halt-or-setup + body-file create pattern |
+| `lifecycle-labels.md` | Label semantics + absent/overwrite gate templates |
 | `questioning-style.md` | How skills should prompt the user |
 | `scope-gates.md` | Definition-of-Ready / Definition-of-Done gates |
-| `steering-doc-process.md` | How steering docs are created and refined |
+| `spec-hierarchy.md` | Task → Feature → Epic traversal (extension + body-scrape) |
+| `steering-doc-process.md` | How steering docs are created, refined, and consumed |
 | `subagent-protocol.md` | Contract for subagent delegation |
 
 Reference these from skills rather than duplicating content.

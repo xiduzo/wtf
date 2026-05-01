@@ -21,84 +21,19 @@ Skip this step if invoked from `wtf.verify-task` or another skill that already r
 
 Ask: "Which Task are you implementing? (issue number)"
 
-Fetch the Task first, extract Feature and Epic numbers from its Context section, then fetch Feature and Epic in parallel:
-
-```bash
-gh issue view <task_number>    # Gherkin, Contracts, Impacted Areas — also yields feature and epic numbers
-# Extract feature and epic numbers, then in parallel:
-gh issue view <feature_number> # ACs, user stories
-gh issue view <epic_number>    # Goal, context, constraints
-```
+Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, Impacted Areas (Task) and ACs / Goal / constraints (Feature, Epic).
 
 ### 2. Lifecycle check
 
-Check whether the task has been designed:
-
-```bash
-gh issue view <task_number> --json labels --jq '.labels[].name'
-```
-
-If the `designed` label is **absent**, warn the user that the task hasn't been designed yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task**. Then apply `../references/questioning-style.md` and ask "This task doesn't have a `designed` label yet. How would you like to proceed?" — header `Design check`:
-
-- **Design it first** → run `wtf.design-task` (default)
-- **Skip design** → proceed to implementation anyway
-
-- **Design it first** → follow the `wtf.design-task` process, passing the Task number in as context.
-- **Skip design** → proceed.
-
-If the `designed` label is present, continue silently.
+Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `designed` label on the Task — recommended skill `wtf.design-task`, header `Design check`. On **Design it first** → follow `wtf.design-task` passing the Task number as context. On **Skip design** → proceed. If present, continue silently.
 
 ### 3. Load the technical steering document
 
-Use the Read tool to attempt reading `docs/steering/TECH.md`.
-
-If the file **exists**: keep its content in context. Use its stack, architecture patterns, key constraints, commands, and ADRs to inform the technical approach and implementation in this session. Do not surface it to the user — just apply it silently.
-
-If the file **does not exist**, ask "docs/steering/TECH.md doesn't exist yet. This document captures your stack, architecture patterns, and technical constraints. Would you like to create it now?" — header `Tech steering doc missing`:
-
-- **Create it now** → run `wtf.steer-tech` (recommended), then return here and continue from step 4
-- **Skip for this session** → continue without it; technical decisions won't reference project standards
-
-- **Create it now** → follow the `wtf.steer-tech` process, then return to this skill and continue from step 4.
-- **Skip for this session** → continue without it.
+Load `docs/steering/TECH.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-tech`). Apply its stack, architecture patterns, key constraints, commands, and ADRs silently throughout this session.
 
 ### 4. Set up the branch
 
-Before writing any code, set up branches following the trunk-based feature branching strategy:
-
-```
-main
-└── feature/<feature-number>-<feature-slug>   (merges → main)
-    └── task/<task-number>-<task-slug>         (merges → feature branch)
-```
-
-**Slug generation:** For both the feature slug and task slug, spawn a subagent using the `claude-haiku-4-5-20251001` model. Pass in the title and ask for a 2–4 word kebab-case summary restricted to `[a-z0-9-]` characters (e.g. `date-range-filter`).
-
-**Feature branch — create if missing:**
-
-```bash
-git fetch origin
-git checkout feature/<feature-number>-<feature-slug> 2>/dev/null || {
-  git checkout main
-  git pull --rebase origin main
-  git checkout -b feature/<feature-number>-<feature-slug>
-  git push -u origin feature/<feature-number>-<feature-slug>
-}
-git pull --rebase origin feature/<feature-number>-<feature-slug>
-```
-
-**Task branch — create or resume:**
-
-```bash
-# Fresh work:
-git checkout -b task/<task-number>-<task-slug>
-
-# Resumed work (branch already exists):
-git checkout task/<task-number>-<task-slug>
-git rebase origin/feature/<feature-number>-<feature-slug>
-```
-
-Resolve any conflicts before proceeding. Print the branch name.
+Set up the feature branch and task branch per `../references/branch-setup.md` (slug generation, feature-branch create-or-checkout, task-branch create-or-resume). Resolve any conflicts before proceeding.
 
 ### 5. Explore the codebase
 

@@ -85,9 +85,7 @@ Evaluate:
 
 Produce a complete draft. Success Metrics must be specific and measurable. Feature Breakdown stays as empty placeholders.
 
-Before drafting, verify `.github/ISSUE_TEMPLATE/EPIC.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
-
-Use the issue body structure from @.github/ISSUE_TEMPLATE/EPIC.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context.
+Load the EPIC template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context.
 
 **DDD writing rules for this draft:**
 

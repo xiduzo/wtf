@@ -53,19 +53,11 @@ If "Not sure" → exit. Suggest `wtf.write-task` as the next step.
 
 ### 3. Load the technical steering document
 
-Use the Read tool to attempt reading `docs/steering/TECH.md`. If it exists, apply its stack constraints, coding patterns, and test commands silently throughout this session.
+Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md`. If present, apply its stack constraints, coding patterns, and test commands silently throughout this session.
 
 ### 4. Set up the hotfix branch
 
-```bash
-git fetch origin
-git checkout main
-git pull --rebase origin main
-git checkout -b hotfix/<bug-number>-<slug>
-git push -u origin hotfix/<bug-number>-<slug>
-```
-
-Where `<slug>` is a 2–4 word kebab-case description of the fix (e.g. `null-check-payment-id`). Print the branch name.
+Set up the hotfix branch per `../references/branch-setup.md` ("Hotfix branch — direct from main" section). Print the branch name.
 
 ### 5. Explore the codebase
 

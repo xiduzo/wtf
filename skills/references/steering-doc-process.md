@@ -4,6 +4,34 @@ Shared procedure for every `wtf.steer-*` skill (`steer-vision`, `steer-tech`, `s
 
 Every steering doc lives at `docs/steering/<NAME>.md`. The docs are treated as living — generated once from research + interview, then refined, never regenerated from scratch.
 
+## Consumer-side load
+
+Any non-steer skill that needs steering context follows this single procedure. Skills citing it: `wtf.design-feature`, `wtf.design-task`, `wtf.implement-task`, `wtf.hotfix`, `wtf.pr-review`, `wtf.spike`, `wtf.verify-task`, `wtf.retro`, `wtf.reflect`.
+
+1. Use the Read tool to attempt reading `docs/steering/<DOC>.md` (one of `TECH.md`, `QA.md`, `DESIGN.md`, `VISION.md`).
+2. If it **exists** → keep its content in context and apply it silently throughout the session. Do not surface it to the user.
+3. If it **does not exist**, choose the appropriate behavior for the skill:
+   - **Strict consumer** (skill cannot do its job without the doc — e.g. `wtf.design-task`, `wtf.design-feature`, `wtf.implement-task`, `wtf.verify-task`): apply `./questioning-style.md` and ask "`docs/steering/<DOC>.md` doesn't exist yet. <one-line description of what the doc captures>. Would you like to create it now?" — header `<Doc> steering doc missing`:
+     - **Create it now** → invoke the matching `wtf.steer-<doc>` skill (recommended), then return and continue
+     - **Skip for this session** → continue without it; decisions won't reference project standards
+   - **Best-effort consumer** (skill can degrade gracefully — e.g. `wtf.hotfix`, `wtf.pr-review`, `wtf.spike`): silently continue without it. Note in any output if the doc would have changed the recommendation.
+
+| Skill | Doc(s) consumed | Mode |
+|---|---|---|
+| `wtf.implement-task` | `TECH.md`, `QA.md` (coverage threshold) | strict for TECH, soft default for QA |
+| `wtf.design-task` | `DESIGN.md` | strict |
+| `wtf.design-feature` | `DESIGN.md` | strict |
+| `wtf.verify-task` | `QA.md` | strict |
+| `wtf.pr-review` | `TECH.md` | best-effort |
+| `wtf.hotfix` | `TECH.md` | best-effort |
+| `wtf.spike` | `TECH.md` | best-effort |
+| `wtf.retro` | `TECH.md`, `QA.md`, `DESIGN.md`, `VISION.md` | best-effort, route deltas |
+| `wtf.reflect` | all four (writes back) | producer — see "Hard-Won Lessons" below |
+
+## Hard-Won Lessons (writer-side, for `wtf.reflect`)
+
+`wtf.reflect` writes session learnings into the consuming docs under a `## Hard-Won Lessons` section. The bullet format and routing rules live in `wtf.reflect` itself — the steering docs accept the appended bullets without further structure changes.
+
 ## Step 1. Check if the document already exists
 
 Use the Read tool to attempt reading `docs/steering/<DOC>.md`.

@@ -33,14 +33,7 @@ gh pr view <pr_number> --json number,title,body,headRefName,baseRefName,addition
 
 ### 2. Fetch the spec hierarchy
 
-Try to extract a Task number from the PR body (`Closes #<n>` or `Fixes #<n>`). If found, fetch the full spec hierarchy:
-
-```bash
-gh issue view <task_number>    # Gherkin, Contracts, Impacted Areas, DoD
-# Extract feature and epic numbers, then in parallel:
-gh issue view <feature_number> # ACs, user stories
-gh issue view <epic_number>    # Goal, constraints
-```
+Extract a Task number from the PR body (`Closes #<n>` or `Fixes #<n>`) per the PR-extraction recipe in `../references/spec-hierarchy.md`. If found, walk Task → Feature → Epic per the same reference to extract Gherkin, Contracts, Impacted Areas, DoD (Task) and ACs / Goal / constraints (Feature, Epic).
 
 If no Task number is found, ask "Is there a Task issue linked to this PR?" — header `Linked task`:
 
@@ -51,7 +44,7 @@ If there is no linked Task, the review proceeds from diff context alone (step 4 
 
 ### 3. Load the technical steering document
 
-Use the Read tool to attempt reading `docs/steering/TECH.md`. Apply its patterns, constraints, and conventions as the baseline for code quality judgements throughout this review.
+Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md`. Apply its patterns, constraints, and conventions as the baseline for code quality judgements throughout this review.
 
 ### 4. Inspect the diff
 

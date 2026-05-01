@@ -19,13 +19,7 @@ Skip this step if invoked from another skill that already ran gh-setup this sess
 
 If the user provided an issue number in their request, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Feature are you designing?" — header `Feature`, options from recent open issues labeled `feature`.
 
-Fetch the Feature and its parent Epic:
-
-```bash
-gh issue view <feature_number>    # User stories, ACs, Edge Cases, Domain Events
-# Extract epic number from Context section, then:
-gh issue view <epic_number>       # Goal, Context, Design Artifacts (strategic input)
-```
+Walk Feature → Epic per `../references/spec-hierarchy.md` to extract user stories, ACs, Edge Cases, Domain Events (Feature) and Goal, Context, Design Artifacts (Epic — strategic input).
 
 Extract and hold in context:
 - Feature capability name (Actor + verb + object)
@@ -37,29 +31,11 @@ Extract and hold in context:
 
 ### 2. Lifecycle check
 
-Check whether the feature already has a `designed` label:
-
-```bash
-gh issue view <feature_number> --json labels --jq '.labels[].name'
-```
-
-If `designed` is **present**, ask "This Feature already has a `designed` label. Continuing will overwrite the existing Design Handoff. How would you like to proceed?" — header `Already designed`:
-
-- **Redesign it** → overwrite the existing Design Handoff with a new one and continue
-- **Exit** → leave the existing design as-is and exit immediately
-
-If absent, continue silently.
+Apply the **present-label overwrite gate** from `../references/lifecycle-labels.md` for the `designed` label on the Feature — output is "Design Handoff", re-run verb is "Redesign". If absent, continue silently.
 
 ### 3. Load the design steering document
 
-Use the Read tool to attempt reading `docs/steering/DESIGN.md`.
-
-If it **exists**: keep its content in context. Apply its design principles, tokens, component patterns, and accessibility standards silently throughout this session.
-
-If it **does not exist**, ask "docs/steering/DESIGN.md doesn't exist yet. This document captures your design principles, tokens, and component patterns. Would you like to create it now?" — header `Design steering doc missing`:
-
-- **Create it now** → follow the `wtf.steer-design` process (recommended), then return here and continue from step 4
-- **Skip for this session** → continue without it; design decisions won't reference project standards
+Load `docs/steering/DESIGN.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-design`). Apply its design principles, tokens, component patterns, and accessibility standards silently throughout this session.
 
 ### 4. Explore the design system and codebase
 
@@ -142,42 +118,7 @@ This component map reduces duplication when `wtf.design-task` runs per-task.
 
 ### 8. Draft the Design Handoff
 
-Produce content for the **Design Handoff** section of the Feature issue:
-
-```markdown
-## Design Handoff
-
-- Figma: <top-level Figma file URL, generated file URL, or "pending (scaffold only)">
-- Flow: <link to prototype/flow if available>
-- Design path: <Path A: human-provided | Path B: AI-generated | Path C: scaffold brief>
-
-### Screen inventory
-
-| Screen | Story | Figma frame | States covered | Source |
-|--------|-------|-------------|----------------|--------|
-| <screen name> | As a... | <url or pending> | default / loading / error / empty | provided / generated / scaffolded |
-
-### Validation (Path A/B only)
-
-- [ ] Every user story has ≥1 frame
-- [ ] Every edge case has a boundary/error state frame
-- [ ] Every Domain Event surface is represented
-- [ ] All frames consistent with DESIGN.md tokens and patterns
-
-### Shared components
-
-| Component | Exists? | Path or new | Used on |
-|-----------|---------|-------------|---------|
-| <name> | yes/no | <path or "new"> | <screens> |
-
-### Accessibility notes
-
-<any feature-level a11y constraints from steering doc or Epic>
-
-### Open gaps
-
-<list any screens or states not yet designed — pending Figma frames>
-```
+Produce content for the **Design Handoff** section of the Feature issue. Use the structure in `references/design-handoff-template.md`.
 
 ### 9. Review with user
 

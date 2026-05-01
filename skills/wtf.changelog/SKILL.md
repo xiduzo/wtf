@@ -24,8 +24,8 @@ If an Epic or Feature number was already passed in as context (e.g. from `wtf.re
 
 Otherwise ask the user whether the changelog covers a Feature, an Epic, or a date range. Each scope has distinct follow-up queries:
 
-- **Feature scope** — fetch the Feature and all closed child tasks (`gh issue view`, `gh sub-issue list`, then `gh issue view` per task for Gherkin and Functional Description).
-- **Epic scope** — walk the full hierarchy: Epic → Features → Tasks, in parallel at each level.
+- **Feature scope** — walk the Feature and its closed child tasks per `../references/spec-hierarchy.md` to extract Gherkin and Functional Description per task.
+- **Epic scope** — walk Epic → Features → Tasks per the same reference, in parallel at each level.
 - **Date range scope** — fetch merged PRs between two dates via `gh pr list --state merged --json number,title,mergedAt,body` and filter with `--jq`.
 
 ### 2. Classify and translate each change

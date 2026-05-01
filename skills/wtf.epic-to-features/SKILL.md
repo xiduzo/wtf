@@ -19,21 +19,9 @@ Skip this step if gh-setup was already confirmed this session (e.g. when chained
 
 If an Epic number was passed in as context, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Epic are you breaking into Features?" — header `Epic`, options from recent open Epics found via `gh issue list --label epic`.
 
-Fetch the Epic:
+Fetch the Epic with `gh issue view <epic_number>` and extract: Goal, Context, and Success Metrics.
 
-```bash
-gh issue view <epic_number>
-```
-
-Extract: Goal, Context, and Success Metrics.
-
-List Features already created under this Epic using the sub-issue hierarchy:
-
-```bash
-gh sub-issue list <epic_number>
-```
-
-Note which Features already exist. Do not re-propose or re-create them.
+List Features already created under this Epic via `gh sub-issue list <epic_number>` per the cookbook in `../references/gh-setup.md`. Note which Features already exist — do not re-propose or re-create them.
 
 ### 2. Propose the full Feature list
 

@@ -19,21 +19,11 @@ Skip this step if gh-setup was already confirmed this session (e.g. when chained
 
 If a Feature number was passed in as context, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Feature are you breaking into Tasks?" — header `Feature`, options from recent open issues labeled `feature`.
 
-Fetch the Feature, then find its parent Epic via the sub-issue hierarchy:
-
-```bash
-gh issue view <feature_number>                                         # ACs, edge cases, user stories
-gh sub-issue list <feature_number> --relation parent                   # find parent Epic number
-gh issue view <epic_number>                                            # Goal, Context
-```
+Walk Feature → Epic per `../references/spec-hierarchy.md` to extract ACs, edge cases, user stories (Feature) and Goal, Context (Epic).
 
 Extract any existing Proposed Tasks checklist items (named, unnumbered items) from the Feature body. In Step 2, use these as the starting point for the proposal rather than generating from scratch.
 
-List Features already created under the Epic — used in step 4 to identify the next Feature:
-
-```bash
-gh sub-issue list <epic_number>
-```
+List Features already created under the Epic via `gh sub-issue list <epic_number>` per the cookbook in `../references/gh-setup.md` — used in step 4 to identify the next Feature.
 
 ### 2. Propose the full Task list
 

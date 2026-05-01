@@ -7,6 +7,8 @@ description: This skill should be used when a developer wants to capture learnin
 
 Capture learnings from this session and route them into the right steering document. Every hard-won insight — especially about where the AI went wrong or where implementation was harder than expected — belongs in a steering doc so it guides future work automatically.
 
+This skill is the **producer** for the `## Hard-Won Lessons` section of the four steering docs — see `../references/steering-doc-process.md` for the producer/consumer model and how other skills load these docs.
+
 **Intervention tracker:** The `hooks/track-interventions.sh` hook runs automatically on every `UserPromptSubmit` event and increments `/tmp/wtf.interventions-$(whoami)-$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")` when it detects correction or frustration language (e.g. "no,", "wrong", "actually", "stop that"). When the counter reaches 3, the hook prints a reminder at the end of the session to run `wtf.reflect`. Step 6 of this skill resets the counter to zero. No manual tracking is needed — the hook handles it.
 
 ## Process
@@ -80,7 +82,7 @@ For each learning gathered, determine where it belongs:
 | Scope confusion, priority conflict, domain language drift      | `VISION.md`         |
 | Doesn't clearly fit one doc                                    | `TECH.md` (default) |
 
-For each target doc:
+For each target doc, follow the writer-side procedure in `../references/steering-doc-process.md` (see "Hard-Won Lessons (writer-side, for `wtf.reflect`)"):
 
 1. If the target doc does not exist (from the map built in step 1) → use `docs/steering/LEARNINGS.md` instead. Create it with a `# Overflow Learnings` heading if it doesn't exist yet.
 2. Read the current file.

@@ -44,7 +44,7 @@ Run all research in parallel using the Agent tool:
 
 **Codebase exploration:**
 - Search for existing implementations, prior attempts, or ADRs addressing the same question (domain nouns, patterns, imports)
-- Check `docs/steering/TECH.md` for constraints that rule out certain approaches
+- Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md` for constraints that rule out certain approaches
 - Identify integration points and dependencies the solution must respect
 
 **External research (if available):**

@@ -39,13 +39,7 @@ Ask in a single message:
 - "What is the bug? (one sentence)"
 - "Which Task does this trace back to? (issue number, or 'unknown')"
 
-If a task number is known, fetch the Task first, extract the Feature number from its Context section, then fetch the Feature:
-
-```bash
-gh issue view <task_number>    # Gherkin, Contracts, ACs, DoD — also yields feature number
-# Extract feature number, then:
-gh issue view <feature_number> # ACs, user stories for expected behavior context
-```
+If a task number is known, walk Task → Feature per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, ACs, DoD (Task) and ACs / user stories (Feature) for expected-behavior context.
 
 ### 2. Identify the failing scenario(s)
 
@@ -98,17 +92,7 @@ List each file found with a one-line description of what it covers. These become
 
 ### 6. Draft the Bug report
 
-Before drafting, verify `.github/ISSUE_TEMPLATE/BUG.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
-
-Read the BUG template:
-
-```bash
-# Read .github/ISSUE_TEMPLATE/BUG.md
-```
-
-Use only the markdown body below the second `---` delimiter (ignore YAML frontmatter).
-
-Fill in all sections:
+Load the BUG template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections:
 
 **Related**
 

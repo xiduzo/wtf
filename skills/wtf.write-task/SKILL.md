@@ -19,15 +19,7 @@ Skip this step if invoked from `wtf.feature-to-tasks` or `wtf.write-feature` (th
 
 Apply `../references/questioning-style.md` and ask "Which Feature does this Task belong to?" — header `Feature`, options from recent open issues labeled `feature`.
 
-Fetch the Feature, then find its parent Epic via the sub-issue hierarchy:
-
-```bash
-gh issue view <feature_number>                                         # ACs, edge cases, user stories
-gh sub-issue list <feature_number> --relation parent                   # find parent Epic number
-gh issue view <epic_number>                                            # Goal, Context
-```
-
-If the Epic number was passed in as context (e.g. from an orchestrator), skip the `gh sub-issue list` call and use it directly.
+Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract ACs, edge cases, user stories, Goal, and Context. If the Epic number was passed in as context (e.g. from an orchestrator), skip the parent walk and use it directly.
 
 ### 2. Name the task
 
@@ -73,20 +65,13 @@ Use the Agent tool to search the codebase for:
 
 Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context — check `docs/glossary.md`, GitHub wiki pages matching the context name, or any ADR files. Use these to verify Ubiquitous Language terms before writing Gherkin scenarios. If no wiki or glossary exists, proceed without comment.
 
-**Cross-feature dependency scan:** Fetch the sibling Features from the Epic's Feature Breakdown checklist (already fetched above), then fetch the Proposed Tasks checklist from each sibling Feature's issue body:
-
-```bash
-# For each sibling Feature number extracted from the Epic's Feature Breakdown:
-gh issue view <sibling_feature_number> --json number,title,body
-```
-
-Extract the task names and issue numbers (where linked) from each Feature's Proposed Tasks section. Then fetch the full body of any already-created sibling tasks to understand their scope:
+**Cross-feature dependency scan:** Fetch sibling Features from the Epic's Feature Breakdown (extracted above) and the Proposed Tasks checklist from each. For sibling Feature bodies, use the per-level fetch in `../references/spec-hierarchy.md`. Then list already-created sibling tasks:
 
 ```bash
 gh issue list --label task --state open --json number,title,body
 ```
 
-Filter this list client-side to tasks whose body references a sibling Feature number. Note any whose scope overlaps with or must precede this task. Keep these candidate dependencies in mind for step 5.
+Filter client-side to tasks whose body references a sibling Feature number. Note any whose scope overlaps with or must precede this task. Keep these candidate dependencies in mind for step 5.
 
 ### 5. Vertical slice assessment
 
@@ -141,9 +126,7 @@ Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 
 ### 8. Draft the Task
 
-Before drafting, verify `.github/ISSUE_TEMPLATE/TASK.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
-
-Use the issue body structure from @.github/ISSUE_TEMPLATE/TASK.md (ignore the YAML frontmatter — use only the markdown body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
+Load the TASK template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
 
 Section-specific guidance:
 
@@ -216,13 +199,7 @@ If either extension is unavailable, warn the user — do not write relationship 
 
 ### 12. Offer to continue
 
-Count remaining tasks by fetching the Feature's Proposed Tasks checklist (named items without issue numbers) and comparing against already-created child tasks via the sub-issue hierarchy:
-
-```bash
-gh sub-issue list <feature_number>
-```
-
-Subtract created task count from total named items in the Proposed Tasks list to get remaining. Mention how many remain.
+Count remaining tasks by fetching the Feature's Proposed Tasks checklist (named items without issue numbers) and comparing against already-created child tasks. Use `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. Subtract created task count from total named items in the Proposed Tasks list to get remaining. Mention how many remain.
 
 Ask "What's next?" — header `Next step`:
 

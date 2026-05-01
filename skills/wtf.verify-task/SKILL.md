@@ -30,30 +30,15 @@ Ask "Are you verifying a single Task or a full Feature?" — header `Scope`:
 
 Ask "Which Task are you testing?" — header `Task`, options from recent open issues labeled `task` or `implemented`.
 
-Fetch the Task first, extract the Feature number from its Context section, then fetch the Feature:
+Walk Task → Feature per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, Edge Cases, Test Mapping, DoD (Task) and ACs / edge cases for additional probe scenarios (Feature).
 
-```bash
-gh issue view <task_number>    # Gherkin, Contracts, Edge Cases, Test Mapping, DoD — also yields feature number
-# Extract feature number, then:
-gh issue view <feature_number> # ACs, edge cases for additional probe scenarios
-```
-
-Check task labels. If `implemented` is **absent**, warn and ask "This task hasn't been implemented yet. How would you like to proceed?" — header `Implement first?`:
-
-- **Implement first** → follow the `wtf.implement-task` process, passing the Task number in as context (default)
-- **Verify anyway** → skip and proceed with verification
+Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `implemented` label on the Task — recommended skill `wtf.implement-task`, header `Implement first?`. On **Implement first** → follow `wtf.implement-task` passing the Task number as context. On **Verify anyway** → proceed.
 
 **If Full Feature:**
 
 Ask "Which Feature are you verifying?" — header `Feature`, options from open feature issues.
 
-Fetch all sub-issues of the Feature using the extension:
-
-```bash
-gh sub-issue list <feature_number>
-```
-
-This returns the authoritative list of Tasks — do not search by label or title matching.
+Fetch all sub-issues of the Feature using `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. This returns the authoritative list of Tasks — do not search by label or title matching.
 
 **Sub-phase the task list.** Apply the file-conflict coloring algorithm in `../references/conflict-graph.md` to partition the tasks into conflict-free sub-phases — tasks within a sub-phase can run in parallel worktrees; sub-phases run sequentially.
 
@@ -70,14 +55,7 @@ Wait for all sub-agents in a sub-phase to complete (and any `NEEDS_INPUT` respon
 
 ### 2. Load the QA steering document
 
-Use the Read tool to attempt reading `docs/steering/QA.md`.
-
-If the file **exists**: keep its content in context. Use its test strategy, coverage thresholds, definition of done, and known flaky areas to inform every verification decision in this session. Do not surface it to the user — just apply it silently.
-
-If the file **does not exist**, ask "docs/steering/QA.md doesn't exist yet. This document captures your test strategy, coverage thresholds, and definition of done. Would you like to create it now?" — header `QA steering doc missing`:
-
-- **Create it now** → run `wtf.steer-qa` (recommended), then return here and continue from step 3
-- **Skip for this session** → continue without it; QA decisions won't reference project standards
+Load `docs/steering/QA.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-qa`). Apply its test strategy, coverage thresholds, definition of done, and known flaky areas silently throughout this session.
 
 ### 3. Establish the test surface
 

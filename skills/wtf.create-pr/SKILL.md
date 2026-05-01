@@ -55,32 +55,13 @@ If not found or the user says no, ask "Is there a Task issue linked to this work
 
 ### 3. Lifecycle check (if Task linked)
 
-If a Task issue is known, check its labels:
-
-```bash
-gh issue view <task_number> --json labels --jq '.labels[].name'
-```
-
-If the `verified` label is **absent**, warn the user that the task hasn't been verified yet and that the recommended flow is: **write-task → design-task → implement-task → verify-task → create-pr**. Then ask "This task hasn't been verified yet. How would you like to proceed?" — header `Verify first?`:
-
-- **Verify first** → run `wtf.verify-task` before opening the PR (default)
-- **Open PR anyway** → skip verification and open the PR now
-
-- **Verify first** → follow the `wtf.verify-task` process, passing the Task number in as context.
-- **Open PR anyway** → proceed.
-
 If no Task is linked, skip this step.
+
+Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `verified` label on the Task — recommended skill `wtf.verify-task`, header `Verify first?`. On **Verify first** → follow `wtf.verify-task` passing the Task number as context. On **Open PR anyway** → proceed.
 
 ### 4. Fetch the spec hierarchy
 
-**If a Task issue is known**, fetch the full hierarchy:
-
-```bash
-gh issue view <task_number>    # Gherkin, Contracts, DoD, Test Mapping — also yields feature and epic numbers
-# Extract feature and epic numbers, then in parallel:
-gh issue view <feature_number> # ACs, user stories
-gh issue view <epic_number>    # Goal, context, constraints
-```
+**If a Task issue is known**, walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, DoD, Test Mapping (Task) and ACs / Goal / constraints (Feature, Epic).
 
 **If no Task issue**, skip hierarchy fetch. The PR will be written from diff context alone (step 5).
 
@@ -97,11 +78,9 @@ This avoids including unrelated merged commits when the branch has a long histor
 
 ### 6. Draft the PR
 
-**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a PR title per `../references/commit-conventions.md`. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly following the same rules. Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
+**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model — apply `../references/subagent-protocol.md` for the spawn — to generate a PR title per `../references/commit-conventions.md`. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly following the same rules. Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
 
-**Body:** Before drafting, verify `.github/pull_request_template.md` exists. If missing, ask the user (per `../references/questioning-style.md`) whether to run `/wtf.setup` or cancel — then halt either way.
-
-Use the structure from @.github/pull_request_template.md. Fill in all sections:
+**Body:** Load the PR template per `../references/issue-template-loading.md` (verify `.github/pull_request_template.md` exists, halt-or-setup if missing). Fill in all sections:
 
 - **Summary**: derived from the Task's Intent + Functional Description (or commit messages if no Task). Explain the _why_.
 - **Changes**: grouped logical summary of `git diff --stat` output — not a file list.
