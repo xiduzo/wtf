@@ -18,7 +18,7 @@ How any wtf skill should use `AskUserQuestion` when gathering context from the u
 
 ## Compact notation in skill files
 
-Skill files describe asks in a compact form. The runtime translates them to `AskUserQuestion` calls — the tool name and field names (`question:`, `header:`, `options:`) do not need to repeat.
+Skill files describe asks in a compact form. **You (Claude) must translate each compact ask into an actual `AskUserQuestion` tool call** — the notation is shorthand for the author, not a directive to another system. The tool name and field names (`question:`, `header:`, `options:`) do not need to repeat in the skill file, but you must emit the tool call when executing.
 
 **Form 1 — inline** (inferred options, source-driven):
 
@@ -50,7 +50,7 @@ Skill files describe asks in a compact form. The runtime translates them to `Ask
 
 ## Reference shapes
 
-The compact notation desugars to the underlying tool call. For reference, the canonical form:
+You must expand compact notation into this tool call. Canonical form:
 
 ```
 AskUserQuestion(

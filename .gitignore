@@ -2,3 +2,7 @@
 .claude/skills/wtf.*
 .agents/skills/wtf.*
 skills-lock.json
+
+# Mac things
+.DS_Store
+skills/.DS_Store
