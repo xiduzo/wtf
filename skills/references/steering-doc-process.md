@@ -27,9 +27,7 @@ Synthesise findings internally. Produce a concrete draft of the factual sections
 
 ## Step 3. Interview the user for gaps only
 
-Apply `./questioning-style.md` — one question at a time via `AskUserQuestion`, with research-inferred options. Only ask about what research could not determine. Each `steer-*` skill defines its own gap-topic list.
-
-Skip any topic already answered by research.
+Apply `./questioning-style.md` for every question. Each `steer-*` skill defines its own gap-topic list.
 
 ## Step 4. Draft the document
 

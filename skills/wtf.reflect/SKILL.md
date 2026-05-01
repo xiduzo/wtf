@@ -38,9 +38,9 @@ Briefly scan context to understand what was worked on:
 - Any failing/passing tests, PRs, or issues mentioned in conversation
 - Do NOT dump this at the user — use it only to pre-fill questions.
 
-### 3. Gather learnings — one question at a time
+### 3. Gather learnings
 
-Use `AskUserQuestion` for each question. Only ask questions that aren't already answered by context.
+Apply `../references/questioning-style.md` for every question.
 
 **Q1 — What was harder than expected?**
 

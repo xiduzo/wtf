@@ -63,7 +63,7 @@ If no Gherkin exists for this bug, skip this step and rely on step 3.
 
 **If called from `wtf.verify-task` and all six details below are already in context, skip this step entirely.**
 
-Otherwise, gather each unknown item **one at a time** using `AskUserQuestion`, omitting any item already known:
+Otherwise, per `../references/questioning-style.md`, gather each unknown item below, omitting any already known:
 
 - **a. Observed behavior** — call `AskUserQuestion` with `question: "What was the exact behavior you observed?"`, `header: "Actual behavior"`, and `options` pre-filled with 1–2 plausible failure descriptions inferred from the scenario context.
 - **b. Expected behavior** — call `AskUserQuestion` with `question: "What did you expect to happen instead?"`, `header: "Expected behavior"`, and `options` pre-filled with the relevant Gherkin `Then` step or AC text if available.
