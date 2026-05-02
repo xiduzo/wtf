@@ -2,6 +2,16 @@
 
 How any wtf skill should use `AskUserQuestion` when gathering context from the user.
 
+## Prerequisite — load the tool schema
+
+`AskUserQuestion` is a deferred tool. Its schema is not loaded by default. Before calling it for the first time in any skill execution, call:
+
+```
+ToolSearch(query: "select:AskUserQuestion")
+```
+
+Do this once per session, before the first `AskUserQuestion` call. If you skip this, the call will fail with `InputValidationError` and the skill will silently fall back to plain-text output — exactly the wrong behavior.
+
 ## Core rules
 
 1. **One question at a time.** Wait for the answer before asking the next. Do not batch questions into a single message — it makes the UI confusing and the answers hard to route.
