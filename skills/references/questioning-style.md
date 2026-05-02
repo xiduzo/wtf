@@ -20,6 +20,30 @@ How any wtf skill should use `AskUserQuestion` when gathering context from the u
 
 Skill files describe asks in a compact form. **You (Claude) must translate each compact ask into an actual `AskUserQuestion` tool call** — the notation is shorthand for the author, not a directive to another system. The tool name and field names (`question:`, `header:`, `options:`) do not need to repeat in the skill file, but you must emit the tool call when executing.
 
+**NEVER output question options as plain text.** This applies to every `Ask` in a skill — including "Offer to continue" / "next step" routing questions at the end of a skill. Printing bullet points instead of calling `AskUserQuestion` is always wrong, regardless of how the skill labels the section.
+
+Wrong — outputs text bullets:
+```
+Next step
+
+— Plan all Features → /wtf.epic-to-features for #427
+— Write one Feature → start with one feature under #427
+— Stop here
+```
+
+Right — calls the tool:
+```
+AskUserQuestion(
+  question: "What's next?",
+  header: "Next step",
+  options: [
+    {label: "Plan all Features", description: "Run /wtf.epic-to-features for #427"},
+    {label: "Write one Feature", description: "Start with one feature under #427"},
+    {label: "Stop here", description: "Exit, no further action"},
+  ]
+)
+```
+
 **Form 1 — inline** (inferred options, source-driven):
 
 > Ask "Which Feature does this belong to?" — header `Feature`, options from recent open issues labeled `feature`.
