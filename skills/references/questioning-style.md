@@ -2,15 +2,15 @@
 
 How any wtf skill should use `AskUserQuestion` when gathering context from the user.
 
-## Prerequisite — load the tool schema
+## Load the tool schema — do this now
 
-`AskUserQuestion` is a deferred tool. Its schema is not loaded by default. Before calling it for the first time in any skill execution, call:
+`AskUserQuestion` is a deferred tool. Call this **immediately upon loading this reference** — before any research or skill steps begin:
 
 ```
 ToolSearch(query: "select:AskUserQuestion")
 ```
 
-Do this once per session, before the first `AskUserQuestion` call. If you skip this, the call will fail with `InputValidationError` and the skill will silently fall back to plain-text output — exactly the wrong behavior.
+Don't wait until the first `Ask`. By then you've processed thousands of tokens of research and the instruction has faded from salience. One call now keeps the schema loaded for the whole session.
 
 ## Core rules
 
@@ -41,7 +41,7 @@ Next step
 — Stop here
 ```
 
-Right — calls the tool:
+Right — calls the tool (schema loaded at reference load time; if somehow missed, call `ToolSearch(query: "select:AskUserQuestion")` now before emitting):
 ```
 AskUserQuestion(
   question: "What's next?",
