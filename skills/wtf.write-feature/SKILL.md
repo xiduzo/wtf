@@ -61,7 +61,7 @@ Clarification questions are split into two tiers. Work through all Required ques
 7. What business invariants must hold?
 8. Are there known edge cases or failure modes?
 
-Apply `../references/questioning-style.md` for every question. Stop when you have enough for a complete draft.
+Apply `../references/questioning-style.md` for questions in this step. Stop when you have enough for a complete draft.
 
 ### 4. Derive user stories
 

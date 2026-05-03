@@ -15,9 +15,7 @@ Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or
 
 ### 1. Identify the Epic
 
-Apply `../references/questioning-style.md` for every question in this skill.
-
-If an Epic number was passed in, use it directly. Otherwise ask "Which Epic are you closing out?" — header `Epic`, options from open Epics via `gh issue list --label epic --state open --limit 10`.
+If an Epic number was passed in, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Epic are you closing out?" — header `Epic`, options from open Epics via `gh issue list --label epic --state open --limit 10`.
 
 Fetch the Epic and its full hierarchy:
 
@@ -46,7 +44,7 @@ Verify all work is actually done before running a retro:
 - All child Tasks are closed (or explicitly marked `won't implement`)
 - No open PRs targeting feature branches under this Epic
 
-If anything is still open, ask "Not all work is closed yet — [list open items]. Run the retro anyway?" — header `Incomplete work`:
+If anything is still open, apply `../references/questioning-style.md` and ask "Not all work is closed yet — [list open items]. Run the retro anyway?" — header `Incomplete work`:
 
 - **Run retro anyway** → some items are open; note them as incomplete
 - **Wait until complete** → exit; finish the remaining work first
@@ -74,7 +72,7 @@ Identify deviations:
 
 ### 4. Gather learnings
 
-Only ask what isn't already evident from the issue history.
+Only ask what isn't already evident from the issue history. Apply `../references/questioning-style.md` for questions in this step.
 
 **Q1 — What was harder than expected?**
 
@@ -165,7 +163,7 @@ The retro summary must include:
 
 ### 7. Offer to generate a changelog
 
-Ask "Would you like to generate a changelog entry or GitHub Release for this Epic?" — header `Changelog`:
+Apply `../references/questioning-style.md` and ask "Would you like to generate a changelog entry or GitHub Release for this Epic?" — header `Changelog`:
 
 - **Yes — run changelog** → run `wtf.changelog` for this Epic (recommended)
 - **Not now** → skip; I'll handle the release notes separately
@@ -184,7 +182,7 @@ If the Epic is already `CLOSED` → print: "Epic #<n> is already closed via merg
 
 If still open (e.g. auto-close chain didn't fire): ask the user whether to close it via a merged PR reference or directly:
 
-Ask "Epic #<n> is still open. How would you like to close it?" — header `Close Epic`:
+Apply `../references/questioning-style.md` and ask "Epic #<n> is still open. How would you like to close it?" — header `Close Epic`:
 
 - **Close as completed** → mark as closed; all work is done
 - **Leave open** → I'll close it separately

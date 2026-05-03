@@ -7,7 +7,7 @@ description: This skill should be used when a team wants to create or refine the
 
 Generate or refine `docs/steering/TECH.md` — the technical guidelines document. This document is the canonical reference for the stack, architectural patterns, and constraints every implementer must follow.
 
-The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below. Apply `../references/questioning-style.md` for every user question.
+The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below.
 
 - **Doc path:** `docs/steering/TECH.md`
 - **Template:** `references/tech-template.md`
@@ -30,7 +30,7 @@ Produce a concrete draft of Stack, Commands, and Code Conventions from research 
 
 ## Step 3 — Gap-topic list
 
-Ask only about items research could not determine:
+Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine:
 
 1. **Key constraints** — "Are there non-negotiables every implementer must respect?" Pre-fill with constraints from `CLAUDE.md` or existing docs.
 2. **Architecture decisions** — "Are there decisions that shaped the architecture but aren't documented yet?" Pre-fill with patterns inferred from the codebase structure.

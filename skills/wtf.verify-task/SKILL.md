@@ -19,16 +19,14 @@ Skip this step if invoked from `wtf.implement-task` or another skill that alread
 
 ### 1. Identify the verification scope
 
-Apply `../references/questioning-style.md` for every question in this skill.
-
-Ask "Are you verifying a single Task or a full Feature?" — header `Scope`:
+Apply `../references/questioning-style.md` and ask "Are you verifying a single Task or a full Feature?" — header `Scope`:
 
 - **Single Task** → verify one Task's Gherkin scenarios
 - **Full Feature** → verify all Tasks under a Feature using its sub-issues
 
 **If Single Task:**
 
-Ask "Which Task are you testing?" — header `Task`, options from recent open issues labeled `task` or `implemented`.
+Apply `../references/questioning-style.md` and ask "Which Task are you testing?" — header `Task`, options from recent open issues labeled `task` or `implemented`.
 
 Walk Task → Feature per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, Edge Cases, Test Mapping, DoD (Task) and ACs / edge cases for additional probe scenarios (Feature).
 
@@ -36,7 +34,7 @@ Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the
 
 **If Full Feature:**
 
-Ask "Which Feature are you verifying?" — header `Feature`, options from open feature issues.
+Apply `../references/questioning-style.md` and ask "Which Feature are you verifying?" — header `Feature`, options from open feature issues.
 
 Fetch all sub-issues of the Feature using `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. This returns the authoritative list of Tasks — do not search by label or title matching.
 
@@ -66,14 +64,14 @@ From the Task, extract and present:
 - Edge Cases & Risks (additional scenarios to probe)
 - Observability requirements (logs, metrics, alerts to verify)
 
-Ask "I found [n] Gherkin scenarios and [m] edge cases to cover. Does this match what you expect?" (replace [n] and [m] with actual counts) — header `Test surface`:
+Apply `../references/questioning-style.md` and ask "I found [n] Gherkin scenarios and [m] edge cases to cover. Does this match what you expect?" (replace [n] and [m] with actual counts) — header `Test surface`:
 
 - **Yes — that's everything** → proceed to testing
 - **There are more scenarios** → add them first
 
 ### 4. Walk through each Gherkin scenario
 
-For each scenario, one at a time:
+Apply `../references/questioning-style.md` for questions in this step. For each scenario, one at a time:
 
 1. Present it as a concrete test case — restate the Given/When/Then in plain language.
 2. Ask "Did this scenario pass?" — header `Result`:
@@ -115,7 +113,7 @@ For each scenario, one at a time:
 
 ### 5. Probe the edge cases
 
-For each Edge Case listed in the Task (and the parent Feature), one at a time:
+Apply `../references/questioning-style.md` for questions in this step. For each Edge Case listed in the Task (and the parent Feature), one at a time:
 
 1. Derive a concrete test action from the edge case description.
 2. Ask "Did this edge case pass?" — header `Result`:
@@ -129,7 +127,7 @@ For each Edge Case listed in the Task (and the parent Feature), one at a time:
 
 ### 6. Verify observability
 
-For each item in the Observability section (logs, metrics, alerts), one at a time:
+Apply `../references/questioning-style.md` for questions in this step. For each item in the Observability section (logs, metrics, alerts), one at a time:
 
 1. Ask "Was this observability item present and correct?" — header `Result`:
    - **Yes ✅** → present and correct
@@ -175,7 +173,7 @@ Print the updated Task issue URL.
 
 ### 8. Offer to open a PR and close the issue
 
-If the verdict is ✅ or ⚠️, ask "Task verified. What would you like to do next?" — header `Next step`:
+If the verdict is ✅ or ⚠️, apply `../references/questioning-style.md` and ask "Task verified. What would you like to do next?" — header `Next step`:
 
 - **Open PR now** → create a pull request; the task closes automatically when the PR is merged (recommended)
 - **Skip for now** → exit; I'll open the PR later
@@ -193,7 +191,7 @@ Check all result tables (Gherkin scenarios from step 4, edge cases from step 5, 
 
 If none exist, skip this step entirely.
 
-If unfiled failures exist, present them as a numbered list, then ask "[n] failing scenario(s) without a bug report. How would you like to handle them?" (replace [n] with the actual count) — header `File bugs?`:
+If unfiled failures exist, present them as a numbered list, then apply `../references/questioning-style.md` and ask "[n] failing scenario(s) without a bug report. How would you like to handle them?" (replace [n] with the actual count) — header `File bugs?`:
 
 - **File separately** → spawn one sub-agent per failing scenario in parallel using the Agent tool, each running the report-bug fast path (read `skills/wtf.report-bug/SKILL.md` and paste steps 1–3 and 6–8 into the sub-agent prompt). Pass in the task number and the specific failing scenario. Apply `../references/subagent-protocol.md` — no `AskUserQuestion` in sub-agents; return `NEEDS_INPUT` for anything ambiguous. Wait for all sub-agents to complete before exiting (default).
 - **File combined** → follow the `wtf.report-bug` process once, passing in the task number and all failing scenarios together.

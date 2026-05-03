@@ -42,9 +42,7 @@ A hotfix must be:
 - **Non-breaking**: no API contract changes, no schema migrations unless strictly required
 - **Testable**: at least one automated test can verify the fix
 
-Apply `../references/questioning-style.md` for every question in this skill.
-
-Ask "Does this fix meet the hotfix criteria? (narrow, non-breaking, testable)" — header `Scope check`:
+Apply `../references/questioning-style.md` and ask "Does this fix meet the hotfix criteria? (narrow, non-breaking, testable)" — header `Scope check`:
 
 - **Yes — proceed** → create the hotfix branch and start the fix
 - **Not sure — it may be larger than that** → use the normal workflow instead
@@ -73,7 +71,7 @@ Do not expand scope based on what you find. If the fix turns out to be larger th
 
 If exploration reveals the fix touches more than 3–4 files, requires changing an API contract, or requires a schema migration, surface it before writing any code:
 
-Ask "This fix is larger than a typical hotfix — [describe what was found]. How do you want to proceed?" — header `Scope gate`:
+Apply `../references/questioning-style.md` and ask "This fix is larger than a typical hotfix — [describe what was found]. How do you want to proceed?" — header `Scope gate`:
 
 - **Proceed as hotfix** → accept the larger scope; I understand the risk
 - **Switch to normal flow** → exit and use `write-epic` + `write-task` instead
@@ -129,7 +127,7 @@ Print the PR URL.
 
 If the project uses release branches, offer to backport:
 
-Ask "Should this fix be backported to a release branch?" — header `Backport`:
+Apply `../references/questioning-style.md` and ask "Should this fix be backported to a release branch?" — header `Backport`:
 
 - Candidates from `git branch -r | grep -iE 'release|v[0-9]'` (limit 5)
 - **No backport needed** — main only

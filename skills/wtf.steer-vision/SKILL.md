@@ -7,7 +7,7 @@ description: This skill should be used when a team wants to create or refine the
 
 Generate or refine `docs/steering/VISION.md` — the product constitution. This document is the highest-level steering artifact: it captures why the product exists, who it serves, and what principles govern every decision.
 
-The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below. Apply `../references/questioning-style.md` for every user question.
+The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below.
 
 - **Doc path:** `docs/steering/VISION.md`
 - **Template:** `references/vision-template.md`
@@ -34,7 +34,7 @@ Synthesise internally. Do not dump raw research at the user.
 
 ## Step 3 — Gap-topic list
 
-Ask only about items research could not determine, in priority order:
+Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine, in priority order:
 
 1. **Product purpose** — "What problem does this product solve, and for whom?" Pre-fill with purpose statements inferred from README or codebase.
 2. **Target users** — "Who are the primary users? Use their domain role names." Pre-fill with named roles inferred from the codebase.

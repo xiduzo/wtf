@@ -7,7 +7,7 @@ description: This skill should be used when a team wants to create or refine the
 
 Generate or refine `docs/steering/DESIGN.md` — the design guidelines document. This document is the canonical reference for design decisions, the system in use, tokens, patterns, and accessibility requirements that every designer and implementer must follow.
 
-The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below. Apply `../references/questioning-style.md` for every user question.
+The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below.
 
 - **Doc path:** `docs/steering/DESIGN.md`
 - **Template:** `references/design-template.md`
@@ -30,7 +30,7 @@ Produce a draft of Stack, Tokens, and Component Patterns from research alone whe
 
 ## Step 3 — Gap-topic list
 
-Ask only about items research could not determine:
+Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine:
 
 1. **Design principles** — "What 3–5 principles guide every design decision for this product?" Pre-fill from `VISION.md` or any existing design docs.
 2. **Design system** — "What design system are you using? Do you have a Figma library?" Pre-fill with anything found in the codebase or imports.

@@ -17,13 +17,11 @@ Skip this step if gh-setup was already confirmed this session.
 
 ### 1. Define the question
 
-Apply `../references/questioning-style.md` for every question in this skill.
-
-If the user described the investigation in their request, extract the core question from it. Otherwise ask "What question should this spike answer?" — header `Spike question`, options from specific questions inferred from any context provided (e.g. linked Epic, conversation).
+If the user described the investigation in their request, extract the core question from it. Otherwise apply `../references/questioning-style.md` and ask "What question should this spike answer?" — header `Spike question`, options from specific questions inferred from any context provided (e.g. linked Epic, conversation).
 
 The question must be specific and answerable — not "how does caching work?" but "is Redis or in-memory caching the right choice for our session store given our deployment constraints?" — and scoped to a decision the team actually needs to make.
 
-Then ask "How much time should this spike take?" — header `Time box`:
+Apply `../references/questioning-style.md` and ask "How much time should this spike take?" — header `Time box`:
 
 - **1 hour** → quick feasibility check
 - **Half day** → moderate investigation
@@ -31,7 +29,7 @@ Then ask "How much time should this spike take?" — header `Time box`:
 
 ### 2. Identify the linked issue (optional)
 
-Ask "Is this spike linked to an existing issue?" — header `Linked issue`:
+Apply `../references/questioning-style.md` and ask "Is this spike linked to an existing issue?" — header `Linked issue`:
 
 - Candidates from `gh issue list --label "epic,feature" --state open --limit 5`
 - **No linked issue** — standalone investigation
@@ -73,7 +71,7 @@ If evidence is genuinely ambiguous or the spike revealed the question is harder 
 
 ### 6. Review with user
 
-Show the full analysis (approaches + recommendation). Then ask "Does this answer the question well enough to proceed?" — header `Spike review`:
+Show the full analysis (approaches + recommendation). Then apply `../references/questioning-style.md` and ask "Does this answer the question well enough to proceed?" — header `Spike review`:
 
 - **Yes — record the findings** → write the spike doc
 - **Need more depth on one approach** → explore a specific area further
@@ -139,7 +137,7 @@ gh issue comment <issue_number> --body "🔬 Spike concluded: **<question>** →
 
 ### 9. Offer next steps
 
-Ask "What's next?" — header `Next step`:
+Apply `../references/questioning-style.md` and ask "What's next?" — header `Next step`:
 
 - **Write an Epic from this** → turn the recommendation into an Epic issue (default)
 - **Write a Task from this** → the spike uncovered a specific narrow change

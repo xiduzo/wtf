@@ -36,7 +36,7 @@ Any non-steer skill that needs steering context follows this single procedure. S
 
 Use the Read tool to attempt reading `docs/steering/<DOC>.md`.
 
-If the file **exists**, ask "docs/steering/<DOC>.md already exists. What would you like to do?" — header `<Doc> found`:
+If the file **exists**, apply `./questioning-style.md` and ask "docs/steering/<DOC>.md already exists. What would you like to do?" — header `<Doc> found`:
 
 - **Refine it** → read the current doc, then skip to step 4 (use the existing doc as context; only ask about gaps or outdated sections).
 - **Exit** → leave it as-is and exit immediately.
@@ -51,7 +51,7 @@ Synthesise findings internally. Produce a concrete draft of the factual sections
 
 ## Step 3. Interview the user for gaps only
 
-Apply `./questioning-style.md` for every question. Each `steer-*` skill defines its own gap-topic list.
+Each `steer-*` skill defines its own gap-topic list and applies `./questioning-style.md` at that step.
 
 ## Step 4. Draft the document
 
@@ -59,7 +59,7 @@ Using the skill's reference template as the shape, fill in all sections with gat
 
 ## Step 5. Review with user
 
-Show the draft. Ask "Does this accurately reflect <the focus>?" — header `Review`:
+Show the draft. Apply `./questioning-style.md` and ask "Does this accurately reflect <the focus>?" — header `Review`:
 
 - **Looks good — save it** → write to `docs/steering/<DOC>.md`
 - **I have changes** → adjust first
@@ -79,7 +79,7 @@ Print the file path.
 
 ## Step 7. Offer wiki sync
 
-Ask "Would you like to sync this to the GitHub wiki?" — header `Wiki sync`:
+Apply `./questioning-style.md` and ask "Would you like to sync this to the GitHub wiki?" — header `Wiki sync`:
 
 - **Yes — push to wiki** → publish `<DOC>.md` as a wiki page
 - **Not now** → skip wiki sync
@@ -99,7 +99,7 @@ Substitute `<slug>` with a lowercase word matching the doc (e.g. `tech`, `design
 
 ## Step 8. Offer to continue
 
-Ask "Continue with another steering doc?" — header `Next steering doc`:
+Apply `./questioning-style.md` and ask "Continue with another steering doc?" — header `Next steering doc`:
 
 - One option per remaining `steer-*` skill not yet created (excluding this skill) → run that skill
 - **Stop here** → exit, no further action

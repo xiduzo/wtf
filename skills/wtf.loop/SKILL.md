@@ -47,9 +47,7 @@ If any are missing, install them before proceeding.
 
 ### 1. Identify the target and build the dependency graph
 
-Apply `../references/questioning-style.md` for every question in this skill.
-
-Ask "What do you want to execute?" — header `Target`:
+Apply `../references/questioning-style.md` and ask "What do you want to execute?" — header `Target`:
 
 - One option per open Feature (e.g. **Feature #<n> — <title>** → execute all Tasks under this Feature)
 - One **Epic — all features** option if an Epic is available
@@ -141,7 +139,7 @@ Feature #5 — Payment Settlement   (no feature-level blockers)
 Feature #6 — Reporting            blocked by Feature #5
 ```
 
-Ask "Here's the suggested execution plan based on the dependency graph. Does this look right?" — header `Plan review`:
+Apply `../references/questioning-style.md` and ask "Here's the suggested execution plan based on the dependency graph. Does this look right?" — header `Plan review`:
 
 - **Approve — start the loop** → execute tasks in this order
 - **Remove a task** → drop one or more tasks from this run; specify which
@@ -174,7 +172,7 @@ gh sub-issue list <feature_number>
 
 If both checks show all work is complete (no open sub-issues, all task PRs merged), open the feature PR automatically — no confirmation needed.
 
-If either check shows pending work, list the outstanding tasks and ask "Not all task PRs are merged yet. Open the feature PR anyway?" — header `Feature PR`:
+If either check shows pending work, list the outstanding tasks and apply `../references/questioning-style.md` and ask "Not all task PRs are merged yet. Open the feature PR anyway?" — header `Feature PR`:
 
 - **Wait — I'll merge them first** → pause here
 - **Open it now** → open feature → main PR with unmerged tasks noted in description

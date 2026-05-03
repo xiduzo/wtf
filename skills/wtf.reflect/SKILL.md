@@ -21,7 +21,7 @@ ls docs/steering/ 2>/dev/null
 
 Build a map of which of the four docs are present: `TECH.md`, `QA.md`, `DESIGN.md`, `VISION.md`.
 
-**If none exist**, ask "No steering docs found. Would you like to create them first?" — header `No steering docs`:
+**If none exist**, apply `../references/questioning-style.md` and ask "No steering docs found. Would you like to create them first?" — header `No steering docs`:
 
 - **Create them now** → run the `steer-*` skills to set up the docs
 - **Skip — just capture notes** → save all learnings to `docs/steering/LEARNINGS.md` instead
@@ -41,11 +41,9 @@ Briefly scan context to understand what was worked on:
 
 ### 3. Gather learnings
 
-Apply `../references/questioning-style.md` for every question.
-
 **Q1 — What was harder than expected?**
 
-Ask "What was harder or more painful than it should have been in this session?" — header `Session friction`:
+Apply `../references/questioning-style.md` and ask "What was harder or more painful than it should have been in this session?" — header `Session friction`:
 
 - 2–3 inferred options based on what was worked on (e.g. "Debugging X took too long", "Claude kept misunderstanding Y")
 - **Nothing — skip** — session went smoothly
@@ -54,18 +52,18 @@ If **Nothing — skip** → skip to step 6 (reset counter) and exit with: "Great
 
 **Q2 — Did Claude make a recurring mistake?**
 
-Ask "Did Claude keep making the same mistake you had to correct?" — header `AI mistakes`:
+Apply `../references/questioning-style.md` and ask "Did Claude keep making the same mistake you had to correct?" — header `AI mistakes`:
 
 - **Yes — describe it** → tell me what it kept doing
 - **No recurring mistakes** → one-off issues only
 
-If **Yes** → ask "Describe the mistake briefly. What rule would prevent it next time?" — header `AI mistake — the rule`:
+If **Yes** → apply `../references/questioning-style.md` and ask "Describe the mistake briefly. What rule would prevent it next time?" — header `AI mistake — the rule`:
 
 - **Skip** — hard to articulate right now
 
 **Q3 — What is the one rule this session taught you?**
 
-Ask "If you had to write one rule that would have prevented the most wasted time today, what would it be?" — header `The lesson`:
+Apply `../references/questioning-style.md` and ask "If you had to write one rule that would have prevented the most wasted time today, what would it be?" — header `The lesson`:
 
 - 1–2 rules inferred from the session
 - **Skip this one** — nothing to add

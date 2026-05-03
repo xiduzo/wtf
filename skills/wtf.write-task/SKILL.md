@@ -49,7 +49,7 @@ Topics that may require clarification (in priority order):
 - What **domain Events** does this Task emit?
 - If this Task touches an integration boundary, which Bounded Contexts are involved?
 
-Apply `../references/questioning-style.md` for every question. Stop when you have enough to write a complete draft — do not invent answers or assume away ambiguity.
+Apply `../references/questioning-style.md` for questions in this step. Stop when you have enough to write a complete draft — do not invent answers or assume away ambiguity.
 
 ### 4. Explore the codebase and wiki
 

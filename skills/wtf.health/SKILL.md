@@ -15,9 +15,7 @@ Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or
 
 ### 1. Choose the scope
 
-Apply `../references/questioning-style.md` for every question in this skill.
-
-Ask "What scope do you want to check?" — header `Scope`:
+Apply `../references/questioning-style.md` and ask "What scope do you want to check?" — header `Scope`:
 
 - **Full project** → all open Epics, Features, and Tasks
 - **One Epic** → all work under a specific Epic
@@ -124,7 +122,7 @@ If everything is clean, print: "All open issues are in a healthy state. Nothing 
 
 ### 5. Offer to act on findings
 
-If findings exist, ask "Would you like to act on any of these findings now?" — header `Next action`:
+If findings exist, apply `../references/questioning-style.md` and ask "Would you like to act on any of these findings now?" — header `Next action`:
 
 - One option per ⚠️ finding (e.g. **Verify Task #42** → run `verify-task`)
 - **Done — just the report** → exit

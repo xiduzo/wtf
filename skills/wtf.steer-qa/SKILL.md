@@ -7,7 +7,7 @@ description: This skill should be used when a team wants to create or refine the
 
 Generate or refine `docs/steering/QA.md` — the QA standards document. This document is the canonical reference for test strategy, coverage requirements, test patterns, and the definition of done that every implementer and QA engineer must follow.
 
-The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below. Apply `../references/questioning-style.md` for every user question.
+The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below.
 
 - **Doc path:** `docs/steering/QA.md`
 - **Template:** `references/qa-template.md`
@@ -33,7 +33,7 @@ Produce a concrete draft of Test Strategy, Test Patterns, and Commands from rese
 
 ## Step 3 — Gap-topic list
 
-Ask only about items research could not determine:
+Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine:
 
 1. **Coverage thresholds** — "What is the minimum acceptable test coverage?" Pre-fill with thresholds found in test config or `CLAUDE.md`.
 2. **Definition of Done** — "What must be true before any task can be merged?" Pre-fill with DoD items from `CLAUDE.md` or existing task templates.

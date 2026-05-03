@@ -50,7 +50,7 @@ Synthesise findings internally. Do not dump raw research at the user.
 
 ### 3. Grill the user
 
-Using what research revealed, ask targeted follow-up questions to close the remaining gaps. Apply `../references/questioning-style.md` for every question.
+Using what research revealed, ask targeted follow-up questions to close the remaining gaps. Apply `../references/questioning-style.md` for questions in this step.
 
 Completeness checklist (ask only about unanswered items):
 
