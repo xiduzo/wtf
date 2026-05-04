@@ -17,22 +17,29 @@ Skip this step if gh-setup was already confirmed this session.
 
 ### 1. Define the question
 
-If the user described the investigation in their request, extract the core question from it. Otherwise apply `../references/questioning-style.md` and ask "What question should this spike answer?" — header `Spike question`, options from specific questions inferred from any context provided (e.g. linked Epic, conversation).
+If the user described the investigation in their request, extract the core question from it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What question should this spike answer?"
+- header: "Spike question"
+- options: specific questions inferred from any context provided (e.g. linked Epic, conversation)
 
-The question must be specific and answerable — not "how does caching work?" but "is Redis or in-memory caching the right choice for our session store given our deployment constraints?" — and scoped to a decision the team actually needs to make.
+The question must be specific and answerable — scoped to a decision the team actually needs to make.
 
-Apply `../references/questioning-style.md` and ask "How much time should this spike take?" — header `Time box`:
-
-- **1 hour** → quick feasibility check
-- **Half day** → moderate investigation
-- **1 day** → deep dive with proof of concept
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How much time should this spike take?"
+- header: "Time box"
+- options:
+  - **1 hour** → quick feasibility check
+  - **Half day** → moderate investigation
+  - **1 day** → deep dive with proof of concept
 
 ### 2. Identify the linked issue (optional)
 
-Apply `../references/questioning-style.md` and ask "Is this spike linked to an existing issue?" — header `Linked issue`:
-
-- Candidates from `gh issue list --label "epic,feature" --state open --limit 5`
-- **No linked issue** — standalone investigation
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Is this spike linked to an existing issue?"
+- header: "Linked issue"
+- options:
+  - Candidates from `gh issue list --label "epic,feature" --state open --limit 5`
+  - **No linked issue** — standalone investigation
 
 If linked: fetch the issue to extract domain context, constraints, and success metrics that inform the investigation scope.
 
@@ -71,11 +78,13 @@ If evidence is genuinely ambiguous or the spike revealed the question is harder 
 
 ### 6. Review with user
 
-Show the full analysis (approaches + recommendation). Then apply `../references/questioning-style.md` and ask "Does this answer the question well enough to proceed?" — header `Spike review`:
-
-- **Yes — record the findings** → write the spike doc
-- **Need more depth on one approach** → explore a specific area further
-- **Question changed** → the investigation revealed a different question
+Show the full analysis (approaches + recommendation). Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this answer the question well enough to proceed?"
+- header: "Spike review"
+- options:
+  - **Yes — record the findings** → write the spike doc
+  - **Need more depth on one approach** → explore a specific area further
+  - **Question changed** → the investigation revealed a different question
 
 Apply any adjustments, then proceed.
 
@@ -137,12 +146,10 @@ gh issue comment <issue_number> --body "🔬 Spike concluded: **<question>** →
 
 ### 9. Offer next steps
 
-Apply `../references/questioning-style.md` and ask "What's next?" — header `Next step`:
-
-- **Write an Epic from this** → turn the recommendation into an Epic issue (default)
-- **Write a Task from this** → the spike uncovered a specific narrow change
-- **Stop here** → exit; the team will decide separately
-
-- **Write an Epic** → follow the `wtf.write-epic` process, seeding it with the spike's recommendation and findings as context.
-- **Write a Task** → follow the `wtf.write-task` process with the spike recommendation as the task description.
-- **Stop here** → exit.
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Write an Epic from this** → follow `wtf.write-epic`, seeding it with the spike's recommendation (default)
+  - **Write a Task from this** → follow `wtf.write-task` with the spike recommendation as the task description
+  - **Stop here** → exit; the team will decide separately

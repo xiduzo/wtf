@@ -17,10 +17,12 @@ Skip this step if invoked from `wtf.epic-to-features` or `wtf.write-epic` (the o
 
 ### 1. Identify the parent Epic
 
-Apply `../references/questioning-style.md` and ask "Which Epic does this Feature belong to?" — header `Epic`:
-
-- Candidates from recent open issues labeled `epic`
-- **None** — no parent Epic exists yet
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Epic does this Feature belong to?"
+- header: "Epic"
+- options:
+  - Candidates from recent open issues labeled `epic`
+  - **None** — no parent Epic exists yet
 
 - If an Epic number is given: fetch it per `../references/spec-hierarchy.md` and extract Goal, Context, and Success Metrics.
 - If "none": note there is no parent Epic. Proceed, but flag the gap at the end — a Feature without an Epic is a planning debt.
@@ -29,7 +31,10 @@ Apply `../references/questioning-style.md` and ask "Which Epic does this Feature
 
 ### 2. Name the capability
 
-Ask: "What user-facing capability is this?" (one sentence)
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What user-facing capability is this?" (one sentence)
+- header: "Capability"
+- options: infer 1–2 candidates from the Epic's Goal or Success Metrics if available
 
 The capability name must follow the pattern: **[Domain Actor] can [domain verb] [domain object]** — where:
 
@@ -61,7 +66,7 @@ Clarification questions are split into two tiers. Work through all Required ques
 7. What business invariants must hold?
 8. Are there known edge cases or failure modes?
 
-Apply `../references/questioning-style.md` for questions in this step. Stop when you have enough for a complete draft.
+For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough for a complete draft.
 
 ### 4. Derive user stories
 
@@ -130,14 +135,18 @@ The DoR items (from the Feature template) are:
 - [ ] Acceptance criteria written and reviewed
 - [ ] Edge cases identified
 
-Evaluate each against the draft. For each unchecked item, ask "The DoR item '[item name]' is not met. How should we handle it?" — header `DoR item`:
+Evaluate each against the draft. For each unchecked item, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "The DoR item '[item name]' is not met. How should we handle it?"
+- header: "DoR item"
+- options:
+  - **Flag as blocker** → add a ⛔ Blocker note to the issue body before creating
+  - **Waive** → note the reason and proceed anyway
 
-- **Flag as blocker** → add a ⛔ Blocker note to the issue body before creating
-- **Waive** → note the reason and proceed anyway
-
-If "Design handoff complete" is flagged as a blocker, also ask "Do you have a Figma link to include?" — header `Figma link`:
-
-- **No link yet** → leave Design Reference empty for now
+If "Design handoff complete" is flagged as a blocker, also call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Do you have a Figma link to include?"
+- header: "Figma link"
+- options:
+  - **No link yet** → leave Design Reference empty for now
 
 If the user provides a link via the free-text escape hatch, add it to the Design Reference section of the issue body.
 
@@ -159,10 +168,12 @@ On **Split it** → return to step 3 with the chosen focused capability as the s
 
 ### 10. Review with user
 
-Show the draft. Then ask "Any changes before I create the issue?" — header `Review`:
-
-- **Looks good — create the issue** → proceed with issue creation
-- **I have changes** → adjust first
+Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Any changes before I create the issue?"
+- header: "Review"
+- options:
+  - **Looks good — create the issue** → proceed with issue creation
+  - **I have changes** → adjust first
 
 Apply edits, then proceed.
 
@@ -206,12 +217,14 @@ Print the Feature issue URL and number.
 
 First, if there is a parent Epic, check its Feature Breakdown checklist: list any Feature placeholders that have not yet been created as issues (i.e. no `#issue` reference beside them). Mention how many remain.
 
-Then ask "What's next?" — header `Next step`:
-
-- **Plan all Tasks** → propose the full Task list for this Feature and create them one by one (default)
-- **Write one Task** → write a single Task for this Feature now
-- **Write next Feature** → write the next Feature for the same Epic (N remaining — replace N with the actual count, or omit if none)
-- **Stop here** → exit, no further action
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Plan all Tasks** → propose the full Task list for this Feature and create them one by one (default)
+  - **Write one Task** → write a single Task for this Feature now
+  - **Write next Feature** → write the next Feature for the same Epic (N remaining — replace N with the actual count, or omit if none)
+  - **Stop here** → exit, no further action
 
 - **Plan all Tasks** → invoke the `wtf.feature-to-tasks` skill, passing the Feature number in as context.
 - **Write one Task** → proceed with the `wtf.write-task` skill, passing the Feature number in as context.

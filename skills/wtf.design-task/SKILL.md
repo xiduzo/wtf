@@ -19,7 +19,10 @@ Skip this step if invoked from `wtf.write-task` or another skill that already ra
 
 ### 1. Identify the Task
 
-If the user provided an issue number in their request, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Task are you designing?" — header `Task`, options from recent open issues labeled `task`.
+If the user provided an issue number in their request, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Task are you designing?"
+- header: "Task"
+- options: from recent open issues labeled `task`
 
 Walk Task → Feature per `../references/spec-hierarchy.md` to extract Functional Description, Gherkin, Design Reference (Task) and user stories / ACs / visual context (Feature).
 
@@ -51,18 +54,22 @@ List these states explicitly — this becomes the design coverage checklist.
 
 ### 6. Ask about design assets
 
-Ask "How would you like to handle design assets for this task?" — header `Design assets`:
-
-- **I have Figma frames** → provide frame URLs; I'll validate coverage against Gherkin scenarios (Path A)
-- **Generate designs for me** → use Figma MCP to generate frames from the Gherkin scenarios and design system (Path B)
-- **Scaffold a spec only** → no Figma; produce a text component spec from the scenarios (Path C)
-- **Partial — some states designed** → provide available frames; remaining states go to generate or scaffold
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How would you like to handle design assets for this task?"
+- header: "Design assets"
+- options:
+  - **I have Figma frames** → provide frame URLs; I'll validate coverage against Gherkin scenarios (Path A)
+  - **Generate designs for me** → use Figma MCP to generate frames from the Gherkin scenarios and design system (Path B)
+  - **Scaffold a spec only** → no Figma; produce a text component spec from the scenarios (Path C)
+  - **Partial — some states designed** → provide available frames; remaining states go to generate or scaffold
 
 **Path A — Human provides frames:**
-Collect frame URLs. For each Gherkin scenario from step 5, check whether a frame covers it. Flag any scenario with no matching frame as a gap. Present the coverage matrix: scenario → frame URL (or ⚠ gap). If gaps exist, ask "How should I handle the uncovered scenarios?" — header `Gaps`:
-
-- **Generate missing frames** → run Path B for the gaps
-- **Leave as pending** → record gaps in the Design Reference and continue
+Collect frame URLs. For each Gherkin scenario from step 5, check whether a frame covers it. Flag any scenario with no matching frame as a gap. Present the coverage matrix: scenario → frame URL (or ⚠ gap). If gaps exist, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How should I handle the uncovered scenarios?"
+- header: "Gaps"
+- options:
+  - **Generate missing frames** → run Path B for the gaps
+  - **Leave as pending** → record gaps in the Design Reference and continue
 
 **Path B — AI generates via Figma MCP:**
 Check whether the Figma MCP tool `generate_figma_design` is available. If unavailable, warn the user and fall back to Path C (scaffold).
@@ -78,10 +85,12 @@ Collect the generated frame URLs and treat them as Path A frames from this point
 Draft a component spec using the structure in `references/component-spec-template.md`, listing each state with its required UI elements and interactions. No Figma frames — this is a text-only design brief for the developer.
 
 **Partial:**
-Collect available frame URLs, run Path A validation on covered states. For uncovered states, ask "How should I handle the remaining states?" — header `Remainder`:
-
-- **Generate** → run Path B
-- **Scaffold** → run Path C
+Collect available frame URLs, run Path A validation on covered states. For uncovered states, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How should I handle the remaining states?"
+- header: "Remainder"
+- options:
+  - **Generate** → run Path B
+  - **Scaffold** → run Path C
 
 ### 7. Draft the Design Reference
 
@@ -96,11 +105,13 @@ Produce the content for the Design Reference section of the Task:
 
 ### 8. Review with user
 
-Show the draft. Then ask "Does this cover all the states in the Gherkin?" — header `Review`:
-
-- **Yes — looks complete** → proceed to update the task
-- **Missing states** → add more coverage
-- **Other changes** → adjust something else
+Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this cover all the states in the Gherkin?"
+- header: "Review"
+- options:
+  - **Yes — looks complete** → proceed to update the task
+  - **Missing states** → add more coverage
+  - **Other changes** → adjust something else
 
 Apply edits, then proceed.
 
@@ -122,11 +133,13 @@ Print the updated Task issue URL.
 
 ### 10. Offer to continue
 
-Ask "What's next?" — header `Next step`:
-
-- **Implement this Task** → run `wtf.implement-task` for this Task now (default)
-- **Design another Task** → design another Task for the same Feature
-- **Stop here** → exit, no further action
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Implement this Task** → run `wtf.implement-task` for this Task now (default)
+  - **Design another Task** → design another Task for the same Feature
+  - **Stop here** → exit, no further action
 
 - **Implement this Task** → follow the `wtf.implement-task` process, passing the Task number in as context so the user is not asked for it again.
 - **Design another Task** → restart this skill from step 1, reusing the same Feature context.

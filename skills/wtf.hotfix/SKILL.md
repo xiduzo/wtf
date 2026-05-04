@@ -42,10 +42,12 @@ A hotfix must be:
 - **Non-breaking**: no API contract changes, no schema migrations unless strictly required
 - **Testable**: at least one automated test can verify the fix
 
-Apply `../references/questioning-style.md` and ask "Does this fix meet the hotfix criteria? (narrow, non-breaking, testable)" — header `Scope check`:
-
-- **Yes — proceed** → create the hotfix branch and start the fix
-- **Not sure — it may be larger than that** → use the normal workflow instead
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this fix meet the hotfix criteria? (narrow, non-breaking, testable)"
+- header: "Scope check"
+- options:
+  - **Yes — proceed** → create the hotfix branch and start the fix
+  - **Not sure — it may be larger than that** → use the normal workflow instead
 
 If "Not sure" → exit. Suggest `wtf.write-task` as the next step.
 
@@ -71,10 +73,12 @@ Do not expand scope based on what you find. If the fix turns out to be larger th
 
 If exploration reveals the fix touches more than 3–4 files, requires changing an API contract, or requires a schema migration, surface it before writing any code:
 
-Apply `../references/questioning-style.md` and ask "This fix is larger than a typical hotfix — [describe what was found]. How do you want to proceed?" — header `Scope gate`:
-
-- **Proceed as hotfix** → accept the larger scope; I understand the risk
-- **Switch to normal flow** → exit and use `write-epic` + `write-task` instead
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "This fix is larger than a typical hotfix — [describe what was found]. How do you want to proceed?"
+- header: "Scope gate"
+- options:
+  - **Proceed as hotfix** → accept the larger scope; I understand the risk
+  - **Switch to normal flow** → exit and use `write-epic` + `write-task` instead
 
 ### 7. Implement the fix
 
@@ -127,10 +131,12 @@ Print the PR URL.
 
 If the project uses release branches, offer to backport:
 
-Apply `../references/questioning-style.md` and ask "Should this fix be backported to a release branch?" — header `Backport`:
-
-- Candidates from `git branch -r | grep -iE 'release|v[0-9]'` (limit 5)
-- **No backport needed** — main only
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Should this fix be backported to a release branch?"
+- header: "Backport"
+- options:
+  - Candidates from `git branch -r | grep -iE 'release|v[0-9]'` (limit 5)
+  - **No backport needed** — main only
 
 If a backport branch is selected — wait until the hotfix PR merges, then:
 

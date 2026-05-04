@@ -23,7 +23,10 @@ If a PR number was passed in, use it directly. Otherwise:
 gh pr list --state open --json number,title,headRefName --limit 20
 ```
 
-Apply `../references/questioning-style.md` and ask "Which PR are you reviewing?" — header `PR`, options from open PRs.
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which PR are you reviewing?"
+- header: "PR"
+- options: from open PRs listed above
 
 Fetch the PR:
 
@@ -35,10 +38,12 @@ gh pr view <pr_number> --json number,title,body,headRefName,baseRefName,addition
 
 Extract a Task number from the PR body (`Closes #<n>` or `Fixes #<n>`) per the PR-extraction recipe in `../references/spec-hierarchy.md`. If found, walk Task → Feature → Epic per the same reference to extract Gherkin, Contracts, Impacted Areas, DoD (Task) and ACs / Goal / constraints (Feature, Epic).
 
-If no Task number is found, ask "Is there a Task issue linked to this PR?" — header `Linked task`:
-
-- **No linked task** → review from diff only
-- **Yes — I'll provide the number** → enter the task issue number
+If no Task number is found, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Is there a Task issue linked to this PR?"
+- header: "Linked task"
+- options:
+  - **No linked task** → review from diff only
+  - **Yes — I'll provide the number** → enter the task issue number
 
 If there is no linked Task, the review proceeds from diff context alone (step 4 will note the absence of a spec as a finding).
 
@@ -137,11 +142,13 @@ Verdicts:
 
 ### 7. Review with user
 
-Show the summary. Then ask "Does this look right? Should I post this as a GitHub PR review?" — header `Post review`:
-
-- **Post it** → submit as a GitHub PR review comment
-- **I have edits** → adjust before posting
-- **Don't post — just the summary** → keep it in the conversation
+Show the summary. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this look right? Should I post this as a GitHub PR review?"
+- header: "Post review"
+- options:
+  - **Post it** → submit as a GitHub PR review comment
+  - **I have edits** → adjust before posting
+  - **Don't post — just the summary** → keep it in the conversation
 
 Apply any edits, then proceed.
 

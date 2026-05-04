@@ -34,14 +34,14 @@ Synthesise internally. Do not dump raw research at the user.
 
 ## Step 3 — Gap-topic list
 
-Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine, in priority order:
+Ask only about items research could not determine, in priority order. For each unanswered item, call `AskUserQuestion` (per `../references/questioning-style.md`):
 
-1. **Product purpose** — "What problem does this product solve, and for whom?" Pre-fill with purpose statements inferred from README or codebase.
-2. **Target users** — "Who are the primary users? Use their domain role names." Pre-fill with named roles inferred from the codebase.
-3. **Core principles** — "What 3–5 principles guide every product decision?" Pre-fill with principles inferred from `CLAUDE.md` or READMEs.
-4. **Strategic goals** — "What does success look like in 12–18 months?" Pre-fill with goals inferred from open Epics or README.
-5. **Bounded contexts** — "Which domain contexts does this product span?" Pre-fill with contexts inferred from module structure or Epic vocabulary.
-6. **Out of scope** — "What is explicitly out of scope?" Pre-fill with exclusions found in existing docs or issue discussions.
+1. **Product purpose** — question: "What problem does this product solve, and for whom?" / header: "Product purpose" / options: pre-fill with purpose statements inferred from README or codebase.
+2. **Target users** — question: "Who are the primary users? Use their domain role names." / header: "Target users" / options: pre-fill with named roles inferred from the codebase.
+3. **Core principles** — question: "What 3–5 principles guide every product decision?" / header: "Core principles" / options: pre-fill with principles inferred from `CLAUDE.md` or READMEs.
+4. **Strategic goals** — question: "What does success look like in 12–18 months?" / header: "Strategic goals" / options: pre-fill with goals inferred from open Epics or README.
+5. **Bounded contexts** — question: "Which domain contexts does this product span?" / header: "Bounded contexts" / options: pre-fill with contexts inferred from module structure or Epic vocabulary.
+6. **Out of scope** — question: "What is explicitly out of scope?" / header: "Out of scope" / options: pre-fill with exclusions found in existing docs or issue discussions.
 
 ## Step 4 — Writing rules
 

@@ -28,7 +28,12 @@ Don't wait until the first `Ask`. By then you've processed thousands of tokens o
 
 ## Compact notation in skill files
 
-Skill files describe asks in a compact form. **You (Claude) must translate each compact ask into an actual `AskUserQuestion` tool call** — the notation is shorthand for the author, not a directive to another system. The tool name and field names (`question:`, `header:`, `options:`) do not need to repeat in the skill file, but you must emit the tool call when executing.
+Skill files describe asks in a compact form. When you reach an `Ask` step, **stop and call `AskUserQuestion` immediately** — do not output text. The compact notation maps directly to tool parameters:
+
+Call `AskUserQuestion` with:
+- **question** — the literal text in straight double quotes
+- **header** — the value after `header` (in backticks in the notation)
+- **options** — derived from the sub-list or inferred from research (see core rule 3)
 
 **NEVER output question options as plain text.** This applies to every `Ask` in a skill — including "Offer to continue" / "next step" routing questions at the end of a skill. Printing bullet points instead of calling `AskUserQuestion` is always wrong, regardless of how the skill labels the section.
 
@@ -41,7 +46,7 @@ Next step
 — Stop here
 ```
 
-Right — calls the tool (schema loaded at reference load time; if somehow missed, call `ToolSearch(query: "select:AskUserQuestion")` now before emitting):
+Right — calls the tool:
 ```
 AskUserQuestion(
   question: "What's next?",
@@ -81,22 +86,6 @@ AskUserQuestion(
 - Wrap the header in backticks — it is the UI tag the user sees.
 - Drop the "1–2 likely options" boilerplate; rule 3 enforces it.
 - For conditional asks ("if X is present, ask…"), put the condition before the `Ask` clause.
-
-## Reference shapes
-
-You must expand compact notation into this tool call. Canonical form:
-
-```
-AskUserQuestion(
-  question: "What triggers this capability?",
-  header: "Trigger",
-  options: [
-    {label: "User initiates", description: "Explicit button or form action"},
-    {label: "System triggers", description: "Automatic event or schedule"},
-    {label: "Both", description: "User-initiated and automatic"},
-  ]
-)
-```
 
 ## When to ask in a single message instead
 

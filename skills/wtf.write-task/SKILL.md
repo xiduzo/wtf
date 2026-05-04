@@ -17,7 +17,10 @@ Skip this step if invoked from `wtf.feature-to-tasks` or `wtf.write-feature` (th
 
 ### 1. Identify the parent Feature
 
-Apply `../references/questioning-style.md` and ask "Which Feature does this Task belong to?" — header `Feature`, options from recent open issues labeled `feature`.
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Feature does this Task belong to?"
+- header: "Feature"
+- options: from recent open issues labeled `feature`
 
 Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract ACs, edge cases, user stories, Goal, and Context. If the Epic number was passed in as context (e.g. from an orchestrator), skip the parent walk and use it directly.
 
@@ -27,12 +30,17 @@ Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract 
 
 > "Here's the task I'll write: _[task description]_. Does this look right, or would you like to adjust it?"
 
-**If invoked from `wtf.write-feature` or `wtf.feature-to-tasks` context but no description was pre-filled**, ask "How would you like to define this task?" — header `Task source`:
+**If invoked from `wtf.write-feature` or `wtf.feature-to-tasks` context but no description was pre-filled**, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How would you like to define this task?"
+- header: "Task source"
+- options:
+  - **Propose from ACs** → based on Feature ACs, existing tasks, and Proposed Tasks checklist; propose the next unimplemented task and confirm (default)
+  - **Describe myself** → I'll provide a one-sentence description
 
-- **Propose from ACs** → based on the Feature's Acceptance Criteria, existing tasks, and the Proposed Tasks checklist from the Feature body, propose the next concrete unimplemented task; state it clearly and ask "Does this task look right, or would you like to adjust it?" (default)
-- **Describe myself** → ask "What is this task implementing?" (one sentence)
-
-**If invoked standalone** (no Feature context), ask directly: "What is this task implementing?" (one sentence — e.g. "Add date range filter to search API")
+**If invoked standalone** (no Feature context), call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What is this task implementing?" (one sentence — e.g. "Add date range filter to search API")
+- header: "Task"
+- options: infer 1–2 candidates from Feature ACs if available
 
 ### 3. Clarify ambiguity before proceeding
 
@@ -49,7 +57,7 @@ Topics that may require clarification (in priority order):
 - What **domain Events** does this Task emit?
 - If this Task touches an integration boundary, which Bounded Contexts are involved?
 
-Apply `../references/questioning-style.md` for questions in this step. Stop when you have enough to write a complete draft — do not invent answers or assume away ambiguity.
+For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough to write a complete draft — do not invent answers or assume away ambiguity.
 
 ### 4. Explore the codebase and wiki
 
@@ -98,10 +106,12 @@ Document all dependencies in the draft with GitHub issue references. For cross-f
 
 ### 6. Ask about contracts
 
-Ask "Are there specific API contracts, events, or data schemas I should know about?" — header `Contracts`:
-
-- Candidates from contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4)
-- **None — proceed without** — skip this section (include only if nothing was found)
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Are there specific API contracts, events, or data schemas I should know about?"
+- header: "Contracts"
+- options:
+  - Candidates from contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4)
+  - **None — proceed without** — skip this section (include only if nothing was found)
 
 Use the answer to fill Contracts & Interfaces. Apply domain event naming rules from `../references/ddd-writing-rules.md` — past-tense domain names, named from the domain's perspective. If "none", stub events with the domain Event names derived in step 3 rather than leaving them blank.
 
@@ -157,11 +167,13 @@ On **Split it** → return to step 2 with the chosen focused task description as
 
 ### 10. Review with user
 
-Show the draft. Pay specific attention to Gherkin. Then ask "Do the scenarios cover everything from the Feature ACs?" — header `Review`:
-
-- **Yes — looks complete** → proceed with issue creation
-- **Missing edge cases** → add more scenarios
-- **Other changes** → adjust something else
+Show the draft. Pay specific attention to Gherkin. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Do the scenarios cover everything from the Feature ACs?"
+- header: "Review"
+- options:
+  - **Yes — looks complete** → proceed with issue creation
+  - **Missing edge cases** → add more scenarios
+  - **Other changes** → adjust something else
 
 Apply edits, then proceed.
 
@@ -201,12 +213,14 @@ If either extension is unavailable, warn the user — do not write relationship 
 
 Count remaining tasks by fetching the Feature's Proposed Tasks checklist (named items without issue numbers) and comparing against already-created child tasks. Use `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. Subtract created task count from total named items in the Proposed Tasks list to get remaining. Mention how many remain.
 
-Ask "What's next?" — header `Next step`:
-
-- **Design this Task** → add design coverage for this Task now (default)
-- **Write next Task** → write the next Task for this Feature (N remaining — replace N with actual count)
-- **Write a Feature** → write a new Feature for the same Epic
-- **Stop here** → exit, no further action
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Design this Task** → add design coverage for this Task now (default)
+  - **Write next Task** → write the next Task for this Feature (N remaining — replace N with actual count)
+  - **Write a Feature** → write a new Feature for the same Epic
+  - **Stop here** → exit, no further action
 
 - **Design this Task** → follow the `wtf.design-task` process, opening with: "Continue with task #<task_number>".
 - **Write next Task** → restart from step 2, reusing the same Feature. If the Feature's Proposed Tasks list has named-but-uncreated items, propose the next one as the default.

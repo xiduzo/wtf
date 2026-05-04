@@ -33,13 +33,13 @@ Produce a concrete draft of Test Strategy, Test Patterns, and Commands from rese
 
 ## Step 3 — Gap-topic list
 
-Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine:
+Ask only about items research could not determine. For each unanswered item, call `AskUserQuestion` (per `../references/questioning-style.md`):
 
-1. **Coverage thresholds** — "What is the minimum acceptable test coverage?" Pre-fill with thresholds found in test config or `CLAUDE.md`.
-2. **Definition of Done** — "What must be true before any task can be merged?" Pre-fill with DoD items from `CLAUDE.md` or existing task templates.
-3. **Test environments** — "What environments are available for testing? (local, staging, CI)" Pre-fill from CI config or README.
-4. **Known flaky areas** — "Are there known areas that produce non-deterministic test failures?" Pre-fill with skipped tests or TODO comments found in step 2.
-5. **Mock strategy** — "Are there project-specific exceptions to the 'only mock at boundaries' rule?" Pre-fill with mock patterns found in existing tests.
+1. **Coverage thresholds** — question: "What is the minimum acceptable test coverage?" / header: "Coverage thresholds" / options: pre-fill with thresholds found in test config or `CLAUDE.md`.
+2. **Definition of Done** — question: "What must be true before any task can be merged?" / header: "Definition of Done" / options: pre-fill with DoD items from `CLAUDE.md` or existing task templates.
+3. **Test environments** — question: "What environments are available for testing? (local, staging, CI)" / header: "Test environments" / options: pre-fill from CI config or README.
+4. **Known flaky areas** — question: "Are there known areas that produce non-deterministic test failures?" / header: "Known flaky areas" / options: pre-fill with skipped tests or TODO comments found in step 2.
+5. **Mock strategy** — question: "Are there project-specific exceptions to the 'only mock at boundaries' rule?" / header: "Mock strategy" / options: pre-fill with mock patterns found in existing tests.
 
 ## Step 4 — Writing rules
 

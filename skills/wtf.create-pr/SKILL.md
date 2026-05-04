@@ -23,7 +23,10 @@ Check the current branch and verify it is not `main`:
 git branch --show-current
 ```
 
-If on `main`, ask: "Which branch should I open a PR from?"
+If on `main`, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which branch should I open a PR from?"
+- header: "Branch"
+- options: from `git branch --list` (local branches)
 
 Check whether a PR already exists for this branch:
 
@@ -31,27 +34,30 @@ Check whether a PR already exists for this branch:
 gh pr list --head <branch_name> --state open
 ```
 
-If an open PR already exists, print its URL and ask "A PR already exists for this branch. Would you like me to update its description instead?" — header `Existing PR`:
-
-- **Update description** → edit the existing PR's description
-- **Open a new one** → create a new PR anyway
-
-- **Update description** → skip to step 5, targeting the existing PR for update via `gh pr edit <pr_number>`.
-- **Open a new one** → continue.
+If an open PR already exists, print its URL and call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "A PR already exists for this branch. Would you like me to update its description instead?"
+- header: "Existing PR"
+- options:
+  - **Update description** → skip to step 5, targeting the existing PR for update via `gh pr edit <pr_number>`
+  - **Open a new one** → create a new PR anyway
 
 ### 2. Identify the Task (if any)
 
 Try to extract a task number from the branch name (e.g. `task/42-date-range-filter` → `#42`).
 
-If found, ask "I found Task #<n> linked to this branch. Is that the right task?" — header `Linked task`:
+If found, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "I found Task #<n> linked to this branch. Is that the right task?"
+- header: "Linked task"
+- options:
+  - **Yes, that's correct** → use Task #<n>
+  - **No, use a different task** → I'll provide the correct issue number
 
-- **Yes, that's correct** → use Task #<n>
-- **No, use a different task** → I'll provide the correct issue number
-
-If not found or the user says no, ask "Is there a Task issue linked to this work?" — header `Linked task`:
-
-- **No linked task** → proceed without a task link
-- **Yes — I'll provide the number** → enter the task issue number
+If not found or the user says no, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Is there a Task issue linked to this work?"
+- header: "Linked task"
+- options:
+  - **No linked task** → proceed without a task link
+  - **Yes — I'll provide the number** → enter the task issue number
 
 ### 3. Lifecycle check (if Task linked)
 
@@ -89,10 +95,12 @@ This avoids including unrelated merged commits when the branch has a long histor
 
 ### 7. Review with user
 
-Show the draft title and body. Then ask "Does this look right?" — header `Review`:
-
-- **Looks good — create the PR** → proceed with PR creation
-- **I have changes** → adjust first
+Show the draft title and body. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this look right?"
+- header: "Review"
+- options:
+  - **Looks good — create the PR** → proceed with PR creation
+  - **I have changes** → adjust first
 
 Apply edits, then proceed.
 
@@ -102,7 +110,10 @@ Determine the base branch from the current branch name:
 
 - `task/*` branch → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
 - `feature/*` branch → target `main`
-- Other → ask "What branch should this PR target?" — header `Base branch`, options from `git branch -r`.
+- Other → call `AskUserQuestion` (per `../references/questioning-style.md`):
+  - question: "What branch should this PR target?"
+  - header: "Base branch"
+  - options: from `git branch -r`
 
 Write the body to a temp file, then create the PR:
 
@@ -135,12 +146,19 @@ gh issue comment <task_number> --body "PR opened: <pr_url>"
 
 ### 10. Offer next steps
 
-Ask "What's next?" — header `Next step`:
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Request a review** → add reviewers to this PR now (default)
+  - **Done** → exit, no further action
 
-- **Request a review** → add reviewers to this PR now (default)
-- **Done** → exit, no further action
+On **Request a review** → call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Who should review this?"
+- header: "Reviewer"
+- options: from team member usernames inferred from recent `git log` authors or the repository's CODEOWNERS file
 
-On **Request a review** → ask "Who should review this?" — header `Reviewer`, options from team member usernames inferred from recent git log authors or the repository's CODEOWNERS file. Then:
+Then:
   ```bash
   gh pr edit <pr_number> --add-reviewer <username>
   ```

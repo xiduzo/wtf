@@ -17,7 +17,10 @@ Skip this step if gh-setup was already confirmed this session (e.g. when chained
 
 ### 1. Identify the Epic
 
-If an Epic number was passed in as context, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Epic are you breaking into Features?" — header `Epic`, options from recent open Epics found via `gh issue list --label epic`.
+If an Epic number was passed in as context, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Epic are you breaking into Features?"
+- header: "Epic"
+- options: from recent open Epics via `gh issue list --label epic`
 
 Fetch the Epic with `gh issue view <epic_number>` and extract: Goal, Context, and Success Metrics.
 
@@ -38,10 +41,12 @@ Present the remaining (or full, if none exist yet) list as plain numbered text, 
 > 3. Finance Manager can export settlement report as CSV
 > 4. System notifies Merchant when settlement is delayed
 
-Then ask "Does this list look complete? You can add, remove, or rename any Feature before we start." — header `Feature list`:
-
-- **Looks good** → proceed with this list
-- **Make changes** → add, remove, or rename a Feature
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this list look complete? You can add, remove, or rename any Feature before we start."
+- header: "Feature list"
+- options:
+  - **Looks good** → proceed with this list
+  - **Make changes** → add, remove, or rename a Feature
 
 Wait for the user to confirm or adjust the list. Apply any changes.
 
@@ -54,11 +59,14 @@ For each Feature in the confirmed list, in order:
    - The Epic number (skip step 1 of write-feature — Epic is already fetched)
    - The capability name as the pre-filled answer to step 2 of write-feature
    - **Abbreviated clarification**: because the capability name already follows the `[Actor] can [verb] [object]` pattern and the Epic context is already in hand, skip write-feature step 3 (clarification questions) unless something is genuinely ambiguous from the Epic. Write-feature step 4 (user story derivation) and step 5 (DDD Language Guard) should still run silently. Resume from write-feature step 6 (vertical slice assessment).
-3. Before moving to the next Feature, ask "Feature [N] created. Ready to continue to Feature [N+1]: _[next capability name]_?" — header `Continue?`:
-   - **Yes, continue** → proceed to the next Feature (default)
-   - **Pause here** → exit; print a summary of which Features were created and which remain; suggest `/clear` before resuming
-   - **Skip this feature** → mark as skipped in the list and move to the next
-   - **Add a new feature** → ask "What is the new feature capability?" — header `New feature`, options from capability names inferred from the Epic's Goal or Success Metrics not yet represented in the list. Add the confirmed feature, then continue.
+3. Before moving to the next Feature, call `AskUserQuestion` (per `../references/questioning-style.md`):
+   - question: "Feature [N] created. Ready to continue to Feature [N+1]: _[next capability name]_?"
+   - header: "Continue?"
+   - options:
+     - **Yes, continue** → proceed to the next Feature (default)
+     - **Pause here** → exit; print a summary of which Features were created and which remain; suggest `/clear` before resuming
+     - **Skip this feature** → mark as skipped in the list and move to the next
+     - **Add a new feature** → call `AskUserQuestion` with question "What is the new feature capability?", header "New feature", options from capability names inferred from the Epic's Goal or Success Metrics not yet in the list; add the confirmed feature, then continue
 
 ### 4. Completion
 
@@ -68,14 +76,12 @@ When all Features have been created (or skipped), print a summary:
 > Created: [list with issue numbers]
 > Skipped: [list if any]"
 
-Then ask "What's next?" — header `Next step`:
-
-- **Break down first Feature** → plan and create Tasks for the first Feature (default)
-- **Break down next Feature** → plan and create Tasks for a different Feature
-- **Stop here** → exit, no further action
-
-- **Break down first Feature** → follow the `wtf.feature-to-tasks` process with the first created Feature number.
-- **Break down next Feature** → follow the `wtf.feature-to-tasks` process with the second created Feature number (or whichever the user specifies).
-- **Stop here** → exit.
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Break down first Feature** → follow `wtf.feature-to-tasks` with the first created Feature number (default)
+  - **Break down next Feature** → follow `wtf.feature-to-tasks` with a different Feature number
+  - **Stop here** → exit, no further action
 
 > Suggest `/clear` before continuing if the conversation has grown long.

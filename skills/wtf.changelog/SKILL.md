@@ -78,11 +78,25 @@ Follow [Keep a Changelog](https://keepachangelog.com) conventions. Omit any sect
 
 ### 4. Review with user
 
-Show the draft and ask whether it accurately describes what shipped. Offer three paths: approve and write, add missing items, or adjust the phrasing. Apply edits, then proceed.
+Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this accurately describe what shipped?"
+- header: "Draft review"
+- options:
+  - **Approve and write** → apply as-is and proceed
+  - **Add missing items** → add items before writing
+  - **Adjust the phrasing** → edit specific entries
+
+Apply edits, then proceed.
 
 ### 5. Choose the output target
 
-Ask the user whether to update `CHANGELOG.md`, create a GitHub Release, or do both.
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Where should I write this changelog?"
+- header: "Output target"
+- options:
+  - **Update CHANGELOG.md** → prepend entry to the changelog file
+  - **Create GitHub Release** → create a tagged GitHub Release
+  - **Both** → update CHANGELOG.md and create a GitHub Release
 
 ### 6. Write CHANGELOG.md (if selected)
 
@@ -97,7 +111,10 @@ git commit -m "chore(changelog): add release notes for <scope>"
 
 ### 7. Create the GitHub Release (if selected)
 
-Ask which tag to use. Pre-fill the options with recent tags from `git tag --sort=-version:refname | head -5`, plus an escape hatch for a new tag (the user types it).
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which tag should I use for this release?"
+- header: "Release tag"
+- options: from `git tag --sort=-version:refname | head -5`; user can type a new tag
 
 Write the entry to a temp file and create the release:
 
@@ -109,4 +126,9 @@ gh release create <tag> \
 
 ### 8. Report and offer to continue
 
-Print the release URL and/or `CHANGELOG.md` path. Then offer two paths: continue with `wtf.retro` to close out the Epic (recommended when the changelog covered an Epic), or exit.
+Print the release URL and/or `CHANGELOG.md` path. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Run retro** → run `wtf.retro` to close out the Epic (recommended if changelog covered an Epic)
+  - **Done** → exit, no further action

@@ -17,7 +17,10 @@ Skip this step if invoked from another skill that already ran gh-setup this sess
 
 ### 1. Identify the Feature
 
-If the user provided an issue number in their request, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Feature are you designing?" — header `Feature`, options from recent open issues labeled `feature`.
+If the user provided an issue number in their request, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Feature are you designing?"
+- header: "Feature"
+- options: from recent open issues labeled `feature`
 
 Walk Feature → Epic per `../references/spec-hierarchy.md` to extract user stories, ACs, Edge Cases, Domain Events (Feature) and Goal, Context, Design Artifacts (Epic — strategic input).
 
@@ -66,18 +69,22 @@ Produce a journey map as a structured list — do not ask the user, derive from 
 
 ### 6. Ask about design assets
 
-Ask "How would you like to handle designs for this feature?" — header `Design assets`:
-
-- **I have Figma frames** → provide frame URLs; I'll validate coverage against the full journey map (Path A)
-- **Generate designs for me** → use Figma MCP to generate frames from the user stories and design system (Path B)
-- **Scaffold a brief only** → no Figma; produce a text screen inventory and component map (Path C)
-- **Partial — some screens designed** → provide available frames; remaining screens go to generate or scaffold
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How would you like to handle designs for this feature?"
+- header: "Design assets"
+- options:
+  - **I have Figma frames** → provide frame URLs; I'll validate coverage against the full journey map (Path A)
+  - **Generate designs for me** → use Figma MCP to generate frames from the user stories and design system (Path B)
+  - **Scaffold a brief only** → no Figma; produce a text screen inventory and component map (Path C)
+  - **Partial — some screens designed** → provide available frames; remaining screens go to generate or scaffold
 
 **Path A — Human provides frames:**
-Collect the top-level Figma file URL plus individual frame URLs. For each screen in the journey map (step 5), check whether a frame covers it. Present a coverage matrix: screen → frame URL (or ⚠ gap). If gaps exist, ask "How should I handle the uncovered screens?" — header `Gaps`:
-
-- **Generate missing frames** → run Path B for the gaps
-- **Leave as pending** → record gaps in the Design Handoff and continue
+Collect the top-level Figma file URL plus individual frame URLs. For each screen in the journey map (step 5), check whether a frame covers it. Present a coverage matrix: screen → frame URL (or ⚠ gap). If gaps exist, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How should I handle the uncovered screens?"
+- header: "Gaps"
+- options:
+  - **Generate missing frames** → run Path B for the gaps
+  - **Leave as pending** → record gaps in the Design Handoff and continue
 
 Also validate provided frames against spec:
 - Every user story has at least one matching frame
@@ -101,10 +108,12 @@ Collect the generated frame URLs and treat them as Path A frames for the coverag
 For each screen in the journey map, produce a text brief listing required UI elements, interactions, and relevant design tokens. This is a Figma-free design brief a designer or developer can execute against. Use `references/component-spec-template.md` as the structure if available.
 
 **Partial:**
-Collect available frame URLs, run Path A validation on covered screens. For uncovered screens, ask "How should I handle the remaining screens?" — header `Remainder`:
-
-- **Generate** → run Path B
-- **Scaffold** → run Path C
+Collect available frame URLs, run Path A validation on covered screens. For uncovered screens, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How should I handle the remaining screens?"
+- header: "Remainder"
+- options:
+  - **Generate** → run Path B
+  - **Scaffold** → run Path C
 
 ### 7. Identify shared components
 
@@ -122,11 +131,13 @@ Produce content for the **Design Handoff** section of the Feature issue. Use the
 
 ### 9. Review with user
 
-Show the draft. Then ask "Does this cover the full feature journey?" — header `Review`:
-
-- **Looks complete — update the issue** → proceed
-- **Missing screens or states** → add coverage
-- **Other changes** → adjust something else
+Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this cover the full feature journey?"
+- header: "Review"
+- options:
+  - **Looks complete — update the issue** → proceed
+  - **Missing screens or states** → add coverage
+  - **Other changes** → adjust something else
 
 Apply edits, then proceed.
 
@@ -154,11 +165,13 @@ Print the updated Feature issue URL.
 
 ### 11. Offer to continue
 
-Ask "What's next?" — header `Next step`:
-
-- **Break into Tasks** → run `feature-to-tasks`; design context will inform task breakdown (default)
-- **Design another Feature** → design another Feature for the same Epic
-- **Stop here** → exit, no further action
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Break into Tasks** → run `feature-to-tasks`; design context will inform task breakdown (default)
+  - **Design another Feature** → design another Feature for the same Epic
+  - **Stop here** → exit, no further action
 
 - **Break into Tasks** → follow the `wtf.feature-to-tasks` skill, passing the Feature number in as context. Note to the user that `wtf.design-task` will inherit the shared component map from this Design Handoff.
 - **Design another Feature** → restart from step 1, reusing the same Epic context.

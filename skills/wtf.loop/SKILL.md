@@ -47,11 +47,13 @@ If any are missing, install them before proceeding.
 
 ### 1. Identify the target and build the dependency graph
 
-Apply `../references/questioning-style.md` and ask "What do you want to execute?" — header `Target`:
-
-- One option per open Feature (e.g. **Feature #<n> — <title>** → execute all Tasks under this Feature)
-- One **Epic — all features** option if an Epic is available
-- **Resume a previous run** → pick up where the loop left off for an in-progress Feature; fetch open tasks under the chosen Feature that are not labeled `implemented` or `verified`, and skip straight to step 4 starting from the first unfinished task. Print which tasks will be skipped (already done) and which will run.
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What do you want to execute?"
+- header: "Target"
+- options:
+  - One option per open Feature (e.g. **Feature #<n> — <title>** → execute all Tasks under this Feature)
+  - One **Epic — all features** option if an Epic is available
+  - **Resume a previous run** → fetch open tasks not yet labeled `implemented` or `verified`; skip to step 4 from the first unfinished task
 
 **Fetch the hierarchy:**
 
@@ -139,12 +141,14 @@ Feature #5 — Payment Settlement   (no feature-level blockers)
 Feature #6 — Reporting            blocked by Feature #5
 ```
 
-Apply `../references/questioning-style.md` and ask "Here's the suggested execution plan based on the dependency graph. Does this look right?" — header `Plan review`:
-
-- **Approve — start the loop** → execute tasks in this order
-- **Remove a task** → drop one or more tasks from this run; specify which
-- **Change the order** → override the suggested phase ordering; describe the change
-- **Decline — stop** → exit without executing anything
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Here's the suggested execution plan based on the dependency graph. Does this look right?"
+- header: "Plan review"
+- options:
+  - **Approve — start the loop** → execute tasks in this order
+  - **Remove a task** → drop one or more tasks from this run; specify which
+  - **Change the order** → override the suggested phase ordering; describe the change
+  - **Decline — stop** → exit without executing anything
 
 **If "Remove a task":** ask which tasks to drop, remove them from the graph (and re-evaluate whether any remaining tasks lose all their blockers and can move to an earlier phase), then re-present the updated plan and ask again.
 
@@ -172,10 +176,12 @@ gh sub-issue list <feature_number>
 
 If both checks show all work is complete (no open sub-issues, all task PRs merged), open the feature PR automatically — no confirmation needed.
 
-If either check shows pending work, list the outstanding tasks and apply `../references/questioning-style.md` and ask "Not all task PRs are merged yet. Open the feature PR anyway?" — header `Feature PR`:
-
-- **Wait — I'll merge them first** → pause here
-- **Open it now** → open feature → main PR with unmerged tasks noted in description
+If either check shows pending work, list the outstanding tasks and call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Not all task PRs are merged yet. Open the feature PR anyway?"
+- header: "Feature PR"
+- options:
+  - **Wait — I'll merge them first** → pause here
+  - **Open it now** → open feature → main PR with unmerged tasks noted in description
 
 Open the feature PR by spawning a sub-agent running the inlined `wtf.create-pr` steps targeting `main`. The body must include `Closes #<feature_number>` and one `Closes #<task_number>` per task on separate lines per `../references/commit-conventions.md`.
 

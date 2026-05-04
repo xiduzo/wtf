@@ -21,10 +21,12 @@ ls docs/steering/ 2>/dev/null
 
 Build a map of which of the four docs are present: `TECH.md`, `QA.md`, `DESIGN.md`, `VISION.md`.
 
-**If none exist**, apply `../references/questioning-style.md` and ask "No steering docs found. Would you like to create them first?" — header `No steering docs`:
-
-- **Create them now** → run the `steer-*` skills to set up the docs
-- **Skip — just capture notes** → save all learnings to `docs/steering/LEARNINGS.md` instead
+**If none exist**, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "No steering docs found. Would you like to create them first?"
+- header: "No steering docs"
+- options:
+  - **Create them now** → run the `steer-*` skills to set up the docs
+  - **Skip — just capture notes** → save all learnings to `docs/steering/LEARNINGS.md` instead
 
 If **Create them now** → invoke `wtf.steer-tech`. Note that `wtf.steer-tech` will offer to chain to the other steer-\* skills at the end — let the user complete that flow, then return here. When control returns, re-run the `ls` check to see which docs now exist.
 If **Skip** → set all four doc paths to the fallback: `docs/steering/LEARNINGS.md`.
@@ -43,30 +45,38 @@ Briefly scan context to understand what was worked on:
 
 **Q1 — What was harder than expected?**
 
-Apply `../references/questioning-style.md` and ask "What was harder or more painful than it should have been in this session?" — header `Session friction`:
-
-- 2–3 inferred options based on what was worked on (e.g. "Debugging X took too long", "Claude kept misunderstanding Y")
-- **Nothing — skip** — session went smoothly
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What was harder or more painful than it should have been in this session?"
+- header: "Session friction"
+- options:
+  - 2–3 inferred options based on what was worked on (e.g. "Debugging X took too long", "Claude kept misunderstanding Y")
+  - **Nothing — skip** — session went smoothly
 
 If **Nothing — skip** → skip to step 6 (reset counter) and exit with: "Great session — nothing to capture."
 
 **Q2 — Did Claude make a recurring mistake?**
 
-Apply `../references/questioning-style.md` and ask "Did Claude keep making the same mistake you had to correct?" — header `AI mistakes`:
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Did Claude keep making the same mistake you had to correct?"
+- header: "AI mistakes"
+- options:
+  - **Yes — describe it** → tell me what it kept doing
+  - **No recurring mistakes** → one-off issues only
 
-- **Yes — describe it** → tell me what it kept doing
-- **No recurring mistakes** → one-off issues only
-
-If **Yes** → apply `../references/questioning-style.md` and ask "Describe the mistake briefly. What rule would prevent it next time?" — header `AI mistake — the rule`:
-
-- **Skip** — hard to articulate right now
+If **Yes** → call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Describe the mistake briefly. What rule would prevent it next time?"
+- header: "AI mistake — the rule"
+- options:
+  - **Skip** — hard to articulate right now
 
 **Q3 — What is the one rule this session taught you?**
 
-Apply `../references/questioning-style.md` and ask "If you had to write one rule that would have prevented the most wasted time today, what would it be?" — header `The lesson`:
-
-- 1–2 rules inferred from the session
-- **Skip this one** — nothing to add
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "If you had to write one rule that would have prevented the most wasted time today, what would it be?"
+- header: "The lesson"
+- options:
+  - 1–2 rules inferred from the session
+  - **Skip this one** — nothing to add
 
 ### 4. Route each learning to the right steering doc
 

@@ -30,11 +30,11 @@ Produce a concrete draft of Stack, Commands, and Code Conventions from research 
 
 ## Step 3 — Gap-topic list
 
-Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine:
+Ask only about items research could not determine. For each unanswered item, call `AskUserQuestion` (per `../references/questioning-style.md`):
 
-1. **Key constraints** — "Are there non-negotiables every implementer must respect?" Pre-fill with constraints from `CLAUDE.md` or existing docs.
-2. **Architecture decisions** — "Are there decisions that shaped the architecture but aren't documented yet?" Pre-fill with patterns inferred from the codebase structure.
-3. **Known pain points** — "Are there areas of the codebase that need special care?" Pre-fill with anything flagged in README or comments.
+1. **Key constraints** — question: "Are there non-negotiables every implementer must respect?" / header: "Key constraints" / options: pre-fill with constraints from `CLAUDE.md` or existing docs.
+2. **Architecture decisions** — question: "Are there decisions that shaped the architecture but aren't documented yet?" / header: "Architecture decisions" / options: pre-fill with patterns inferred from the codebase structure.
+3. **Known pain points** — question: "Are there areas of the codebase that need special care?" / header: "Known pain points" / options: pre-fill with anything flagged in README or comments.
 
 ## Step 4 — Writing rules
 

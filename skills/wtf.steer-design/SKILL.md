@@ -30,13 +30,13 @@ Produce a draft of Stack, Tokens, and Component Patterns from research alone whe
 
 ## Step 3 — Gap-topic list
 
-Apply `../references/questioning-style.md` for questions in this step. Ask only about items research could not determine:
+Ask only about items research could not determine. For each unanswered item, call `AskUserQuestion` (per `../references/questioning-style.md`):
 
-1. **Design principles** — "What 3–5 principles guide every design decision for this product?" Pre-fill from `VISION.md` or any existing design docs.
-2. **Design system** — "What design system are you using? Do you have a Figma library?" Pre-fill with anything found in the codebase or imports.
-3. **Token gaps** — "Are there tokens not yet defined in code that designers rely on?" Pre-fill with gaps inferred from design-system research.
-4. **Responsive strategy** — "How does the layout adapt across breakpoints?" Pre-fill with breakpoints found in the codebase.
-5. **Accessibility target** — "Are there accessibility requirements beyond WCAG 2.1 AA?" Pre-fill with any existing a11y config found.
+1. **Design principles** — question: "What 3–5 principles guide every design decision for this product?" / header: "Design principles" / options: pre-fill from `VISION.md` or any existing design docs.
+2. **Design system** — question: "What design system are you using? Do you have a Figma library?" / header: "Design system" / options: pre-fill with anything found in the codebase or imports.
+3. **Token gaps** — question: "Are there tokens not yet defined in code that designers rely on?" / header: "Token gaps" / options: pre-fill with gaps inferred from design-system research.
+4. **Responsive strategy** — question: "How does the layout adapt across breakpoints?" / header: "Responsive strategy" / options: pre-fill with breakpoints found in the codebase.
+5. **Accessibility target** — question: "Are there accessibility requirements beyond WCAG 2.1 AA?" / header: "Accessibility target" / options: pre-fill with any existing a11y config found.
 
 ## Step 4 — Writing rules
 

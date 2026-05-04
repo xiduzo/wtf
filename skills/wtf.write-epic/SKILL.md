@@ -17,7 +17,10 @@ Skip this step if gh-setup was already confirmed this session (e.g. when this sk
 
 ### 1. Capture the seed idea
 
-Ask ONE question: "What initiative are you working on?"
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What initiative are you working on?"
+- header: "Initiative"
+- options: infer 1–2 candidates from recent open Epics or README context if available
 
 Do not ask follow-up questions yet. Acknowledge the idea briefly and move straight to research.
 
@@ -50,7 +53,7 @@ Synthesise findings internally. Do not dump raw research at the user.
 
 ### 3. Grill the user
 
-Using what research revealed, ask targeted follow-up questions to close the remaining gaps. Apply `../references/questioning-style.md` for questions in this step.
+Using what research revealed, ask targeted follow-up questions to close the remaining gaps. For each unanswered item below, call `AskUserQuestion` (per `../references/questioning-style.md`).
 
 Completeness checklist (ask only about unanswered items):
 
@@ -112,10 +115,12 @@ On **Split it** → return to step 3 with the chosen focused Epic as the seed. C
 
 ### 8. Review with user
 
-Show the draft. Then ask "Does this look right?" — header `Review`:
-
-- **Looks good — create the issue** → proceed with issue creation
-- **I have changes** → adjust first
+Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this look right?"
+- header: "Review"
+- options:
+  - **Looks good — create the issue** → proceed with issue creation
+  - **I have changes** → adjust first
 
 Apply edits, then proceed immediately.
 
@@ -155,11 +160,13 @@ Skip without comment if no terms were introduced. Report only the page name and 
 
 ### 11. Offer to continue
 
-Ask "What's next?" — header `Next step`:
-
-- **Plan all Features** → invoke `wtf.epic-to-features`, passing the Epic number in as context (default)
-- **Write one Feature** → proceed with `wtf.write-feature`, passing the Epic number in as context so the user is not asked for it again
-- **Write another Epic** → restart this skill from step 1
-- **Stop here** → exit, no further action
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Plan all Features** → invoke `wtf.epic-to-features`, passing the Epic number in as context (default)
+  - **Write one Feature** → proceed with `wtf.write-feature`, passing the Epic number in as context so the user is not asked for it again
+  - **Write another Epic** → restart this skill from step 1
+  - **Stop here** → exit, no further action
 
 > Suggest clearing context before continuing to features if the conversation has grown long: "The context is getting long — you may want to `/clear` before continuing."

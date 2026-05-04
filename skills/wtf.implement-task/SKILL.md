@@ -19,7 +19,10 @@ Skip this step if invoked from `wtf.verify-task` or another skill that already r
 
 ### 1. Identify the Task
 
-Ask: "Which Task are you implementing? (issue number)"
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Task are you implementing?"
+- header: "Task"
+- options: from recent open issues labeled `task`
 
 Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, Impacted Areas (Task) and ACs / Goal / constraints (Feature, Epic).
 
@@ -68,11 +71,13 @@ Produce a concrete Technical Approach with actual file paths (not generic layer 
 
 ### 7. Review approach with user
 
-Show the Technical Approach. Then ask "Does this align with how you'd approach it?" — header `Approach review`:
-
-- **Yes — looks good, proceed** → continue with implementation
-- **I have constraints to share** → adjust the approach first
-- **Suggest an alternative** → describe a different approach
+Show the Technical Approach. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does this align with how you'd approach it?"
+- header: "Approach review"
+- options:
+  - **Yes — looks good, proceed** → continue with implementation
+  - **I have constraints to share** → adjust the approach first
+  - **Suggest an alternative** → describe a different approach
 
 Apply changes. Then update the Task issue with the Technical Approach and Impacted Areas.
 
@@ -145,12 +150,10 @@ gh issue edit <task_number> --add-label "implemented"
 
 If invoked from the loop (non-interactive mode), skip the ask below and return control to the loop.
 
-Ask "What's next?" — header `Next step`:
-
-- **Verify this Task** → run QA against the Gherkin scenarios (recommended next step, default)
-- **Open a pull request** → create a PR for this branch
-- **Implement another Task** → implement another Task for the same Feature
-
-- **Verify this Task** → follow the `wtf.verify-task` process, passing the Task number in as context so the user is not asked for it again.
-- **Open a pull request** → follow the `wtf.create-pr` process, passing the Task number and branch in as context.
-- **Implement another Task** → restart this skill from step 1.
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What's next?"
+- header: "Next step"
+- options:
+  - **Verify this Task** → follow `wtf.verify-task`, passing the Task number in as context (recommended)
+  - **Open a pull request** → follow `wtf.create-pr`, passing the Task number and branch in as context
+  - **Implement another Task** → restart this skill from step 1

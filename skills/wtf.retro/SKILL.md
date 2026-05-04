@@ -15,7 +15,10 @@ Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or
 
 ### 1. Identify the Epic
 
-If an Epic number was passed in, use it directly. Otherwise apply `../references/questioning-style.md` and ask "Which Epic are you closing out?" — header `Epic`, options from open Epics via `gh issue list --label epic --state open --limit 10`.
+If an Epic number was passed in, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Epic are you closing out?"
+- header: "Epic"
+- options: from open Epics via `gh issue list --label epic --state open --limit 10`
 
 Fetch the Epic and its full hierarchy:
 
@@ -44,10 +47,12 @@ Verify all work is actually done before running a retro:
 - All child Tasks are closed (or explicitly marked `won't implement`)
 - No open PRs targeting feature branches under this Epic
 
-If anything is still open, apply `../references/questioning-style.md` and ask "Not all work is closed yet — [list open items]. Run the retro anyway?" — header `Incomplete work`:
-
-- **Run retro anyway** → some items are open; note them as incomplete
-- **Wait until complete** → exit; finish the remaining work first
+If anything is still open, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Not all work is closed yet — [list open items]. Run the retro anyway?"
+- header: "Incomplete work"
+- options:
+  - **Run retro anyway** → some items are open; note them as incomplete
+  - **Wait until complete** → exit; finish the remaining work first
 
 ### 3. Compare planned vs. shipped
 
@@ -72,27 +77,34 @@ Identify deviations:
 
 ### 4. Gather learnings
 
-Only ask what isn't already evident from the issue history. Apply `../references/questioning-style.md` for questions in this step.
+Only ask what isn't already evident from the issue history. For each question below, call `AskUserQuestion` (per `../references/questioning-style.md`).
 
 **Q1 — What was harder than expected?**
 
-Ask "What was harder or took longer than planned in this Epic?" — header `Friction points`, options from 2–3 inferences from the deviation analysis (e.g. "Feature #X needed 3 verify cycles", "Task #Y was unscoped after implementation started").
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "What was harder or took longer than planned in this Epic?"
+- header: "Friction points"
+- options: 2–3 inferences from the deviation analysis (e.g. "Feature #X needed 3 verify cycles", "Task #Y was unscoped after implementation started")
 
 **Q2 — What should we do differently next time?**
 
-Ask "If you ran this Epic again, what would you change about how it was planned or executed?" — header `Process improvements`:
-
-- **Better scoping upfront** → scope drift was the main issue
-- **Earlier design** → design gaps caused implementation rework
-- **Clearer contracts** → interface ambiguity caused re-work
-- **Nothing significant** → execution was smooth
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "If you ran this Epic again, what would you change about how it was planned or executed?"
+- header: "Process improvements"
+- options:
+  - **Better scoping upfront** → scope drift was the main issue
+  - **Earlier design** → design gaps caused implementation rework
+  - **Clearer contracts** → interface ambiguity caused re-work
+  - **Nothing significant** → execution was smooth
 
 **Q3 — Any domain model insights?**
 
-Ask "Did this Epic reveal anything new about the domain model — new concepts, corrected names, missing bounded contexts?" — header `Domain insights`:
-
-- **Yes — describe them** → new terms or corrections to capture
-- **No domain changes** → model held up well
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Did this Epic reveal anything new about the domain model — new concepts, corrected names, missing bounded contexts?"
+- header: "Domain insights"
+- options:
+  - **Yes — describe them** → new terms or corrections to capture
+  - **No domain changes** → model held up well
 
 ### 5. Route learnings to steering docs
 
@@ -163,10 +175,12 @@ The retro summary must include:
 
 ### 7. Offer to generate a changelog
 
-Apply `../references/questioning-style.md` and ask "Would you like to generate a changelog entry or GitHub Release for this Epic?" — header `Changelog`:
-
-- **Yes — run changelog** → run `wtf.changelog` for this Epic (recommended)
-- **Not now** → skip; I'll handle the release notes separately
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Would you like to generate a changelog entry or GitHub Release for this Epic?"
+- header: "Changelog"
+- options:
+  - **Yes — run changelog** → run `wtf.changelog` for this Epic (recommended)
+  - **Not now** → skip; I'll handle the release notes separately
 
 If yes → follow the `wtf.changelog` process with the Epic number pre-loaded as context.
 
@@ -182,10 +196,12 @@ If the Epic is already `CLOSED` → print: "Epic #<n> is already closed via merg
 
 If still open (e.g. auto-close chain didn't fire): ask the user whether to close it via a merged PR reference or directly:
 
-Apply `../references/questioning-style.md` and ask "Epic #<n> is still open. How would you like to close it?" — header `Close Epic`:
-
-- **Close as completed** → mark as closed; all work is done
-- **Leave open** → I'll close it separately
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Epic #<n> is still open. How would you like to close it?"
+- header: "Close Epic"
+- options:
+  - **Close as completed** → mark as closed; all work is done
+  - **Leave open** → I'll close it separately
 
 If "Close as completed":
 ```bash
