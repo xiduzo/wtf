@@ -1,0 +1,6 @@
+{
+  "_note": "Single fix commit on fix/prevent-double-settlement — no linked task. Tests that the no-task path produces a fix-prefixed title and a Summary that describes the bug being prevented.",
+  "branch": "fix/prevent-double-settlement",
+  "git_log": "b3c4d5e prevent double settlement on retry",
+  "git_diff_stat": " src/services/SettlementService.ts | 28 +++++++++++++++++-----------\n src/services/SettlementService.test.ts | 19 +++++++++++++++++++\n 2 files changed, 36 insertions(+), 11 deletions(-)"
+}

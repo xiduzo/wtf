@@ -1,0 +1,41 @@
+{
+  "skill_name": "wtf.epic-to-features",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0–1 (gh setup already confirmed, Epic already fetched). Use the Epic from `evals/fixtures/multi-actor-epic.json`, field `epic`. The `existing_features` array is empty — no Features have been created yet. Run step 2 only: propose the full Feature list. Output the proposed list.",
+      "expected_output": "A proposed Feature list covering both the Merchant and Finance Manager actors, with at least one Feature per actor, all following the [Actor] can [verb] [object] pattern and using no implementation vocabulary.",
+      "files": ["evals/fixtures/multi-actor-epic.json"],
+      "expectations": [
+        "At least one proposed Feature names Merchant as the actor (e.g. 'Merchant can view settlement status')",
+        "At least one proposed Feature names Finance Manager as the actor (e.g. 'Finance Manager can export settlement report')",
+        "Every proposed Feature follows the [Actor] can [domain verb] [domain object] pattern",
+        "No proposed Feature contains implementation vocabulary such as 'API', 'database', 'endpoint', or 'table'"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0–1 (gh setup already confirmed, Epic already fetched). Use the Epic from `evals/fixtures/existing-features-epic.json`, field `epic`. The `existing_features` field lists Features already created under this Epic — do not re-propose them. Run step 2 only: propose the remaining Features. Output the proposed list.",
+      "expected_output": "The output explicitly acknowledges the two Features already created (Feature #10 and Feature #11) before listing only the remaining Features. The remaining proposals cover Finance Manager capabilities and the notification capability, totalling at least 2 new Features.",
+      "files": ["evals/fixtures/existing-features-epic.json"],
+      "expectations": [
+        "The output explicitly lists or references Feature #10 ('Merchant can view settlement status') as already existing before presenting the remaining proposals",
+        "The proposed list does not include 'Merchant can view settlement status' as a new proposal",
+        "The proposed list does not include 'Merchant can filter settlements by date range' as a new proposal",
+        "The proposed list includes at least 2 new Features not yet created (covering Finance Manager or notification capabilities)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0–1 (gh setup already confirmed, Epic already fetched). Use the Epic from `evals/fixtures/ordered-capabilities-epic.json`, field `epic`. No existing Features. Run step 2 only: propose the full Feature list. Output the proposed list.",
+      "expected_output": "A proposed Feature list of 5 Features corresponding to the 5 Success Metrics, ordered so that view precedes filter and filter precedes export for the Merchant actor.",
+      "files": ["evals/fixtures/ordered-capabilities-epic.json"],
+      "expectations": [
+        "The proposed list includes exactly 5 Features, one per Success Metric",
+        "The Feature corresponding to 'Merchant can view settlement list' appears before the Feature for 'Merchant can filter settlements' in the proposed order",
+        "The Feature corresponding to 'Merchant can filter settlements' appears before the Feature for 'Merchant can export settlements' in the proposed order",
+        "All 5 proposed Features follow the [Actor] can [verb] [object] pattern"
+      ]
+    }
+  ]
+}

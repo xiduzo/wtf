@@ -1,0 +1,9 @@
+{
+  "_note": "Feature for settlement export (CSV). Insight adds a new technical constraint: multi-currency support with ISO 4217 formatting. Expected change map: scope/new constraint yes, ACs changed yes, Edge Cases changed yes.",
+  "issue": {
+    "number": 38,
+    "title": "Feature: Settlement CSV export",
+    "labels": [{"name": "feature"}],
+    "body": "## Goal\nMerchants can export their settlement list as a CSV file for use in accounting software.\n\n## Acceptance Criteria\n- [ ] Merchants can click \"Export CSV\" to download all settlements matching the current filter\n- [ ] The CSV includes columns: date, reference, description, amount, status\n- [ ] Amounts are formatted as decimal numbers (e.g. 1234.56)\n- [ ] The export filename includes the date range (e.g. `settlements-2026-01-01-2026-03-31.csv`)\n- [ ] Exports of more than 10,000 rows are chunked and delivered as a ZIP archive\n\n## Edge Cases\n- Empty result set (no settlements in range) → export a CSV with headers only, no error\n- Export triggered while filter is loading → button is disabled until filter resolves\n- Network failure during download → browser shows native download error; no partial file is saved\n\n## Domain Events\n- `SettlementExportRequested` — emitted when a Merchant triggers a CSV export\n- `SettlementExportReady` — emitted when the file is available for download\n\n## Proposed Tasks\n- [ ] Add Export CSV button to settlement list UI\n- [ ] Implement CSV generation in the settlements service\n- [ ] Handle chunked export for large result sets\n\n## Rollout\nGA — no feature flag required. Delivered as part of the settlement v2 milestone.\n\n## Bounded Context\nSettlement domain. Merchant actor. Reads from `settlements` table; no write side effects."
+  }
+}

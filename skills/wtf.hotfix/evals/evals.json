@@ -1,0 +1,44 @@
+{
+  "skill_name": "wtf.hotfix",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Test mode: skip steps 0–3 (gh setup, bug identification, scope confirmation, and TECH.md load are already done). Read evals/fixtures/narrow-fix.json and use its bug object as the live bug context. Run step 4 only: determine the hotfix branch name for this bug, print the branch name, and explain how the slug was derived from the bug title. Do not start implementing the fix.",
+      "expected_output": "A hotfix branch name in the format hotfix/<bug-number>-<slug>, where the slug is a 2–4 word kebab-case summary derived from the bug title (e.g. hotfix/88-settlement-rounding-truncation). The output explains the slug derivation and confirms the branch targets main. No code or tests are written.",
+      "files": ["evals/fixtures/narrow-fix.json"],
+      "expectations": [
+        "The branch name starts with 'hotfix/' followed by the bug number 88 and a kebab-case slug (matches the pattern ^hotfix/88-[a-z0-9-]+$).",
+        "The slug contains only lowercase letters, digits, and hyphens — no special characters, spaces, or capital letters.",
+        "The output states that the branch targets main (not a feature branch or any other base).",
+        "The output explains how the slug was derived from the bug title words.",
+        "The output does not contain any code implementation, test code, or file edits — step 4 only."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Test mode: skip steps 0–5 (gh setup, bug identification, scope confirmation, TECH.md load, branch setup, and codebase exploration are already done). Read evals/fixtures/scope-gate-fires.json and use its codebase_findings as the exploration result. Run step 6 only: evaluate whether the scope gate fires for this fix, describe what was found, and present the keep/proceed vs switch-to-normal-flow choice to the user. Do not write any code or tests.",
+      "expected_output": "The scope gate fires. The output describes the findings: 6 files affected (exceeds the 3–4 file threshold), one schema migration (add_currency_code to settlements table), and two API contract changes. The user is presented with a binary choice: proceed as hotfix (accepting the larger scope) or switch to the normal write-epic + write-task flow. No code or tests are written.",
+      "files": ["evals/fixtures/scope-gate-fires.json"],
+      "expectations": [
+        "The output explicitly states that the scope gate fires — it does not silently proceed to implementation.",
+        "The output reports the number of files affected (6) and notes this exceeds the hotfix threshold of 3–4 files.",
+        "The output describes the schema migration (adding currency_code to the settlements table) and the API contract change.",
+        "The user is presented with two distinct options: proceed as hotfix or switch to the normal flow (write-epic / write-task).",
+        "No code, test, or file edit appears in the output — step 6 only."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Test mode: skip steps 0–7 (gh setup, bug identification, scope confirmation, TECH.md load, branch setup, codebase exploration, scope gate, and implementation are already done). Read evals/fixtures/pr-body-completeness.json and use its bug and fix_context objects as the live context. Run step 8 only: produce the full PR title and PR body that would be passed to gh pr create.",
+      "expected_output": "A PR title in the format 'fix(settlement): use integer arithmetic for settlement amount calculation to avoid floating-point truncation' and a PR body containing five sections: Related (with Closes #88), Impact, Root cause, Fix, and Risk. The body is ready to be written to a temp file and passed to gh pr create --body-file.",
+      "files": ["evals/fixtures/pr-body-completeness.json"],
+      "expectations": [
+        "The PR title matches the pattern ^fix\\([a-z-]+\\): [a-z] — it starts with 'fix(' followed by a lowercase scope, closing paren, colon, space, and a lowercase description.",
+        "The PR body contains a 'Closes #88' line in the Related section.",
+        "The PR body contains an Impact section that describes what was broken and who was affected.",
+        "The PR body contains a Root cause section that explains the floating-point truncation in calculateSettlementAmount().",
+        "The PR body contains a Risk section describing what could be affected by the change."
+      ]
+    }
+  ]
+}

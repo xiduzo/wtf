@@ -1,0 +1,9 @@
+{
+  "_note": "Fixture for eval 1 — Feature with no Proposed Tasks checklist whose ACs clearly imply a database schema migration. The skill must derive the task list from ACs and place the migration task first.",
+  "feature": {
+    "number": 42,
+    "title": "Feature: Track settlement processing fees",
+    "labels": [{ "name": "feature" }, { "name": "designed" }],
+    "body": "## Goal\nAllow the system to record and expose the processing fee charged for each settlement so that merchants can reconcile costs accurately.\n\n## Bounded Context\nSettlement\n\n## User Stories\n- As a Merchant, I want to see the processing fee for each settlement so that I can match it against my payment provider invoice.\n\n## Acceptance Criteria\n- AC1: The settlement record includes a processing fee amount stored persistently (requires a new `fee` column on the settlements table).\n- AC2: The fee is calculated automatically from the settlement total using the configured fee rate when a settlement is processed.\n- AC3: The `GET /settlements/:id` API response includes a `processingFee` field.\n- AC4: The settlement list UI displays the processing fee alongside the settlement total.\n\n## Edge Cases\n- Fee is zero when the settlement total is zero.\n- Fee calculation rounds to two decimal places using standard banker's rounding.\n\n## Domain Events\n- `SettlementFeeCalculated` — emitted after fee is applied to a settlement record."
+  }
+}

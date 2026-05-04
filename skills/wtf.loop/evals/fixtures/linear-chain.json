@@ -1,0 +1,13 @@
+{
+  "_note": "Linear chain: A→B→C. Each task blocks the next. Expected: 3 phases, 1 task each, no parallelism.",
+  "nodes": [
+    { "number": 10, "title": "Task A — Define data model", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/db/"] },
+    { "number": 11, "title": "Task B — Implement service layer", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/services/"] },
+    { "number": 12, "title": "Task C — Expose API endpoint", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/api/"] }
+  ],
+  "edges": {
+    "10": { "blocks": [11], "blocked_by": [] },
+    "11": { "blocks": [12], "blocked_by": [10] },
+    "12": { "blocks": [], "blocked_by": [11] }
+  }
+}

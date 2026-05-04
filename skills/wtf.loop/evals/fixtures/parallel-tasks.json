@@ -1,0 +1,13 @@
+{
+  "_note": "Fully parallel: 3 tasks, zero internal dependencies, no shared file areas. Expected: 1 phase, 1 sub-phase, all 3 tasks parallel.",
+  "nodes": [
+    { "number": 20, "title": "Task A — Frontend component", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/ui/"] },
+    { "number": 21, "title": "Task B — Background job", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/jobs/"] },
+    { "number": 22, "title": "Task C — Analytics event", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/analytics/"] }
+  ],
+  "edges": {
+    "20": { "blocks": [], "blocked_by": [] },
+    "21": { "blocks": [], "blocked_by": [] },
+    "22": { "blocks": [], "blocked_by": [] }
+  }
+}

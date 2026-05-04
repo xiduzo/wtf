@@ -1,0 +1,9 @@
+{
+  "_note": "Feature with 4 ACs: download trigger, PDF header, empty state, permission gate. Edge cases: slow generation, empty range. Expected step-7 output: 5+ scenarios, Merchant actor, domain language only, business-outcome Then steps.",
+  "feature": {
+    "number": 55,
+    "title": "Feature: Settlement PDF export",
+    "labels": [{"name": "feature"}],
+    "body": "## Goal\nMerchants can export their settlement history as a PDF for accounting and audit purposes.\n\n## Acceptance Criteria\n- [ ] Merchants can click \"Export PDF\" to download a formatted PDF of their settlement history\n- [ ] The PDF includes a header with the Merchant name, export date, and date range\n- [ ] An empty result set produces a PDF with headers and a 'No settlements found' message\n- [ ] Only Merchants with the `settlement.export` permission can trigger an export\n\n## Edge Cases\n- PDF generation takes longer than 10 seconds → show a progress indicator; do not time out silently\n- Merchant has no settlements in range → PDF shows 'No settlements found' with headers intact\n\n## Domain Events\n- `SettlementExportRequested` — emitted when a Merchant triggers a PDF export\n- `SettlementExportReady` — emitted when the PDF is available for download\n\n## Bounded Context\nSettlement domain. Merchant actor. Reads from settlement records; no write side effects."
+  }
+}

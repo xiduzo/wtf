@@ -1,0 +1,25 @@
+{
+  "_note": "Feature scope with two new user-facing capabilities — both tasks should appear under ### Added with domain language",
+  "feature": {
+    "number": 5,
+    "title": "Settlement date range filter",
+    "body": "## Goal\nMerchants need to narrow their settlement list to a specific period so they can reconcile payouts efficiently.\n\n## Acceptance Criteria\n- Merchants can select a start and end date on the settlement list\n- Only settlements within the selected range are displayed\n- The active filter is visually indicated so merchants know they are viewing a subset\n- Clearing the filter restores the full settlement list",
+    "state": "CLOSED"
+  },
+  "tasks": [
+    {
+      "number": 10,
+      "title": "Add date range picker to settlement list",
+      "labels": [{"name": "task"}, {"name": "verified"}],
+      "state": "CLOSED",
+      "body": "## Functional Description\nAdd a date range picker component to the settlement list header so merchants can filter settlements by payout date.\n\n## Gherkin\n```gherkin\nScenario: Merchant filters settlements by date range\n  Given a merchant is viewing the settlement list\n  When they select a start date of 2026-04-01 and an end date of 2026-04-30\n  Then only settlements with a payout date in April 2026 are shown\n  And the date range filter is displayed as active above the list\n```"
+    },
+    {
+      "number": 11,
+      "title": "Add clear filter button to settlement list",
+      "labels": [{"name": "task"}, {"name": "verified"}],
+      "state": "CLOSED",
+      "body": "## Functional Description\nProvide a one-click way for merchants to remove an active date range filter and return to the full settlement list.\n\n## Gherkin\n```gherkin\nScenario: Merchant clears an active date range filter\n  Given a merchant is viewing the settlement list with a date range filter active\n  When they click the 'Clear filter' button\n  Then all settlements are shown regardless of payout date\n  And the date range filter indicator is removed from the list header\n```"
+    }
+  ]
+}

@@ -88,6 +88,17 @@ The harness runs each eval with-skill and without-skill, grades expectations, an
 | Skill | Evals | Status |
 |---|---|---|
 | `wtf.health` | 3 (clean, implemented-not-verified, stale-designed) | ✅ |
+| `wtf.loop` | 5 (linear-chain, parallel-tasks, diamond-file-conflict, contradiction-spec, external-blocker) | ✅ |
+| `wtf.create-pr` | 3 (feat-branch, fix-branch, refactor-branch — no-Task path) | ✅ |
+| `wtf.refine` | 4 (scope-narrowed, domain-language-correction, technical-constraint, conflicting-insights) | ✅ |
+| `wtf.changelog` | 3 (all-added, mixed-added-fixed, drop-internal-refactor) | ✅ |
+| `wtf.write-task` | 3 checkpoint evals (gherkin-generation, scope-gate, ambiguous-task) | ✅ |
+| `wtf.pr-review` | 3 checkpoint evals (missing-test-coverage, schema-drift, scope-creep) | ✅ |
+| `wtf.report-bug` | 3 checkpoint evals (failing-gherkin-scenario, domain-language-restatement, no-linked-task) | ✅ |
+| `wtf.epic-to-features` | 3 checkpoint evals (multi-actor-epic, existing-features-epic, ordered-capabilities-epic) | ✅ |
+| `wtf.feature-to-tasks` | 3 checkpoint evals (migration-implied, cross-layer-feature, complex-edge-case) | ✅ |
+| `wtf.reflect` | 5 checkpoint evals (arch-gotcha→TECH, flaky-test→QA, domain-drift→VISION, component-misuse→DESIGN, ambiguous→TECH-default) | ✅ |
+| `wtf.hotfix` | 3 checkpoint evals (branch-naming, scope-gate, pr-body-completeness) | ✅ |
 
 Add new skills to this table when evals are authored. See `docs/future-work/add-evals.md` for the candidate ranking.
 

@@ -1,0 +1,42 @@
+{
+  "skill_name": "wtf.report-bug",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.report-bug in test mode. Skip steps 0–5 (gh setup, source identification, scenario selection, bug detail gathering, ubiquitous language mapping, test file search). All context is already assembled in `evals/fixtures/failing-gherkin-scenario.json`. Run step 6 only: draft the bug report. Output the full draft.",
+      "expected_output": "A fully structured bug report with all required sections: Related (linking Task #31 and Feature #22), Expected Behavior (quoting the failing Gherkin Then step), Actual Behavior (in domain language, no implementation vocabulary), Steps to Reproduce (numbered), Contracts Violated (noting the missing NotificationQueued event), Suggested Fix, and Regression Risk.",
+      "files": ["evals/fixtures/failing-gherkin-scenario.json"],
+      "expectations": [
+        "The Related section links to Task #31",
+        "The Expected Behavior section quotes the failing Gherkin Then step verbatim or near-verbatim ('the Merchant receives a confirmation email')",
+        "The Actual Behavior section uses domain language and does not contain 'HTTP', 'database', 'JSON', or 'null pointer'",
+        "The Contracts Violated section references the NotificationQueued event as missing or not emitted",
+        "The Steps to Reproduce section contains at least 2 numbered steps"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.report-bug in test mode. Skip steps 0–3 and step 5 (gh setup, source identification, scenario selection, bug detail gathering, test file search). Run step 4 (Ubiquitous Language mapping) and step 6 (draft the bug report). Use the context from `evals/fixtures/domain-language-restatement.json`. Output the full bug report draft.",
+      "expected_output": "A fully structured bug report where the Actual Behavior section has been restated in domain terms — no mention of 'HTTP 500', 'database record', or 'JSON response field'. The report links Task #35, notes the SettlementProcessed contract violation, and includes concrete reproduction steps.",
+      "files": ["evals/fixtures/domain-language-restatement.json"],
+      "expectations": [
+        "The bug report does not contain the phrases 'HTTP 500', 'database record', or 'JSON response field'",
+        "The Actual Behavior section restates the failure in domain terms (e.g. 'Settlement status did not transition to Processed' or equivalent)",
+        "The Related section links to Task #35",
+        "The Steps to Reproduce section is present and contains concrete, numbered steps"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.report-bug in test mode. Skip steps 0–5. All context is in `evals/fixtures/no-linked-task.json`. Run step 6 only: draft the bug report. Output the full draft.",
+      "expected_output": "A fully structured bug report where every required section is present. The Related section explicitly notes no linked Task or Feature. The Contracts Violated section contains 'None identified' or equivalent. The Actual Behavior and Steps to Reproduce sections are present with domain-language content.",
+      "files": ["evals/fixtures/no-linked-task.json"],
+      "expectations": [
+        "The Related section explicitly notes no linked Task or Feature (e.g. 'Unknown', 'None', or 'not identified')",
+        "The Contracts Violated section contains 'None identified' or equivalent phrasing",
+        "The Actual Behavior section is present and describes the duplicate Settlement row behavior in domain language",
+        "The Steps to Reproduce section is present and includes the page-refresh reproduction step"
+      ]
+    }
+  ]
+}

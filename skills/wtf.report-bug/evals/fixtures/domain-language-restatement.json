@@ -1,0 +1,26 @@
+{
+  "_note": "Bug where the raw observed behavior uses implementation vocabulary (HTTP 500, database record, JSON response field). Tests that step 4 (Ubiquitous Language mapping) strips implementation terms before step 6 drafts the report.",
+  "task": {
+    "number": 35,
+    "title": "Task: Update settlement status after payment confirmation",
+    "body": "## Gherkin\n\n```gherkin\nFeature: Settlement status update on payment confirmation\n\n  Scenario: Settlement transitions to processed after payment is confirmed\n    Given a Settlement with status 'pending'\n    And a Payment confirmation is received\n    When the payment confirmation is applied to the Settlement\n    Then the Settlement status transitions to 'processed'\n    And the SettlementProcessed event is emitted\n\n  Scenario: Settlement remains pending when payment confirmation is rejected\n    Given a Settlement with status 'pending'\n    And a Payment confirmation is rejected\n    When the rejection is applied to the Settlement\n    Then the Settlement status remains 'pending'\n```\n\n## Contracts\n\n### SettlementProcessed\nEmitted when a Settlement successfully transitions to the 'processed' state.\n```json\n{\n  \"event\": \"SettlementProcessed\",\n  \"settlementId\": \"<uuid>\",\n  \"processedAt\": \"<iso8601>\",\n  \"confirmedPaymentReference\": \"<string>\"\n}\n```\n\n## Impacted Areas\n- `src/settlements/`\n- `src/payments/`\n- `src/events/`\n"
+  },
+  "feature": {
+    "number": 28,
+    "title": "Feature: Payment confirmation integration"
+  },
+  "bug_context": {
+    "one_sentence_description": "After receiving a payment confirmation, the Settlement status does not update to processed.",
+    "failing_scenario": "Settlement transitions to processed after payment is confirmed",
+    "observed_behavior": "The API returned HTTP 500 and the database record still shows status 'pending'. The JSON response field 'status' was null.",
+    "expected_behavior": "The Settlement status should transition to 'processed' and the SettlementProcessed event should be emitted after a payment confirmation is applied.",
+    "reproduction_steps": [
+      "Create a Settlement with status 'pending'.",
+      "Submit a payment confirmation for that Settlement.",
+      "Inspect the Settlement — its status remains 'pending' and no SettlementProcessed event appears in the event log."
+    ],
+    "contract_violated": "SettlementProcessed",
+    "regression_risk": "Any downstream process that reacts to the SettlementProcessed event (e.g. sending confirmation emails, releasing held funds) will also fail silently.",
+    "suggested_fix": "The payment confirmation handler may not be persisting the status change before emitting the event, causing a rollback on failure that reverts both."
+  }
+}

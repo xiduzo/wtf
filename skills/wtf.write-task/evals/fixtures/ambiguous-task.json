@@ -1,0 +1,10 @@
+{
+  "_note": "Vague task description 'Handle settlement errors' against a Feature with retry, notification, and operator-retry ACs. Step 3 should ask about error scope, handling strategy, and entry/exit points — not invent answers.",
+  "task_description": "Handle settlement errors",
+  "feature": {
+    "number": 60,
+    "title": "Feature: Settlement error handling",
+    "labels": [{"name": "feature"}],
+    "body": "## Goal\nProcess merchant settlements reliably, surfacing failure states to both operators and merchants.\n\n## Acceptance Criteria\n- [ ] Failed settlements are retried up to 3 times before being marked as permanently failed\n- [ ] Merchants receive an email notification when a settlement fails permanently\n- [ ] Operators can view and manually retry failed settlements in the admin panel\n\n## Edge Cases\n- Retry exhausted during a downstream outage → mark as permanently failed but flag for auto-retry once the outage resolves\n- Duplicate retry request from operator → idempotent; no second event emitted\n\n## Domain Events\n- `SettlementFailed` — emitted when a settlement attempt fails\n- `SettlementPermanentlyFailed` — emitted after all retries are exhausted\n- `SettlementRetryRequested` — emitted when an operator requests a manual retry\n\n## Bounded Context\nSettlement domain. Merchant actor. Payment processor integration boundary."
+  }
+}

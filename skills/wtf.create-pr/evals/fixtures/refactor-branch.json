@@ -1,0 +1,6 @@
+{
+  "_note": "Multiple refactor commits on refactor/extract-fulfilment-service — no linked task. Tests that the no-task path groups changes logically rather than listing files, and produces a refactor/chore-prefixed title.",
+  "branch": "refactor/extract-fulfilment-service",
+  "git_log": "c4d5e6f extract FulfilmentService from OrderService\nd5e6f7a move fulfilment types to shared contracts\ne6f7a8b add unit tests for FulfilmentService\nf7a8b9c remove fulfilment logic from OrderService",
+  "git_diff_stat": " src/services/OrderService.ts         | 87 +--------------------------\n src/services/FulfilmentService.ts    | 94 +++++++++++++++++++++++++++++++\n src/services/FulfilmentService.test.ts | 61 ++++++++++++++++++++\n src/contracts/fulfilment.ts          | 23 ++++++++\n src/contracts/index.ts               |  2 +\n 5 files changed, 182 insertions(+), 85 deletions(-)"
+}

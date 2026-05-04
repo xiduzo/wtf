@@ -1,0 +1,9 @@
+{
+  "_note": "Fixture for eval 2 — Feature with a Proposed Tasks checklist spanning distinct backend and frontend layers. The skill must use the checklist as its starting point and keep backend/frontend tasks separate.",
+  "feature": {
+    "number": 45,
+    "title": "Feature: Settlement date range filter",
+    "labels": [{ "name": "feature" }, { "name": "designed" }],
+    "body": "## Goal\nLet merchants filter their settlement list by a date range so they can focus on a specific billing period without scrolling through all records.\n\n## Bounded Context\nSettlement\n\n## User Stories\n- As a Merchant, I want to filter settlements by a start and end date so that I can view only the records relevant to a billing period.\n\n## Acceptance Criteria\n- AC1: The `GET /settlements` endpoint accepts optional `from` and `to` query parameters (ISO 8601 dates) and returns only settlements whose `settledAt` date falls within the range.\n- AC2: Settlement queries filtered by date range use an index on `settledAt` so that response times remain under 200 ms for datasets up to 500,000 rows.\n- AC3: The settlement list UI shows a date range picker that lets the merchant select a start and end date; applying the filter reloads the list with the chosen range.\n- AC4: The selected date range is persisted in the URL as `?from=YYYY-MM-DD&to=YYYY-MM-DD` so that filtered views are bookmarkable and shareable.\n\n## Edge Cases\n- When only `from` is provided the filter returns all settlements on or after that date.\n- When only `to` is provided the filter returns all settlements on or before that date.\n- Invalid date formats are rejected with a 400 response.\n\n## Domain Events\n- None — this feature is read-only.\n\n## Proposed Tasks\n- [ ] Add date range filter to settlements API\n- [ ] Optimise settlement query for date range lookups\n- [ ] Add date range picker component to settlement list UI\n- [ ] Wire URL query parameter persistence"
+  }
+}

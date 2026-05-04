@@ -6,3 +6,6 @@ skills-lock.json
 # Mac things
 .DS_Store
 skills/.DS_Store
+
+# Evals output
+wtf.*-workspace

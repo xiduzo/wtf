@@ -1,0 +1,9 @@
+{
+  "_note": "Same Feature #24 body as scope-narrowed-feature.json (both desktop and mobile ACs present). Used for the conflicting-insights eval where insight (1) says exclude mobile and insight (2) says exclude desktop. Step 3 change map should flag the contradiction rather than silently applying one.",
+  "issue": {
+    "number": 24,
+    "title": "Feature: Settlement date range filter",
+    "labels": [{"name": "feature"}],
+    "body": "## Goal\nMerchants can filter their settlement list by a custom date range to quickly find historical transactions.\n\n## Acceptance Criteria\n- [ ] Merchants can select a start date and end date using a date picker on desktop browsers\n- [ ] Merchants can select a date range using a native date input on mobile browsers\n- [ ] The settlement list updates in real time as the date range changes\n- [ ] Invalid ranges (start after end) show an inline error\n- [ ] The selected range persists across page refreshes via URL query params\n\n## Edge Cases\n- Mobile browsers that do not support the `date` input type fall back to a text field with DD/MM/YYYY validation\n- Date ranges spanning more than 12 months show a warning but are not blocked\n- Selecting today as the end date includes all settlements up to the current moment\n\n## Domain Events\n- `SettlementListFiltered` — emitted when a Merchant applies or changes a date range\n\n## Proposed Tasks\n- [ ] Add date range picker component (desktop)\n- [ ] Add mobile date input fallback\n- [ ] Wire URL query param persistence\n- [ ] Write integration tests\n\n## Rollout\nFeature-flagged behind `settlement-date-filter`. Enable for all Merchants once QA signs off.\n\n## Bounded Context\nSettlement domain. Merchant actor. No cross-domain side effects."
+  }
+}

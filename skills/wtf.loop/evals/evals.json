@@ -1,0 +1,67 @@
+{
+  "skill_name": "wtf.loop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.loop for Feature #1 — Linear Pipeline. Test mode: skip step 0 (gh setup already confirmed) and step 1 (hierarchy already fetched). Use the task graph from `evals/fixtures/linear-chain.json` as the pre-built dependency graph — its `nodes` array and `edges` object replace the output of `gh sub-issue list` + `gh issue-dependency list`. Skip AskUserQuestion in step 3 and auto-approve the execution plan. Output only the proposed execution plan (step 3 format).",
+      "expected_output": "An execution plan with 3 sequential phases, one task per phase: Phase 1 contains task #10, Phase 2 contains task #11 (blocked by #10), Phase 3 contains task #12 (blocked by #11). No tasks run in parallel.",
+      "files": ["evals/fixtures/linear-chain.json"],
+      "expectations": [
+        "Phase 1 contains only task #10",
+        "Phase 2 contains only task #11",
+        "Phase 3 contains only task #12",
+        "The plan shows 3 phases",
+        "Tasks #10, #11, and #12 are not listed in the same phase"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.loop for Feature #2 — Parallel Tasks. Test mode: skip step 0 (gh setup already confirmed) and step 1 (hierarchy already fetched). Use the task graph from `evals/fixtures/parallel-tasks.json` as the pre-built dependency graph — its `nodes` array and `edges` object replace the output of `gh sub-issue list` + `gh issue-dependency list`. Skip AskUserQuestion in step 3 and auto-approve the execution plan. Output only the proposed execution plan (step 3 format).",
+      "expected_output": "An execution plan with 1 phase and 1 sub-phase listing all 3 tasks (#20, #21, #22) as parallel with no ordering constraints between them.",
+      "files": ["evals/fixtures/parallel-tasks.json"],
+      "expectations": [
+        "The plan shows 1 phase",
+        "Tasks #20, #21, and #22 are all listed in the same sub-phase",
+        "The sub-phase is marked as parallel",
+        "No task is described as blocked by another task in the plan"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.loop for Feature #3 — API Diamond. Test mode: skip step 0 (gh setup already confirmed) and step 1 (hierarchy already fetched). Use the task graph from `evals/fixtures/diamond-file-conflict.json` as the pre-built dependency graph — its `nodes` array and `edges` object replace the output of `gh sub-issue list` + `gh issue-dependency list`. Skip AskUserQuestion in step 3 and auto-approve the execution plan. Output only the proposed execution plan (step 3 format).",
+      "expected_output": "An execution plan where Phase 1 runs task #30 alone; Phase 2 splits tasks #31 and #32 into separate sub-phases due to the shared src/api/ file area conflict; Phase 3 runs task #33 after both #31 and #32 complete.",
+      "files": ["evals/fixtures/diamond-file-conflict.json"],
+      "expectations": [
+        "Phase 1 contains only task #30",
+        "Tasks #31 and #32 are not in the same sub-phase",
+        "Task #33 appears in a phase after both #31 and #32",
+        "The plan shows at least 3 phases",
+        "The plan notes a file conflict or file area overlap between tasks #31 and #32 involving src/api/"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Run wtf.loop in test mode. Skip step 0 (gh setup already confirmed) and step 1 (hierarchy already fetched). Use the spec from `evals/fixtures/contradiction-spec.json` — its `feature` and `tasks` fields replace the output of `gh issue view` and `gh sub-issue list`. Skip pre-flight checks 2a, 2c, and 2d. Run only step 2b (contradiction scan). Output only the findings from step 2b.",
+      "expected_output": "Step 2b surfaces an Actor contradiction: the Feature declares 'Merchant' as the sole actor throughout, but Task #10's Gherkin uses 'Admin user' in all Given steps. The finding identifies both the Feature and Task #10 as the conflicting sources and does not proceed to step 3.",
+      "files": ["evals/fixtures/contradiction-spec.json"],
+      "expectations": [
+        "The contradiction scan identifies a mismatch between the Feature actor ('Merchant') and Task #10's Gherkin actor ('Admin user')",
+        "The finding names both the Feature (#62) and Task #10 as the conflicting sources",
+        "The skill does not auto-resolve the contradiction or proceed to proposing an execution plan",
+        "The output is framed as a pre-flight gate requiring human resolution"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Run wtf.loop in test mode. Skip step 0 (gh setup already confirmed) and step 1 (hierarchy already fetched). Use the task graph from `evals/fixtures/external-blocker.json` — its `nodes` array and `edges` object replace the output of `gh sub-issue list` and `gh issue-dependency list`. Skip pre-flight checks 2a, 2b, and 2c. Run only step 2d (dependency validation). Output only the dependency validation findings.",
+      "expected_output": "Step 2d correctly classifies issue #999 (present in node 40's blocked_by list but absent from the node list) as an external blocker. It surfaces this as a pre-flight gate: the loop cannot proceed until #999 is merged or closed. It does not proceed to propose an execution plan.",
+      "files": ["evals/fixtures/external-blocker.json"],
+      "expectations": [
+        "Issue #999 is classified as an external blocker (not in the current run's node list)",
+        "The external blocker is surfaced as a pre-flight gate rather than silently ignored",
+        "The skill does not proceed to propose an execution plan (step 3) while #999 is unresolved",
+        "The dependency chain is correctly described: #999 blocks #40, which blocks #41"
+      ]
+    }
+  ]
+}

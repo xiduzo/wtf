@@ -1,0 +1,42 @@
+{
+  "skill_name": "wtf.write-task",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.write-task in test mode. Skip steps 0–6 (gh setup, parent feature selection, task naming, ambiguity clarification, codebase exploration, scope pre-check, contracts). The parent Feature is provided in `evals/fixtures/gherkin-generation.json`, field `feature`. Run step 7 only: generate Gherkin scenarios from the Feature's Acceptance Criteria and edge cases. Do not proceed to step 8. Output only the Gherkin block.",
+      "expected_output": "Four or more Gherkin scenarios: one for each Acceptance Criterion (download trigger, PDF header, empty state, permission gate) plus at least one for an edge case. All steps use Merchant as the domain actor, no implementation vocabulary, Then steps describe business outcomes not system state.",
+      "files": ["evals/fixtures/gherkin-generation.json"],
+      "expectations": [
+        "At least four Gherkin scenarios are produced",
+        "The domain actor used in Given steps is 'Merchant' (not 'user', 'admin', or 'customer')",
+        "Then steps describe business outcomes without implementation vocabulary (no 'HTTP', 'database', 'JSON field', 'REST', 'table', 'mock')",
+        "At least one scenario covers the empty result edge case ('No settlements found')",
+        "At least one scenario covers the permission gate (Merchant without settlement.export permission)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.write-task in test mode. Skip steps 0–8 (all steps before the scope gate). The task draft is provided in `evals/fixtures/scope-gate-draft.json`, field `task.draft_body`. Run step 9 only: scope gate. Evaluate the draft for split signals and output whether a split is needed, which signals fire, and what concrete split is proposed.",
+      "expected_output": "Step 9 fires at least one split signal — either too many distinct Gherkin journeys (schema migration, background worker, UI, API, and permission scenarios are independent journeys) or too many impacted modules (DB, service, API, UI, worker). It proposes a concrete split such as 'migration as Task A, application behaviour as Task B' and uses the keep/split/stop gate.",
+      "files": ["evals/fixtures/scope-gate-draft.json"],
+      "expectations": [
+        "At least one split signal is identified (too many distinct journeys or too many unrelated modules)",
+        "A concrete split strategy is proposed (e.g. migration vs behaviour, or backend vs frontend)",
+        "The keep/split/stop choice is presented to the user",
+        "The draft is not silently approved without raising the split question"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.write-task in test mode. Skip steps 0–2 (gh setup, parent feature selection, task naming). The task description is 'Handle settlement errors'. The parent Feature is from `evals/fixtures/ambiguous-task.json`, field `feature`. Run step 3 only: clarify ambiguity. List the questions you would ask the user before proceeding. Do not answer the questions or proceed to step 4.",
+      "expected_output": "Step 3 produces a set of clarifying questions covering at minimum: which error types or failure modes are in scope, what the expected handling strategy is (retry, surface to user, log only), and the entry/exit points of this task. It does not invent answers or proceed with assumptions.",
+      "files": ["evals/fixtures/ambiguous-task.json"],
+      "expectations": [
+        "Questions are asked rather than assumptions being made",
+        "At least one question targets scope or entry/exit points (which errors, what triggers this task)",
+        "At least one question targets error handling strategy (retry logic, notification, logging)",
+        "The skill does not proceed to step 4 or produce a task draft in this output"
+      ]
+    }
+  ]
+}

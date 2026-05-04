@@ -1,0 +1,25 @@
+{
+  "_note": "Feature scope with one user-facing task and one pure internal refactor — task #33 (refactor) must be dropped; only task #34 appears in the changelog",
+  "feature": {
+    "number": 30,
+    "title": "Settlement status display",
+    "body": "## Goal\nMerchants need to see the current processing status of each settlement so they can track payouts without contacting support.\n\n## Acceptance Criteria\n- Each settlement in the list shows a status badge (Pending, Processing, Paid, Failed)\n- The status is updated in real time when it changes\n- Merchants can filter the list by status",
+    "state": "CLOSED"
+  },
+  "tasks": [
+    {
+      "number": 33,
+      "title": "Migrate settlement storage from flat table to normalised schema",
+      "labels": [{"name": "task"}, {"name": "verified"}],
+      "state": "CLOSED",
+      "body": "## Functional Description\nRefactor the internal database schema to split the settlements table into a normalised structure with a separate status_events table. This is an internal engineering change with no direct user-facing behaviour change.\n\n## Gherkin\n```gherkin\nScenario: Internal schema migration completes without data loss\n  Given the settlements table contains 10,000 existing records\n  When the database migration runs\n  Then all 10,000 records are present in the new normalised schema\n  And no existing settlement data is lost or corrupted\n```"
+    },
+    {
+      "number": 34,
+      "title": "Show status badge on each settlement row",
+      "labels": [{"name": "task"}, {"name": "verified"}],
+      "state": "CLOSED",
+      "body": "## Functional Description\nDisplay a colour-coded status badge (Pending, Processing, Paid, Failed) on each row of the settlement list so merchants can see payout progress at a glance.\n\n## Gherkin\n```gherkin\nScenario: Merchant sees status badge on settlement row\n  Given a merchant is viewing the settlement list\n  When the list loads\n  Then each settlement row shows a status badge indicating its current processing state\n  And the badge colour reflects the status: grey for Pending, blue for Processing, green for Paid, red for Failed\n\nScenario: Merchant filters settlements by status\n  Given a merchant is viewing the settlement list\n  When they select 'Failed' from the status filter\n  Then only settlements with a Failed status badge are shown in the list\n```"
+    }
+  ]
+}

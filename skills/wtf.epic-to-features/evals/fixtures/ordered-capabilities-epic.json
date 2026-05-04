@@ -1,0 +1,10 @@
+{
+  "_note": "Fixture for eval 3 — Epic whose Success Metrics are listed in logical dependency order (view before filter, filter before export). Tests that the proposed Feature list respects the natural capability ordering implied by the metrics.",
+  "epic": {
+    "number": 3,
+    "title": "Epic: Settlement Reporting Suite",
+    "labels": [{ "name": "epic" }],
+    "body": "## Goal\nA complete reporting suite so Merchants can find and export their settlement records, and Finance Managers can run cross-merchant analytics.\n\n## Context\nThe settlement reporting capability is currently absent. Merchants need sequential access: they must first see their settlements before they can filter them, and must filter before a meaningful export is possible. Finance Managers need aggregate visibility before they can identify anomalies. Building these capabilities in the wrong order would produce a feature set that is unusable until all parts are present.\n\n## Domain Actors\n- **Merchant** — a business receiving payouts from the platform\n- **Finance Manager** — an internal operator responsible for cross-merchant financial oversight\n\n## Success Metrics\n1. Merchant can see their settlement list\n2. Merchant can filter settlements by date and status\n3. Merchant can export filtered results as CSV\n4. Finance Manager can view all-merchant settlement summary\n5. Finance Manager can flag anomalous settlements\n\n## Bounded Context\nSettlement"
+  },
+  "existing_features": []
+}

@@ -1,0 +1,6 @@
+{
+  "_note": "Single feat commit on feat/add-date-filter — no linked task. Tests that the no-task path derives title and body from diff alone.",
+  "branch": "feat/add-date-filter",
+  "git_log": "a1b2c3d add date range filter to settlement list",
+  "git_diff_stat": " src/ui/SettlementList.tsx | 45 +++++++++++++++++++++++++++++++++++++++++++++\n src/api/settlements.ts  | 12 ++++++++++++\n 2 files changed, 57 insertions(+)"
+}

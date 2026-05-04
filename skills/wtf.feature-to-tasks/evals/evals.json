@@ -1,0 +1,41 @@
+{
+  "skill_name": "wtf.feature-to-tasks",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.feature-to-tasks in test mode. Skip steps 0–1 (gh setup already confirmed, Feature already fetched). Use the Feature from `evals/fixtures/migration-implied.json`, field `feature`. No existing Tasks under this Feature. Run step 2 only: propose the full Task list derived from the Feature's Acceptance Criteria. Output the proposed list.",
+      "expected_output": "A numbered proposed Task list of at least 3 Tasks where a database migration Task (adding a fee column to the settlements table) appears first, followed by Tasks covering the fee calculation logic, API exposure, and UI display — each mapping to at least one Feature AC.",
+      "files": ["evals/fixtures/migration-implied.json"],
+      "expectations": [
+        "A database migration task (adding a column, schema change, or migration script for the fee field) is included in the proposed list",
+        "The migration task appears before the business logic and API tasks in the proposed order",
+        "At least 3 Tasks are proposed",
+        "Each proposed Task can be traced to at least one of the Feature's Acceptance Criteria (AC1–AC4)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.feature-to-tasks in test mode. Skip steps 0–1 (gh setup already confirmed, Feature already fetched). Use the Feature from `evals/fixtures/cross-layer-feature.json`, field `feature`. No existing Tasks under this Feature. Run step 2 only: propose the full Task list starting from the Feature's Proposed Tasks checklist. Output the proposed list.",
+      "expected_output": "A proposed Task list of 4 Tasks that mirrors the Proposed Tasks checklist from the Feature body: API filter, query optimisation, date picker UI, and URL persistence — kept as separate Tasks with no backend/frontend bundling.",
+      "files": ["evals/fixtures/cross-layer-feature.json"],
+      "expectations": [
+        "The proposed list includes all 4 Tasks from the Feature's Proposed Tasks checklist (or close variants covering API filter, query optimisation, date picker UI, and URL persistence)",
+        "Backend Tasks (API filter, query optimisation) and frontend Tasks (date picker, URL persistence) are listed as separate Tasks, not merged into one",
+        "No single proposed Task bundles both a backend implementation and a frontend component in its description",
+        "The output acknowledges the Proposed Tasks checklist as the source of the list rather than generating it from scratch"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.feature-to-tasks in test mode. Skip steps 0–1 (gh setup already confirmed, Feature already fetched). Use the Feature from `evals/fixtures/complex-edge-case.json`, field `feature`. No existing Tasks under this Feature. Run step 2 only: propose the full Task list derived from the Feature's Acceptance Criteria. Output the proposed list.",
+      "expected_output": "A proposed Task list of at least 2 Tasks where the basic CSV download and the chunked ZIP export are separate Tasks — the chunked export is not folded into the basic export Task.",
+      "files": ["evals/fixtures/complex-edge-case.json"],
+      "expectations": [
+        "At least 2 Tasks are proposed",
+        "The chunked or ZIP export (AC3) appears as its own dedicated Task, not combined with the basic CSV download Task",
+        "At least one Task directly addresses the basic CSV download AC (AC1)",
+        "Each proposed Task is described as independently shippable or independently deliverable"
+      ]
+    }
+  ]
+}

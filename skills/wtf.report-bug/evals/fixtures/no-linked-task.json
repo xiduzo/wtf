@@ -1,0 +1,20 @@
+{
+  "_note": "Bug filed without a linked Task or Gherkin context. Tests that step 6 produces a complete report with all required sections present, using 'None identified' or 'Unknown' for sections that cannot be filled.",
+  "task": null,
+  "feature": null,
+  "bug_context": {
+    "one_sentence_description": "The settlement list sometimes shows duplicate entries for the same Settlement after a page refresh.",
+    "failing_scenario": null,
+    "observed_behavior": "After filtering the Settlements list and refreshing the page, duplicate rows appear for one or more Settlements. Each duplicate row shows identical data for the same Settlement.",
+    "expected_behavior": "The Settlements list should display each Settlement exactly once, regardless of how many times the page is refreshed or the filter is reapplied.",
+    "reproduction_steps": [
+      "Navigate to the Settlements list.",
+      "Apply any filter (e.g. filter by 'processed' status).",
+      "Refresh the page.",
+      "Observe that one or more Settlements appear as duplicate rows in the list."
+    ],
+    "contract_violated": null,
+    "regression_risk": "If the duplication affects Settlement counts or totals shown in summary views, merchants may see inflated figures in their dashboards.",
+    "suggested_fix": null
+  }
+}

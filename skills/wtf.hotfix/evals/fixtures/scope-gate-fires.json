@@ -1,0 +1,26 @@
+{
+  "_note": "Fix that appears narrow but exploration reveals >4 files, a schema migration, and an API contract change. Used by eval 2 to test scope gate detection (step 6 only).",
+  "bug": {
+    "number": 91,
+    "title": "Bug: Settlement payouts missing currency code in multi-currency accounts",
+    "labels": [{"name": "bug"}],
+    "body": "## What is broken?\n\nMerchants with multi-currency accounts receive settlement payouts that do not include the currency code, causing reconciliation failures in their accounting systems.\n\n## User impact\n\nAll multi-currency merchants — approximately 40 accounts. Finance teams cannot reconcile payouts without the currency identifier.\n\n## Expected behaviour\n\nEvery settlement payout record includes a `currency_code` field.\n\n## Actual behaviour\n\n`currency_code` is absent from settlement records and API responses."
+  },
+  "codebase_findings": {
+    "files_affected": [
+      "src/services/settlement.ts",
+      "src/aggregates/payment.ts",
+      "src/api/routes/settlements.ts",
+      "src/api/routes/payments.ts",
+      "src/db/migrations/add_currency_code.sql",
+      "src/services/notifications.ts"
+    ],
+    "contract_changes": [
+      "POST /settlements response adds currency_code field",
+      "GET /settlements/:id response adds currency_code field"
+    ],
+    "schema_changes": [
+      "settlements table: add currency_code VARCHAR(3) NOT NULL"
+    ]
+  }
+}

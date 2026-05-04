@@ -1,0 +1,9 @@
+{
+  "_note": "Fixture for eval 3 — Feature with no Proposed Tasks checklist where one AC (chunked ZIP export for large datasets) is significantly more complex than the others and must become its own separate Task.",
+  "feature": {
+    "number": 50,
+    "title": "Feature: Settlement CSV export",
+    "labels": [{ "name": "feature" }, { "name": "designed" }],
+    "body": "## Goal\nAllow merchants to download their settlement data as a CSV file so they can perform offline analysis and import into accounting tools.\n\n## Bounded Context\nSettlement\n\n## User Stories\n- As a Merchant, I want to download my settlements as a CSV file so that I can analyse them in a spreadsheet.\n- As a Merchant, I want any active filters to be applied to my CSV export so that I only export the data I can see on screen.\n\n## Acceptance Criteria\n- AC1: A merchant can trigger a CSV download from the settlement list UI; the file contains all columns visible in the list.\n- AC2: When filters (e.g. date range, status) are active, the exported CSV reflects those filters — only matching settlements are included.\n- AC3: Exports containing more than 10,000 rows are chunked into multiple CSV files and delivered to the merchant as a single ZIP archive; a progress indicator is shown while the archive is being prepared.\n\n## Edge Cases\n- Exporting zero results produces an empty CSV with the header row only.\n- Chunking boundary falls exactly on 10,000 rows: the archive contains two files, each up to 10,000 rows.\n- If the ZIP preparation exceeds 60 seconds, the merchant receives an email link to download the archive instead.\n\n## Domain Events\n- `SettlementExportRequested` — emitted when a merchant initiates an export.\n- `SettlementExportReady` — emitted when the export file or archive is ready for download."
+  }
+}

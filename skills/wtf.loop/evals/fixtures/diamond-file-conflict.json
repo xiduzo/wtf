@@ -1,0 +1,15 @@
+{
+  "_note": "Diamond with file conflict: A unblocked; B and C both blocked by A, both touch src/api/; D blocked by B and C. B and C share a file area so must be in separate sub-phases even though they have identical blockers. Expected: Phase 1 (A), Phase 2a (B), Phase 2b (C), Phase 3 (D).",
+  "nodes": [
+    { "number": 30, "title": "Task A — Auth middleware", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/middleware/"] },
+    { "number": 31, "title": "Task B — User endpoints", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/api/"] },
+    { "number": 32, "title": "Task C — Admin endpoints", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/api/"] },
+    { "number": 33, "title": "Task D — Integration tests", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/tests/"] }
+  ],
+  "edges": {
+    "30": { "blocks": [31, 32], "blocked_by": [] },
+    "31": { "blocks": [33], "blocked_by": [30] },
+    "32": { "blocks": [33], "blocked_by": [30] },
+    "33": { "blocks": [], "blocked_by": [31, 32] }
+  }
+}

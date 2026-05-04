@@ -1,0 +1,41 @@
+{
+  "skill_name": "wtf.pr-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.pr-review in test mode. Skip steps 0–4 (gh setup, PR identification, spec hierarchy fetch, diff fetch). Use the fixture from `evals/fixtures/missing-test-coverage.json` — its `task` field is the Task spec and its `diff` and `diff_stat` fields replace the output of `git diff`. Run step 5 only (review checklist). Output all findings.",
+      "expected_output": "A structured review with a FAIL or WARN on the Spec adherence dimension, explicitly identifying that the second Gherkin scenario (automatic cancellation after the grace period) has no corresponding test. Verdict must be REQUEST CHANGES or APPROVE WITH COMMENTS. Scenario 1 (timeout warning) should be noted as covered.",
+      "files": ["evals/fixtures/missing-test-coverage.json"],
+      "expectations": [
+        "The Spec adherence dimension is rated FAIL or WARN",
+        "The missing test is identified by reference to cancellation or grace period (the second scenario)",
+        "Scenario 1 (timeout warning) is noted as covered or passing",
+        "The verdict is REQUEST CHANGES or APPROVE WITH COMMENTS — not a clean APPROVE"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.pr-review in test mode. Skip steps 0–4 (gh setup, PR identification, spec hierarchy fetch, diff fetch). Use the fixture from `evals/fixtures/schema-drift.json` — its `task` field is the Task spec and its `diff` and `diff_stat` fields replace the output of `git diff`. Run step 5 only (review checklist). Output all findings.",
+      "expected_output": "A structured review with a FAIL on the Contract compliance dimension. The review must call out the field name mismatches (id vs settlementId, value vs amount, state vs status) and note that the currency field is missing from the implementation. Verdict must be REQUEST CHANGES.",
+      "files": ["evals/fixtures/schema-drift.json"],
+      "expectations": [
+        "The Contract compliance dimension is rated FAIL",
+        "The mismatch between `settlementId` (spec) and `id` (implementation) is explicitly named",
+        "The missing `currency` field is identified as a contract violation",
+        "The verdict is REQUEST CHANGES"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.pr-review in test mode. Skip steps 0–4 (gh setup, PR identification, spec hierarchy fetch, diff fetch). Use the fixture from `evals/fixtures/scope-creep.json` — its `task` field is the Task spec and its `diff` and `diff_stat` fields replace the output of `git diff`. Run step 5 only (review checklist). Output all findings.",
+      "expected_output": "A structured review with a WARN or FAIL on the Impacted Areas dimension, specifically naming src/auth/middleware.ts as a file changed outside the declared scope. The finding should note this is a high-risk area not listed in Impacted Areas. Verdict is at minimum APPROVE WITH COMMENTS.",
+      "files": ["evals/fixtures/scope-creep.json"],
+      "expectations": [
+        "The Impacted Areas dimension is rated WARN or FAIL",
+        "`src/auth/middleware.ts` is specifically named as an unexpected changed file",
+        "The finding states the file is outside the declared scope or impacted areas",
+        "The verdict is APPROVE WITH COMMENTS or REQUEST CHANGES — not a clean APPROVE"
+      ]
+    }
+  ]
+}

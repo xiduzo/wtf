@@ -1,0 +1,65 @@
+{
+  "skill_name": "wtf.reflect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.reflect in test mode. Skip steps 1–3 (steering doc check, session orientation, learning gathering). The following learning has been gathered: 'Calling settlement.process() before settlement.validate() silently overwrites validation errors — the settlement gets marked as processed even when validation failed. Always call validate() first and gate on its result.' Run step 4 only: classify this learning and route it to the correct steering doc. Output which doc it routes to and the formatted bullet.",
+      "expected_output": "The learning is classified as an architecture/implementation gotcha and routed to TECH.md. The formatted bullet follows the project convention: bold short label, dash, concrete rule, italicised date.",
+      "files": [],
+      "expectations": [
+        "The learning is routed to TECH.md (architecture pattern / implementation gotcha)",
+        "The output includes a formatted bullet with a bold short label (e.g. '**Settlement validate-before-process invariant**')",
+        "The bullet includes a concrete rule about calling validate() before process()",
+        "The bullet ends with an italicised date in the format *Learned YYYY-MM-DD.*"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.reflect in test mode. Skip steps 1–3. The following learning has been gathered: 'The settlement status integration test is flaky in CI — it passes locally because the test synchronously checks status, but in CI the SettlementProcessed event is async and arrives after the assertion runs. The fix is to await the event bus flush before asserting status.' Run step 4 only: classify this learning and route it to the correct steering doc. Output which doc it routes to and the formatted bullet.",
+      "expected_output": "The learning is classified as a test failure pattern / flaky test cause and routed to QA.md. The bullet captures the root cause (async event bus timing) and the fix (await flush before asserting).",
+      "files": [],
+      "expectations": [
+        "The learning is routed to QA.md (test failure pattern / flaky test cause)",
+        "The output includes a formatted bullet with a bold short label referencing the flaky test or async timing issue",
+        "The bullet describes the root cause (async event bus / timing)",
+        "The bullet includes the fix or prevention rule (await flush before assertion)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.reflect in test mode. Skip steps 1–3. The following learning has been gathered: 'Throughout this session Claude kept using Customer instead of Merchant in Gherkin scenario descriptions, even after being corrected. The bounded context for this project uses Merchant for B2B clients — Customer is wrong and must never appear in specs or domain events.' Run step 4 only: classify this learning and route it to the correct steering doc. Output which doc it routes to and the formatted bullet.",
+      "expected_output": "The learning is classified as domain language drift / scope confusion and routed to VISION.md. The bullet captures the Merchant vs Customer distinction as a concrete rule.",
+      "files": [],
+      "expectations": [
+        "The learning is routed to VISION.md (domain language drift / scope confusion)",
+        "The output includes a formatted bullet with a bold short label referencing the Merchant vs Customer distinction",
+        "The bullet states that 'Customer' must not appear in specs or domain events for this bounded context",
+        "The bullet ends with an italicised date in the format *Learned YYYY-MM-DD.*"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Run wtf.reflect in test mode. Skip steps 1–3 (steering doc check, session orientation, learning gathering). The following learning has been gathered: 'The settlement list page uses a custom table component that duplicates the behaviour of the shared DataTable component in src/ui/components/shared/. The duplicate was created in a rush but the shared component handles sorting, pagination, and empty states correctly. Every new table should use the shared DataTable component.' Run step 4 only: classify this learning and route it to the correct steering doc. Output which doc it routes to and the formatted bullet.",
+      "expected_output": "The learning is classified as a design inconsistency / component misuse and routed to DESIGN.md. The bullet captures the rule: always use the shared DataTable component for all new tables.",
+      "files": [],
+      "expectations": [
+        "The learning is routed to DESIGN.md (design inconsistency / component misuse)",
+        "The output includes a formatted bullet with a bold short label referencing the DataTable or component duplication",
+        "The bullet states the rule: use the shared DataTable component for all new tables",
+        "The bullet ends with an italicised date in the format *Learned YYYY-MM-DD.*"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Run wtf.reflect in test mode. Skip steps 1–3. The following learning has been gathered: 'The settlement processor and the notification service both compute the settlement amount independently. They started in sync but have now drifted — the processor rounds to 2 decimal places and the notification service rounds to 4. This caused merchant-facing discrepancies in the email vs the dashboard amount.' Run step 4 only: classify this learning and route it to the correct steering doc. Output which doc it routes to, why, and the formatted bullet.",
+      "expected_output": "The learning is classified as an ambiguous implementation concern; routed to TECH.md (default for multi-category learnings). The bullet captures the rounding drift and the rule about a single canonical amount computation.",
+      "files": [],
+      "expectations": [
+        "The learning is routed to TECH.md",
+        "The output acknowledges the ambiguity or explains why TECH.md was chosen",
+        "The bullet captures the rounding drift or the rule about a single canonical amount computation",
+        "The bullet ends with an italicised date in the format *Learned YYYY-MM-DD.*"
+      ]
+    }
+  ]
+}

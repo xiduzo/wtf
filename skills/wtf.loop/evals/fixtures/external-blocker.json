@@ -1,0 +1,21 @@
+{
+  "_note": "Node 40 has a blocked_by edge pointing to issue #999, which is not in the node list. Step 2d should classify #999 as an external blocker, surface it in the pre-flight gate, and not proceed to step 3 until the external dependency is resolved.",
+  "nodes": [
+    {
+      "number": 40,
+      "title": "Task: Build settlement retry UI",
+      "labels": ["task"],
+      "impacted_areas": ["src/ui/components/SettlementList/"]
+    },
+    {
+      "number": 41,
+      "title": "Task: Add settlement retry API route",
+      "labels": ["task"],
+      "impacted_areas": ["src/api/routes/"]
+    }
+  ],
+  "edges": {
+    "40": {"blocks": [], "blocked_by": [999]},
+    "41": {"blocks": [], "blocked_by": [40]}
+  }
+}

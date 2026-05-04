@@ -1,0 +1,9 @@
+{
+  "_note": "Narrow, well-scoped hotfix: floating-point truncation in settlement calculation. Used by eval 1 to test branch naming and slug derivation (step 4 only).",
+  "bug": {
+    "number": 88,
+    "title": "Bug: Settlement amount rounds incorrectly for amounts above 10,000",
+    "labels": [{"name": "bug"}],
+    "body": "## What is broken?\n\nMerchants receiving settlement payouts for amounts above £10,000 are consistently underpaid by £0.01. The issue has been traced to `calculateSettlementAmount()` in the settlement service, which uses JavaScript floating-point division.\n\n## User impact\n\nRevenue impact: all merchants processing settlements above £10,000. Approximately 200 settlements per day are affected, each short by £0.01.\n\n## Steps to reproduce\n\n1. Create a settlement for £10,000.01\n2. Observe `calculateSettlementAmount()` returns £10,000.00\n\n## Expected behaviour\n\nSettlement amount should match the exact pence value, with no floating-point rounding error.\n\n## Actual behaviour\n\nSettlement amount is £0.01 less than expected for any amount above £10,000."
+  }
+}

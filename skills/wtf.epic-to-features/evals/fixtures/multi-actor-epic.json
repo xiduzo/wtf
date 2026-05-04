@@ -1,0 +1,10 @@
+{
+  "_note": "Fixture for eval 1 — Epic with two distinct domain actors (Merchant, Finance Manager) and no existing Features. Tests that the skill proposes at least one Feature per actor and that all proposed Features follow the [Actor] can [verb] [object] pattern without implementation vocabulary.",
+  "epic": {
+    "number": 1,
+    "title": "Epic: Settlement Management Platform",
+    "labels": [{ "name": "epic" }],
+    "body": "## Goal\nMerchants can track, filter, and export their settlement history. Finance Managers can generate consolidated reports across all merchants and flag anomalies.\n\n## Context\nThe settlement domain currently has no self-service visibility. Merchants open support tickets to query settlement status. Finance Managers use spreadsheet exports manually assembled from the payments database. Both workflows are slow, error-prone, and do not scale.\n\n## Domain Actors\n- **Merchant** — a business receiving payouts from the platform\n- **Finance Manager** — an internal operator responsible for cross-merchant financial oversight\n\n## Success Metrics\n- Merchant can view real-time settlement status for any completed payment\n- Merchant can filter their settlement history by date range\n- Finance Manager can export a cross-merchant settlement report\n- System notifies Merchant when a settlement is delayed beyond the expected window\n- Finance Manager can flag anomalous settlements for review\n\n## Bounded Context\nSettlement"
+  },
+  "existing_features": []
+}

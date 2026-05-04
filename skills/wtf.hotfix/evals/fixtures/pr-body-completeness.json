@@ -1,0 +1,17 @@
+{
+  "_note": "Complete hotfix context: fix is implemented and committed, ready to produce the PR title and body (step 8 only). Uses the same bug as eval 1 (issue #88).",
+  "bug": {
+    "number": 88,
+    "title": "Bug: Settlement amount rounds incorrectly for amounts above 10,000",
+    "labels": [{"name": "bug"}],
+    "body": "Merchants receiving settlement payouts for amounts above £10,000 are consistently underpaid by £0.01 due to floating-point truncation in `calculateSettlementAmount()`."
+  },
+  "fix_context": {
+    "scope": "settlement",
+    "description": "use integer arithmetic for settlement amount calculation to avoid floating-point truncation",
+    "root_cause": "calculateSettlementAmount() used JavaScript floating-point division which truncates amounts above 10,000 by £0.01",
+    "what_changed": "replaced floating-point division with integer arithmetic in src/services/settlement.ts:calculateSettlementAmount()",
+    "risk": "all settlement amount calculations — existing tests cover amounts below 10,000; new test covers the boundary case",
+    "commit_sha": "a1b2c3d"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "_note": "Feature declares 'Merchant' as the sole actor. Task #10 Gherkin uses 'Admin user' in Given steps. Step 2b (contradiction scan) should surface this Actor mismatch between the Feature spec and the Task Gherkin.",
+  "feature": {
+    "number": 62,
+    "title": "Feature: Settlement retry management",
+    "labels": [{"name": "feature"}],
+    "body": "## Goal\nMerchants can view failed settlements and trigger manual retries from their dashboard.\n\n## Acceptance Criteria\n- [ ] Merchants can see failed settlements with reason codes in their settlement list\n- [ ] Merchants can request a retry for a permanently-failed settlement\n- [ ] A retried settlement is re-queued and its status changes to 'pending'\n\n## Domain Events\n- `SettlementRetryRequested` — emitted when a Merchant requests a retry\n\n## Bounded Context\nSettlement domain. Merchant actor. No operator or admin access paths in this feature."
+  },
+  "tasks": [
+    {
+      "number": 10,
+      "title": "Task: Add settlement retry endpoint",
+      "labels": [{"name": "task"}],
+      "body": "## Intent\nExpose an endpoint that allows retrying a permanently-failed settlement.\n\n## Gherkin\n```gherkin\nFeature: Settlement retry endpoint\n\n  Scenario: Admin user triggers a settlement retry\n    Given an Admin user has access to the settlement management panel\n    When the Admin user submits a retry request for settlement #S-123\n    Then the SettlementRetryRequested event is emitted\n    And the settlement status changes to 'pending'\n\n  Scenario: Admin user cannot retry a settlement in 'pending' status\n    Given an Admin user views a settlement in 'pending' status\n    When the Admin user attempts to submit a retry\n    Then the retry action is rejected\n```\n\n## Contracts\n- Input: POST /settlements/:id/retry\n- Precondition: Settlement must be in 'permanently_failed' status\n- Postcondition: SettlementRetryRequested emitted with merchantId and settlementId"
+    }
+  ]
+}

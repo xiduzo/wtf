@@ -1,0 +1,44 @@
+{
+  "skill_name": "wtf.create-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `feat/add-date-filter` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked task. Skip steps 3–4 (no task hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/feat-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output. Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
+      "expected_output": "A PR draft whose title matches `^feat(.*): ` (Conventional Commits format) and whose body contains a Summary section and a Test plan section.",
+      "files": ["evals/fixtures/feat-branch.json"],
+      "expectations": [
+        "The PR title matches the pattern `^feat(\\([a-z-]+\\))?: `",
+        "The PR title contains at least one of: 'date', 'filter', 'settlement'",
+        "The PR body contains a Summary section",
+        "The PR body contains a Test plan section",
+        "The PR body does not contain a 'Closes #' line (no linked task)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `fix/prevent-double-settlement` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked task. Skip steps 3–4 (no task hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/fix-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output. Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
+      "expected_output": "A PR draft whose title matches `^fix(.*): ` (Conventional Commits format) and whose Summary section describes the bug being prevented (double settlement on retry).",
+      "files": ["evals/fixtures/fix-branch.json"],
+      "expectations": [
+        "The PR title matches the pattern `^fix(\\([a-z-]+\\))?: `",
+        "The PR title contains at least one of: 'settlement', 'double', 'retry'",
+        "The PR body contains a Summary section",
+        "The PR body Summary mentions the bug or the fix (e.g. 'double', 'retry', 'prevent', 'idempotent')",
+        "The PR body contains a Test plan section"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `refactor/extract-fulfilment-service` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked task. Skip steps 3–4 (no task hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/refactor-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output. Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
+      "expected_output": "A PR draft whose title matches `^(refactor|chore)(.*): ` (Conventional Commits format), whose Changes section groups changes logically rather than listing raw file names, and whose Test plan has at least one item.",
+      "files": ["evals/fixtures/refactor-branch.json"],
+      "expectations": [
+        "The PR title matches the pattern `^(refactor|chore)(\\([a-z-]+\\))?: `",
+        "The PR title contains at least one of: 'fulfilment', 'service', 'extract'",
+        "The PR body Changes section does not read as a raw file list (i.e. does not enumerate every filename verbatim without grouping context)",
+        "The PR body Test plan section contains at least one checklist item (line starting with '- [ ]' or '* [ ]')",
+        "The PR body contains a Summary section"
+      ]
+    }
+  ]
+}

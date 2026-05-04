@@ -1,0 +1,26 @@
+{
+  "_note": "Clean bug from a failing Gherkin scenario. All context is in domain language — no vocabulary cleanup needed. Tests that step 6 produces a fully-structured bug report with all required sections.",
+  "task": {
+    "number": 31,
+    "title": "Task: Send settlement confirmation email",
+    "body": "## Gherkin\n\n```gherkin\nFeature: Settlement confirmation email\n\n  Scenario: Merchant receives confirmation email after settlement is processed\n    Given a Settlement with status 'pending'\n    When the Settlement is marked as 'processed'\n    Then the Merchant receives a confirmation email\n    And the NotificationQueued event is emitted\n\n  Scenario: No email sent when settlement is cancelled\n    Given a Settlement with status 'pending'\n    When the Settlement is cancelled\n    Then no email is sent to the Merchant\n```\n\n## Contracts\n\n### NotificationQueued\nEmitted when a notification is queued for delivery.\n```json\n{\n  \"event\": \"NotificationQueued\",\n  \"settlementId\": \"<uuid>\",\n  \"recipientMerchantId\": \"<uuid>\",\n  \"notificationType\": \"settlement_confirmation\",\n  \"queuedAt\": \"<iso8601>\"\n}\n```\n\n## Impacted Areas\n- `src/settlements/notifications/`\n- `src/events/`\n"
+  },
+  "feature": {
+    "number": 22,
+    "title": "Feature: Settlement lifecycle notifications"
+  },
+  "bug_context": {
+    "one_sentence_description": "After a Settlement is marked as processed, no confirmation email is sent to the Merchant.",
+    "failing_scenario": "Merchant receives confirmation email after settlement is processed",
+    "observed_behavior": "No confirmation email was delivered to the Merchant after the Settlement was marked as processed. The NotificationQueued event was not emitted.",
+    "expected_behavior": "The Merchant receives a confirmation email and the NotificationQueued event is emitted when the Settlement transitions to processed.",
+    "reproduction_steps": [
+      "Create a Settlement and set its status to 'pending'.",
+      "Mark the Settlement as 'processed' via the Settlement management interface.",
+      "Observe the email queue — no confirmation email appears for the Merchant."
+    ],
+    "contract_violated": "NotificationQueued",
+    "regression_risk": "Other notification types (e.g. cancellation notices) may share the same dispatch path and could also be silently failing.",
+    "suggested_fix": null
+  }
+}
