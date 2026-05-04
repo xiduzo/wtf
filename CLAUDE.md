@@ -69,6 +69,28 @@ Cross-skill references live in `skills/references/`:
 
 Reference these from skills rather than duplicating content.
 
+## Evals
+
+Selected skills have evals for regression detection and proof-of-value benchmarking.
+
+**Location:** `skills/<skill-name>/evals/evals.json` + `evals/fixtures/`
+
+**Convention:** See `skills/references/eval-fixture-convention.md` — covers `evals.json` format, fixture structure for `gh`-calling skills, and how to write invariant expectations.
+
+**Running evals:** Install the skill-creator plugin, then:
+```
+/skill-creator test skills/wtf.health
+```
+The harness runs each eval with-skill and without-skill, grades expectations, and writes results to `benchmarks/<timestamp>/`.
+
+**Skills with evals:**
+
+| Skill | Evals | Status |
+|---|---|---|
+| `wtf.health` | 3 (clean, implemented-not-verified, stale-designed) | ✅ |
+
+Add new skills to this table when evals are authored. See `docs/future-work/add-evals.md` for the candidate ranking.
+
 ## Hooks
 
 `skills/wtf.setup/hooks/track-interventions.sh` rides along inside the `wtf.setup` skill payload. The `wtf.setup` skill registers it into the user's `~/.claude/settings.json` or the repo's `.claude/settings.json` for `UserPromptSubmit` + `Stop` events. Counts user corrections and nudges toward `/wtf.reflect` when they accumulate. Do not bypass.

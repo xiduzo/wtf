@@ -1,0 +1,29 @@
+{
+  "_note": "Fixture for eval 2 — one task (implemented) waiting for QA verification. Arrays match gh issue list --json number,title,labels,updatedAt output.",
+  "epics": [
+    {
+      "number": 5,
+      "title": "Settlement Visibility",
+      "labels": [{"name": "epic"}],
+      "updatedAt": "2026-05-01T09:00:00Z"
+    }
+  ],
+  "features": [
+    {
+      "number": 10,
+      "title": "Merchant can view settlement status for a completed payment",
+      "labels": [{"name": "feature"}],
+      "updatedAt": "2026-05-01T10:00:00Z"
+    }
+  ],
+  "tasks": [
+    {
+      "number": 42,
+      "title": "Add settlement status field to Payment Aggregate",
+      "labels": [{"name": "task"}, {"name": "designed"}, {"name": "implemented"}],
+      "updatedAt": "2026-05-02T14:30:00Z"
+    }
+  ],
+  "bugs": [],
+  "pull_requests": []
+}

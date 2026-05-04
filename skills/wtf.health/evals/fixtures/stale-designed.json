@@ -1,0 +1,29 @@
+{
+  "_note": "Fixture for eval 3 — one task stale (designed but not implemented for well over 7 days). updatedAt is 2025-01-01 so the task is always stale regardless of when the eval runs.",
+  "epics": [
+    {
+      "number": 5,
+      "title": "Settlement Visibility",
+      "labels": [{"name": "epic"}],
+      "updatedAt": "2025-01-01T09:00:00Z"
+    }
+  ],
+  "features": [
+    {
+      "number": 10,
+      "title": "Merchant can view settlement status in merchant dashboard",
+      "labels": [{"name": "feature"}],
+      "updatedAt": "2025-01-01T09:00:00Z"
+    }
+  ],
+  "tasks": [
+    {
+      "number": 17,
+      "title": "Display settlement status in merchant dashboard UI",
+      "labels": [{"name": "task"}, {"name": "designed"}],
+      "updatedAt": "2025-01-01T10:00:00Z"
+    }
+  ],
+  "bugs": [],
+  "pull_requests": []
+}
