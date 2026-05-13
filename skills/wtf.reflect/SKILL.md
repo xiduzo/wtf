@@ -9,7 +9,7 @@ Capture learnings from this session and route them into the right steering docum
 
 This skill is the **producer** for the `## Hard-Won Lessons` section of the four steering docs — see `../references/steering-doc-process.md` for the producer/consumer model and how other skills load these docs.
 
-**Intervention tracker:** The `hooks/track-interventions.sh` hook runs automatically on every `UserPromptSubmit` event and increments `/tmp/wtf.interventions-$(whoami)-$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")` when it detects correction or frustration language (e.g. "no,", "wrong", "actually", "stop that"). When the counter reaches 3, the hook prints a reminder at the end of the session to run `wtf.reflect`. Step 6 of this skill resets the counter to zero. No manual tracking is needed — the hook handles it.
+**Intervention tracker:** The `hooks/track-interventions.py` hook runs automatically on every `UserPromptSubmit` event and increments a per-user counter file in `$WTF_STATE_DIR` (default: `$XDG_STATE_HOME/wtf/interventions-<user>`, falling back to `~/.local/state/wtf/` or `$TMPDIR/wtf/`) when it detects correction or frustration language (e.g. "no,", "wrong", "actually", "stop that"). When the counter reaches 3, the hook prints a reminder at the end of the session to run `wtf.reflect`. Step 6 of this skill resets the counter to zero. No manual tracking is needed — the hook handles it.
 
 ## Process
 
@@ -121,8 +121,14 @@ git commit -m "docs(steering): add hard-won lessons from $(date +%Y-%m-%d) sessi
 
 ### 6. Reset the intervention counter
 
+Resolve the counter file using the same precedence the hook uses, then truncate it:
+
 ```bash
-echo "0" > /tmp/wtf.interventions-$(whoami)-$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+USER_ID="${USER:-${USERNAME:-user}}"
+STATE_DIR="${WTF_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/wtf}"
+[ -d "$STATE_DIR" ] || STATE_DIR="${TMPDIR:-/tmp}/wtf"
+mkdir -p "$STATE_DIR" 2>/dev/null
+echo "0" > "$STATE_DIR/interventions-$USER_ID"
 ```
 
 ### 7. Close the loop

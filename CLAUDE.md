@@ -104,4 +104,4 @@ Add new skills to this table when evals are authored. See `docs/future-work/add-
 
 ## Hooks
 
-`skills/wtf.setup/hooks/track-interventions.sh` rides along inside the `wtf.setup` skill payload. The `wtf.setup` skill registers it into the user's `~/.claude/settings.json` or the repo's `.claude/settings.json` for `UserPromptSubmit` + `Stop` events. Counts user corrections and nudges toward `/wtf.reflect` when they accumulate. Do not bypass.
+`skills/wtf.setup/hooks/track-interventions.py` rides along inside the `wtf.setup` skill payload. The `wtf.setup` skill registers it into the user's `~/.claude/settings.json` or the repo's `.claude/settings.json` for `UserPromptSubmit` + `Stop` events. Counts user corrections and nudges toward `/wtf.reflect` when they accumulate. Do not bypass.

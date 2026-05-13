@@ -168,13 +168,13 @@ If any label creation fails (e.g. insufficient permissions), warn the user — n
 
 The tracker hook counts user corrections and nudges toward `/wtf.reflect`. skills.sh copies the hook script into the skill dir, but the hook must be registered in Claude Code's `settings.json` manually.
 
-**Step A — locate the installed hook script.** Probe, in order, and keep the first that exists:
+**Step A — locate the installed hook script.** The hook is a Python script (`track-interventions.py`) so it runs identically on macOS, Linux, and Windows. Probe, in order, and keep the first that exists:
 
 ```bash
 for cand in \
-  "$HOME/.claude/skills/wtf.setup/hooks/track-interventions.sh" \
-  "$PWD/.claude/skills/wtf.setup/hooks/track-interventions.sh" \
-  "$PWD/skills/wtf.setup/hooks/track-interventions.sh"; do
+  "$HOME/.claude/skills/wtf.setup/hooks/track-interventions.py" \
+  "$PWD/.claude/skills/wtf.setup/hooks/track-interventions.py" \
+  "$PWD/skills/wtf.setup/hooks/track-interventions.py"; do
   [ -f "$cand" ] && HOOK_PATH="$cand" && break
 done
 ```
@@ -196,10 +196,11 @@ Set `SETTINGS_FILE` accordingly:
 - Per-repo → `.claude/settings.json`
 - Skip → jump to step 9.
 
-**Step C — patch settings.json idempotently.** Create the file if missing (`echo '{}' > "$SETTINGS_FILE"`). Then merge the two hook entries using `python3` (available on macOS/Linux; git-bash on Windows ships it via the installer or can be swapped for `py`):
+**Step C — patch settings.json idempotently.** Create the file if missing (`echo '{}' > "$SETTINGS_FILE"`). Then merge the two hook entries using `python3` (available on macOS/Linux; git-bash on Windows ships it via the installer or can be swapped for `py`). The registered command invokes the hook via `python3` so it works without a POSIX shell on Windows:
 
 ```bash
-HOOK_CMD="sh $HOOK_PATH"
+PY_BIN=$(command -v python3 || command -v py || echo python)
+HOOK_CMD="$PY_BIN $HOOK_PATH"
 python3 - "$SETTINGS_FILE" "$HOOK_CMD" <<'PY'
 import json, sys, pathlib
 path, cmd = sys.argv[1], sys.argv[2]
@@ -208,6 +209,13 @@ data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
 hooks = data.setdefault("hooks", {})
 for event in ("UserPromptSubmit", "Stop"):
     arr = hooks.setdefault(event, [])
+    # Strip legacy sh-based entries so we don't double-fire after the .sh→.py migration.
+    for entry in arr:
+        entry["hooks"] = [
+            h for h in entry.get("hooks", [])
+            if "track-interventions.sh" not in (h.get("command") or "")
+        ]
+    arr[:] = [e for e in arr if e.get("hooks")]
     exists = any(
         any(h.get("command") == cmd for h in entry.get("hooks", []))
         for entry in arr
