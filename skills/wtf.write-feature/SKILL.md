@@ -194,6 +194,18 @@ gh issue create --title "🚀 Feature: <title>" --body-file /tmp/wtf.feature-$(d
 
 Print the Feature issue URL and number.
 
+**Set native GitHub issue type** — if the repository has issue types configured, set the type to `Feature` on the newly created issue:
+
+```bash
+ISSUE_NUMBER=<number from issue URL>
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+ISSUE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issue(number: $ISSUE_NUMBER) { id } } }" --jq '.data.repository.issue.id' 2>/dev/null)
+TYPE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issueTypes(first:10) { nodes { id name } } } }" --jq '.data.repository.issueTypes.nodes[] | select(.name=="Feature") | .id' 2>/dev/null)
+[ -n "$ISSUE_ID" ] && [ -n "$TYPE_ID" ] && gh api graphql -f query="mutation { updateIssue(input: { id: \"$ISSUE_ID\", issueTypeId: \"$TYPE_ID\" }) { issue { number } } }" 2>/dev/null || true
+```
+
+If issue types are not configured in the repository, this step is silently skipped — the label alone is sufficient.
+
 **Native relationships:** If `gh-sub-issue-available` (from step 0), link this Feature as a child of its Epic:
 
 ```bash

@@ -139,6 +139,18 @@ gh issue create --title "🎯 Epic: <title>" --body-file /tmp/wtf.epic-$(date +%
 
 Print the issue URL and number.
 
+**Set native GitHub issue type** — if the repository has issue types configured, set the type to `Epic` on the newly created issue:
+
+```bash
+ISSUE_NUMBER=<number from issue URL>
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+ISSUE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issue(number: $ISSUE_NUMBER) { id } } }" --jq '.data.repository.issue.id' 2>/dev/null)
+TYPE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issueTypes(first:10) { nodes { id name } } } }" --jq '.data.repository.issueTypes.nodes[] | select(.name=="Epic") | .id' 2>/dev/null)
+[ -n "$ISSUE_ID" ] && [ -n "$TYPE_ID" ] && gh api graphql -f query="mutation { updateIssue(input: { id: \"$ISSUE_ID\", issueTypeId: \"$TYPE_ID\" }) { issue { number } } }" 2>/dev/null || true
+```
+
+If issue types are not configured in the repository, this step is silently skipped — the label alone is sufficient.
+
 **Native dependency links:** Epics are top-level — no `gh sub-issue` call is needed here. If `gh-issue-dependency-available` (from step 0), create a blocking link for each dependency identified in step 5:
 
 ```bash

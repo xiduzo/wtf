@@ -138,6 +138,18 @@ BUG_TMP=/tmp/wtf.bug-$(date +%s)-body.md
 gh issue create --title "🐞 Bug: <title>" --body-file "$BUG_TMP" --label "bug"
 ```
 
+**Set native GitHub issue type** — if the repository has issue types configured, set the type to `Bug` on the newly created issue:
+
+```bash
+ISSUE_NUMBER=<number from issue URL>
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+ISSUE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issue(number: $ISSUE_NUMBER) { id } } }" --jq '.data.repository.issue.id' 2>/dev/null)
+TYPE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issueTypes(first:10) { nodes { id name } } } }" --jq '.data.repository.issueTypes.nodes[] | select(.name=="Bug") | .id' 2>/dev/null)
+[ -n "$ISSUE_ID" ] && [ -n "$TYPE_ID" ] && gh api graphql -f query="mutation { updateIssue(input: { id: \"$ISSUE_ID\", issueTypeId: \"$TYPE_ID\" }) { issue { number } } }" 2>/dev/null || true
+```
+
+If issue types are not configured in the repository, this step is silently skipped — the label alone is sufficient.
+
 If the originating Task is known, add a comment to it linking the bug:
 
 ```bash
