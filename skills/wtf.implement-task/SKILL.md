@@ -81,10 +81,11 @@ Show the Technical Approach. Then call `AskUserQuestion` (per `../references/que
 
 Apply changes. Then update the Task issue with the Technical Approach and Impacted Areas.
 
-> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Use `/tmp/wtf.implement-task-<task_number>-approach.md` as the temp file.
+> See `references/issue-body-update-pattern.md` for the read-merge-write pattern (it goes through the gh body helper).
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf.implement-task-<task_number>-approach.md
+python3 .wtf/gh-body.py read <task_number>        # prints a temp path; Read it, merge in Technical Approach + Impacted Areas
+python3 .wtf/gh-body.py edit <task_number> --body-file "<path-from-read>"
 ```
 
 ### 8. Drive the TDD cycle
@@ -132,10 +133,11 @@ Fill the Test Mapping table in the Task issue with concrete file paths:
 | ----------------- | ----------------------- | ------- |
 | `<scenario name>` | `<test file path:line>` | passing |
 
-> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Re-fetch the body (do not reuse the temp file from step 6). Use `/tmp/wtf.implement-task-<task_number>-test-mapping.md` as the temp file.
+> See `references/issue-body-update-pattern.md` for the read-merge-write pattern. Re-`read` the body (do not reuse the temp file from step 6).
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf.implement-task-<task_number>-test-mapping.md
+python3 .wtf/gh-body.py read <task_number>        # re-fetch; prints a fresh temp path; Read it, update the Test Mapping table
+python3 .wtf/gh-body.py edit <task_number> --body-file "<path-from-read>"
 ```
 
 Print the updated Task issue URL.

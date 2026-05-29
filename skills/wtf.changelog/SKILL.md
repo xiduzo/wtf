@@ -116,12 +116,13 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - header: "Release tag"
 - options: from `git tag --sort=-version:refname | head -5`; user can type a new tag
 
-Write the entry to a temp file and create the release:
+Write the entry to a temp file (`$NOTES`) with the Write tool, then create the release via the gh body helper (`../references/gh-body-helper.md`) so the notes survive UTF-8 on Windows:
 
 ```bash
-gh release create <tag> \
+# $NOTES is the temp file you wrote the release notes to with the Write tool.
+python3 .wtf/gh-body.py release <tag> \
   --title "<release title>" \
-  --notes-file /tmp/wtf.release-notes-<tag>.md
+  --notes-file "$NOTES"
 ```
 
 ### 8. Report and offer to continue

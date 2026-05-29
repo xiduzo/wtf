@@ -138,7 +138,8 @@ If any domain model insights were gathered (Q3), also update the glossary via th
 Post a structured retro comment on the Epic issue:
 
 ```bash
-gh issue comment <epic_number> --body "<retro_summary>"
+# Write the retro summary to a temp file with the Write tool; $COMMENT is that path.
+python3 .wtf/gh-body.py comment <epic_number> --body-file "$COMMENT"
 ```
 
 The retro summary must include:

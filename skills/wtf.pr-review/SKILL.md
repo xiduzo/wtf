@@ -154,10 +154,13 @@ Apply any edits, then proceed.
 
 ### 8. Post the review
 
+Write the review body to a temp file (`$BODY`) with the Write tool, then post it through the gh body helper (`../references/gh-body-helper.md`) so it survives UTF-8 on Windows:
+
 ```bash
-gh pr review <pr_number> \
+# $BODY is the temp file you wrote the review body to with the Write tool.
+python3 .wtf/gh-body.py review <pr_number> \
   --<approve|request-changes|comment> \
-  --body-file /tmp/wtf.pr-review-<pr_number>-body.md
+  --body-file "$BODY"
 ```
 
 Use:

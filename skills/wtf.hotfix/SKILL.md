@@ -103,15 +103,16 @@ Bug: #<bug_number>"
 
 ### 8. Open the PR
 
-Write the body to a temp file, then create the PR targeting `main`:
+Write the body to a temp file (`$BODY`) with the Write tool, then create the PR targeting `main` via the gh body helper (`../references/gh-body-helper.md`):
 
 ```bash
 # Ensure the hotfix label exists
 gh label create hotfix --color e11d48 --description "Emergency fix targeting main directly" 2>/dev/null || true
 
-gh pr create \
+# $BODY is the temp file you wrote the PR body to with the Write tool.
+python3 .wtf/gh-body.py create --pr \
   --title "fix(<scope>): <description>" \
-  --body-file /tmp/wtf.hotfix-<bug_number>-body.md \
+  --body-file "$BODY" \
   --base main \
   --label "hotfix"
 ```

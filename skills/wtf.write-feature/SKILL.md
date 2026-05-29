@@ -179,7 +179,7 @@ Apply edits, then proceed.
 
 ### 11. Create the issue and link to Epic
 
-> Note: Write each body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
+> Note: Write the body to a temp file (`$BODY`) with the Write tool, then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the capability name. Pass in the capability name and ask for a short title (no prefix emoji/label needed — that is added below).
 
@@ -189,7 +189,8 @@ Create the Feature issue:
 # Ensure the label exists before creating the issue
 gh label create feature --color 0075ca --description "User-facing capability delivered as a vertical slice" 2>/dev/null || true
 
-gh issue create --title "🚀 Feature: <title>" --body-file /tmp/wtf.feature-$(date +%s)-body.md --label "feature"
+# $BODY is the temp file you wrote the filled body to with the Write tool.
+python3 .wtf/gh-body.py create --title "🚀 Feature: <title>" --body-file "$BODY" --label "feature"
 ```
 
 Print the Feature issue URL and number.

@@ -115,22 +115,21 @@ Determine the base branch from the current branch name:
   - header: "Base branch"
   - options: from `git branch -r`
 
-Write the body to a temp file, then create the PR:
+Write the body to a temp file (`$BODY`) with the Write tool, then create the PR via the gh body helper (`../references/gh-body-helper.md`) so the description survives UTF-8 on Windows:
 
 ```bash
-# Derive a unique suffix from the branch name (fallback to timestamp):
-SUFFIX=$(git rev-parse --abbrev-ref HEAD | tr '/' '-' || date +%s)
+# $BODY is the temp file you wrote the PR body to with the Write tool.
 
 # task branch:
-gh pr create \
+python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
-  --body-file /tmp/wtf.create-pr-${SUFFIX}-body.md \
+  --body-file "$BODY" \
   --base feature/<feature-number>-<feature-slug>
 
 # feature branch:
-gh pr create \
+python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
-  --body-file /tmp/wtf.create-pr-${SUFFIX}-body.md \
+  --body-file "$BODY" \
   --base main
 ```
 
@@ -141,7 +140,8 @@ Print the PR URL.
 If a Task issue is linked, post a comment linking the PR:
 
 ```bash
-gh issue comment <task_number> --body "PR opened: <pr_url>"
+# Write "PR opened: <pr_url>" to a temp file with the Write tool ($COMMENT), then:
+python3 .wtf/gh-body.py comment <task_number> --body-file "$COMMENT"
 ```
 
 ### 10. Offer next steps

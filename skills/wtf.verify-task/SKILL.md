@@ -124,13 +124,13 @@ For each scenario, one at a time, call `AskUserQuestion` (per `../references/que
    | `<scenario name>` | ✅/❌/🚫/N/A/⚠️ | yes / no / — |
 
    ```bash
-   gh issue view <task_number> --json body -q .body > /tmp/wtf.verify-<task_number>-body.md
+   python3 .wtf/gh-body.py read <task_number>       # prints a temp path
    ```
 
-   Programmatically replace the Test Mapping table section in `/tmp/wtf.verify-<task_number>-body.md` using the Write or Edit tool, preserving all other sections unchanged. Then push:
+   Programmatically replace the Test Mapping table section in the printed temp file using the Write or Edit tool, preserving all other sections unchanged. Then push (see `../references/gh-body-helper.md`):
 
    ```bash
-   gh issue edit <task_number> --body-file /tmp/wtf.verify-<task_number>-body.md
+   python3 .wtf/gh-body.py edit <task_number> --body-file "<path-from-read>"
    ```
 
 4. Keep a running tally. After updating, confirm: "Updated. Moving to next scenario..."
@@ -168,19 +168,20 @@ For each item in the Observability section (logs, metrics, alerts), one at a tim
 The Test Mapping table has been updated after each scenario (step 4). Now do a final update: check off DoD items that passed; leave failing ones unchecked.
 
 ```bash
-gh issue view <task_number> --json body -q .body > /tmp/wtf.verify-<task_number>-final.md
+python3 .wtf/gh-body.py read <task_number>       # re-fetch; prints a fresh temp path
 ```
 
-Programmatically update the DoD checklist in `/tmp/wtf.verify-<task_number>-final.md` using the Write or Edit tool. Then push:
+Programmatically update the DoD checklist in the printed temp file using the Write or Edit tool. Then push:
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf.verify-<task_number>-final.md
+python3 .wtf/gh-body.py edit <task_number> --body-file "<path-from-read>"
 ```
 
 Post a QA summary comment:
 
 ```bash
-gh issue comment <task_number> --body "<qa_summary>"
+# Write the QA summary to a temp file with the Write tool; $COMMENT is that path.
+python3 .wtf/gh-body.py comment <task_number> --body-file "$COMMENT"
 ```
 
 The QA summary must include:

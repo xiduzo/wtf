@@ -232,6 +232,51 @@ Re-running is safe — existing entries are detected by exact `command` string a
 
 Record `hook-installed: true|false|skipped` for the status report.
 
+### 8b. Install the gh body helper
+
+`gh-body.py` is a cross-platform utility that makes every GitHub issue/PR body read and write UTF-8-safe — it prevents the CP850 mojibake, newline collapse, and inline-`--body` corruption that `gh` suffers under PowerShell on Windows. Skills invoke it at `.wtf/gh-body.py`; installing it here means the guard is committed to the repo and shared with every teammate. See `../references/gh-body-helper.md`.
+
+**Step A — locate the bundled helper** (same install-location probe as the tracker):
+
+```bash
+for cand in \
+  "$HOME/.claude/skills/wtf.setup/hooks/gh-body.py" \
+  "$PWD/.claude/skills/wtf.setup/hooks/gh-body.py" \
+  "$PWD/skills/wtf.setup/hooks/gh-body.py"; do
+  [ -f "$cand" ] && GHBODY_SRC="$cand" && break
+done
+```
+
+**Step B — copy it into the repo:**
+
+```bash
+if [ -n "$GHBODY_SRC" ]; then
+  mkdir -p .wtf
+  cp "$GHBODY_SRC" .wtf/gh-body.py
+fi
+```
+
+Commit `.wtf/gh-body.py` so the guard travels with the repo for every contributor. If `GHBODY_SRC` is empty (helper not found) or `cp` is unavailable (Windows without git-bash), tell the user to copy `gh-body.py` into `.wtf/` manually and note it — skills fall back to raw `gh` until then, which is unguarded on Windows.
+
+**Step C — verify it actually runs.** Skills invoke the helper as `python3 .wtf/gh-body.py`, so test that *exact* form — it validates the interpreter name, that Python is present, and that the copy is valid, all in one shot:
+
+```bash
+if python3 .wtf/gh-body.py --help >/dev/null 2>&1; then
+  GUARD=verified
+elif command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1 || command -v py >/dev/null 2>&1; then
+  GUARD=wrong-name     # Python is installed, but not reachable as `python3`
+else
+  GUARD=no-python
+fi
+```
+
+Interpret the result for the user:
+- `verified` → the guard is live.
+- `wrong-name` → Python exists but not as `python3` (common on Windows: the python.org installer provides `python`/`py`, not `python3`). The skill commands call `python3`, so the guard will fail until the user adds a `python3` alias/shim. Show the working interpreter you found (e.g. `py -3`) and tell them to alias it.
+- `no-python` → no Python 3 on PATH. The guard is inert; every body/comment op falls back to raw `gh`, which corrupts UTF-8 on Windows. Point the user to https://www.python.org/downloads/ and have them re-run setup.
+
+Record `gh-body-helper: verified|wrong-name|no-python|not-installed` for the status report (`not-installed` if Step B could not copy the file).
+
 ### 9. Report status
 
 Print a clear status summary covering every check:
@@ -254,6 +299,7 @@ Issue templates
 PR template               ✅  (or ✅ installed from references)
 GitHub labels             ✅  epic, feature, task, bug, implemented, designed, verified
 Intervention hook         ✅  installed (global)  (or  ✅ installed (repo)  /  ⚪ skipped  /  ⚠️ manual paste required)
+Body encoding guard       ✅  verified (python3)  (or  ⚠️ Python is 'py'/'python', not 'python3' — alias it or body ops fail  /  ⚠️ Python 3 not found — guard inert, raw-gh fallback  /  ⚠️ helper not copied)
 ─────────────────────────
 Ready to use WTF. Start with `wtf.write-epic` to plan your first initiative.
 ```

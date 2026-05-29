@@ -126,7 +126,7 @@ Apply edits, then proceed immediately.
 
 ### 9. Create the issue
 
-> Note: Write the issue body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
+> Note: Write the issue body to a temp file (`$BODY`) with the Write tool, then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 > **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the Epic's Goal. Pass in the Goal text and ask for a title (no prefix emoji/label needed — that is added below).
 
@@ -134,7 +134,8 @@ Apply edits, then proceed immediately.
 # Ensure the label exists before creating the issue
 gh label create epic --color 5319e7 --description "Strategic initiative spanning multiple features" 2>/dev/null || true
 
-gh issue create --title "🎯 Epic: <title>" --body-file /tmp/wtf.epic-$(date +%s)-body.md --label "epic"
+# $BODY is the temp file you wrote the filled body to with the Write tool.
+python3 .wtf/gh-body.py create --title "🎯 Epic: <title>" --body-file "$BODY" --label "epic"
 ```
 
 Print the issue URL and number.

@@ -138,10 +138,13 @@ Print the file path.
 
 ### 8. Post to linked issue (if applicable)
 
-If a linked issue exists, post a comment:
+If a linked issue exists, write this comment to a temp file with the Write tool, then post it via the gh body helper (`../references/gh-body-helper.md`):
+
+> 🔬 Spike concluded: **<question>** → Recommendation: <one-line summary>. Full findings: docs/spikes/<filename>.md
 
 ```bash
-gh issue comment <issue_number> --body "🔬 Spike concluded: **<question>** → Recommendation: <one-line summary>. Full findings: docs/spikes/<filename>.md"
+# $COMMENT is the temp file you wrote the comment above to.
+python3 .wtf/gh-body.py comment <issue_number> --body-file "$COMMENT"
 ```
 
 ### 9. Offer next steps

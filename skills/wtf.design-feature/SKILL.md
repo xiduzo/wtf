@@ -143,10 +143,11 @@ Apply edits, then proceed.
 
 ### 10. Update the Feature issue
 
-Read the current issue body, replace only the **Design Handoff** section with the new content, preserve all other sections. Write to temp file and use `--body-file`:
+Read the current body with the gh body helper, replace only the **Design Handoff** section with the new content (Read + Edit tools), preserve all other sections. See `../references/gh-body-helper.md`:
 
 ```bash
-gh issue edit <feature_number> --body-file /tmp/wtf.design-feature-<feature_number>-body.md
+python3 .wtf/gh-body.py read <feature_number>     # prints a temp path; Read it, edit the Design Handoff section
+python3 .wtf/gh-body.py edit <feature_number> --body-file "<path-from-read>"
 ```
 
 Add the `designed` label when either:

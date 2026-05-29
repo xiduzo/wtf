@@ -117,10 +117,11 @@ Apply edits, then proceed.
 
 ### 9. Update the Task issue
 
-> Note: read the current issue body first (`gh issue view <task_number>`), replace only the Design Reference section with the new content, and preserve all other sections unchanged. Write the full updated body to a temp file and use `--body-file`.
+> Note: read the current body with the gh body helper, replace only the Design Reference section with the new content (Read + Edit tools), and preserve all other sections unchanged. See `../references/gh-body-helper.md`.
 
 ```bash
-gh issue edit <task_number> --body-file /tmp/wtf.design-task-<task_number>-body.md
+python3 .wtf/gh-body.py read <task_number>        # prints a temp path; Read it, edit the Design Reference section
+python3 .wtf/gh-body.py edit <task_number> --body-file "<path-from-read>"
 ```
 
 Add the `designed` lifecycle label to mark this step complete:

@@ -129,19 +129,22 @@ Apply edits, then proceed.
 
 ### 8. Create the issue
 
-> Note: the commands below are pseudo-code. Write each body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
+> Note: the commands below are pseudo-code. Write each body to a temp file with the Write tool, then create it through the gh body helper (`.wtf/gh-body.py`) so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the bug's one-sentence description. Pass in the description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence description.
 
 ```bash
-BUG_TMP=/tmp/wtf.bug-$(date +%s)-body.md
-gh issue create --title "🐞 Bug: <title>" --body-file "$BUG_TMP" --label "bug"
+# Write the filled bug body to a temp file with the Write tool; $BUG_TMP is that path.
+python3 .wtf/gh-body.py create --title "🐞 Bug: <title>" --body-file "$BUG_TMP" --label "bug"
 ```
 
-If the originating Task is known, add a comment to it linking the bug:
+If the originating Task is known, write this comment to a temp file with the Write tool, then post it linking the bug:
+
+> 🐞 Bug reported: #<bug_number> — <one-line summary>
 
 ```bash
-gh issue comment <task_number> --body "🐞 Bug reported: #<bug_number> — <one-line summary>"
+# $COMMENT is the temp file you wrote the comment above to.
+python3 .wtf/gh-body.py comment <task_number> --body-file "$COMMENT"
 ```
 
 Print the Bug issue URL and number.
@@ -166,6 +169,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - **Mark Task blocked** → reopen the Task and add a blocking comment:
   ```bash
   gh issue reopen <task_number>
-  gh issue comment <task_number> --body "Blocked by #<bug_number>."
+  # Write "Blocked by #<bug_number>." to a temp file with the Write tool ($COMMENT), then:
+  python3 .wtf/gh-body.py comment <task_number> --body-file "$COMMENT"
   ```
 - **Done (default when no more failures remain)** → exit.

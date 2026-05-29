@@ -179,7 +179,7 @@ Apply edits, then proceed.
 
 ### 11. Create the issue and link to Feature
 
-> Note: Write each body to a temp file with the Write tool, then use `--body-file` to avoid shell quoting issues with multi-line content.
+> Note: Write the body to a temp file (`$BODY`) with the Write tool, then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the task description. Pass in the task description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence task description provided in step 2.
 
@@ -189,7 +189,8 @@ Create the Task issue:
 # Ensure the label exists before creating the issue
 gh label create task --color e4e669 --description "Implementable vertical slice of a Feature" 2>/dev/null || true
 
-gh issue create --title "🛠 Task: <title>" --body-file /tmp/wtf.task-$(date +%s)-body.md --label "task"
+# $BODY is the temp file you wrote the filled body to with the Write tool.
+python3 .wtf/gh-body.py create --title "🛠 Task: <title>" --body-file "$BODY" --label "task"
 ```
 
 Print the Task issue URL and number.

@@ -209,16 +209,16 @@ Record the decision for the audit comment in step 8.
 
 ### 7. Apply the changes
 
-Read the current issue body, merge only the changed sections (preserving all unchanged content), and write the updated body:
+Read the current issue body, merge only the changed sections (preserving all unchanged content), and write the updated body — through the gh body helper (`../references/gh-body-helper.md`):
 
 ```bash
-gh issue view <issue_number> --json body -q .body > /tmp/wtf.refine-<issue_number>-body.md
+python3 .wtf/gh-body.py read <issue_number>       # prints a temp path
 ```
 
-Use the Edit tool to replace each changed section in `/tmp/wtf.refine-<issue_number>-body.md` with its updated content. Preserve all other sections verbatim.
+Use the Edit tool to replace each changed section in the printed temp file with its updated content. Preserve all other sections verbatim.
 
 ```bash
-gh issue edit <issue_number> --body-file /tmp/wtf.refine-<issue_number>-body.md
+python3 .wtf/gh-body.py edit <issue_number> --body-file "<path-from-read>"
 ```
 
 If stale labels should be stripped (from step 6):
@@ -235,7 +235,8 @@ Print the updated issue URL.
 Post a structured comment summarising the refinement:
 
 ```bash
-gh issue comment <issue_number> --body "<audit_comment>"
+# Write the audit comment to a temp file with the Write tool; $COMMENT is that path.
+python3 .wtf/gh-body.py comment <issue_number> --body-file "$COMMENT"
 ```
 
 The audit comment must include:

@@ -33,19 +33,21 @@ Use only the markdown body **below the second `---` delimiter**. Ignore the YAML
 
 Replace every `[PLACEHOLDER]` (or any section the template treats as fillable) with the gathered context. Preserve every section heading and structural element exactly — downstream skills parse these by name.
 
-## 5. Write to a temp file, then create
+## 5. Write the body to a temp file, then create via the gh body helper
 
-Multi-line bodies must go through a temp file to avoid shell quoting issues:
+Multi-line bodies must go through a temp file (never an inline `--body`), and every create must go through the **gh body helper** so UTF-8 content survives on Windows. See `./gh-body-helper.md`.
 
-```bash
-BODY=/tmp/wtf.<skill-slug>-$(date +%s)-body.md
-# Use the Write tool to write the filled body to $BODY.
+1. Use the Write tool to write the filled body to a temp file `$BODY` (any path under the OS temp dir).
+2. Create through the helper:
 
-# Issue creation:
-gh issue create --title "<emoji> <Type>: <title>" --body-file "$BODY" --label "<label>"
+   ```bash
+   # Issue:
+   python3 .wtf/gh-body.py create --title "<emoji> <Type>: <title>" --body-file "$BODY" --label "<label>"
 
-# PR creation:
-gh pr create --title "<title>" --body-file "$BODY" --base "<base_branch>"
-```
+   # PR (add --pr and a base branch):
+   python3 .wtf/gh-body.py create --pr --title "<title>" --body-file "$BODY" --base "<base_branch>"
+   ```
 
-The exact title prefix (`🎯 Epic:`, `🚀 Feature:`, `🛠 Task:`, `🐞 Bug:`) and label name are skill-specific — see each skill's create step. The Read → Write-temp → `--body-file` pattern is universal.
+If `.wtf/gh-body.py` is absent (repo hasn't run `wtf.setup` since the guard shipped), use the raw-`gh` fallback documented in `./gh-body-helper.md` — works on macOS/Linux, unguarded on Windows.
+
+The exact title prefix (`🎯 Epic:`, `🚀 Feature:`, `🛠 Task:`, `🐞 Bug:`) and label name are skill-specific — see each skill's create step. The Read → Write-temp → helper pattern is universal.
