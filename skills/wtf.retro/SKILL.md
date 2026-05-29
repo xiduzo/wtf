@@ -18,7 +18,7 @@ Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or
 If an Epic number was passed in, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Epic are you closing out?"
 - header: "Epic"
-- options: from open Epics via `gh issue list --label epic --state open --limit 10`
+- options: from open Epics — list them per the **List issues of a kind** query (kind `Epic`) in `../references/issue-classification.md` (`--label epic` in labels mode, `--search 'type:"Epic"'` in types mode)
 
 Fetch the Epic and its full hierarchy:
 

@@ -5,7 +5,7 @@ description: This skill should be used when a user wants to set up WTF in a new 
 
 # Setup
 
-Pre-flight check and installer for the WTF workflow. Validates the GitHub CLI, installs required extensions, ensures `.github/ISSUE_TEMPLATE/` contains all required templates, creates all lifecycle labels, and installs the PR template so both agents and humans can create structured issues and pull requests.
+Pre-flight check and installer for the WTF workflow. Validates the GitHub CLI, installs required extensions, ensures `.github/ISSUE_TEMPLATE/` contains all required templates, sets up issue classification (native GitHub issue types or labels) and the lifecycle labels, and installs the PR template so both agents and humans can create structured issues and pull requests.
 
 ## Process
 
@@ -146,21 +146,96 @@ cp skills/wtf.setup/references/pull_request_template.md .github/pull_request_tem
 
 Do not overwrite if it already exists.
 
-### 7. Create required GitHub labels
+### 7. Choose the issue-classification mode and provision it
 
-Create all lifecycle labels the workflow depends on. Using `--force` makes the command idempotent — it updates the description/color if the label already exists and creates it if it does not:
+WTF classifies every issue as an **Epic**, **Feature**, **Task**, or **Bug**. There are two mechanisms — native **GitHub issue types** (an organization-only feature, with labels left free for your own segmentation) or the `epic`/`feature`/`task`/`bug` **labels** (portable to any repo). See `../references/issue-classification.md`. Pick the mode once here and record it in `.wtf/config.json` so every skill resolves it identically. Lifecycle labels (`implemented`, `designed`, `verified`) are always created regardless of mode.
+
+**Step A — detect the owner type:**
 
 ```bash
-gh label create epic        --color 5319e7 --description "Strategic initiative spanning multiple features"      --force
-gh label create feature     --color 0075ca --description "User-facing capability delivered as a vertical slice" --force
-gh label create task        --color e4e669 --description "Implementable vertical slice of a Feature"            --force
-gh label create bug         --color d73a4a --description "Something is broken"                                  --force
-gh label create implemented --color 0e8a16 --description "Implementation complete — ready for QA"              --force
-gh label create designed    --color f9d0c4 --description "Design coverage added to the Task"                   --force
-gh label create verified    --color 006b75 --description "QA verified — ready for merge"                       --force
+OWNER=$(gh repo view --json owner -q .owner.login)
+OWNER_TYPE=$(gh api "users/$OWNER" --jq '.type' 2>/dev/null)   # "User" or "Organization"
 ```
 
-If any label creation fails (e.g. insufficient permissions), warn the user — note that the affected skills will fall back to creating labels on first use.
+**Step B — pick the mode.**
+
+- If `OWNER_TYPE` is **not** `Organization` (a personal account, or detection failed): native issue types are unavailable — GitHub gates them to organizations. Set `CLASS_MODE=labels` and tell the user plainly: *"This is a personal-account repo, so GitHub issue types aren't available (they're org-only). WTF will classify with the `epic`/`feature`/`task`/`bug` labels."* Skip to Step D.
+
+- If `OWNER_TYPE` is `Organization` **and** `repo-write-ok` and `token-scopes-ok` (from step 4b) are both true, call `AskUserQuestion` (per `../references/questioning-style.md`):
+  - question: "This repo is in an org, so WTF can classify issues with native GitHub issue types (Epic/Feature/Task/Bug) instead of labels — leaving labels free for your own segmentation like `phase-2`. Use native issue types?"
+  - header: "Classification"
+  - options:
+    - **Native issue types (recommended)** → `CLASS_MODE=types`
+    - **Labels** → `CLASS_MODE=labels`
+
+  If write/token perms are missing, do **not** offer types — provisioning needs org-owner rights. Set `CLASS_MODE=labels` and note it.
+
+**Step C — provision native types** (only when `CLASS_MODE=types`). Run the **Provision native types** block from `../references/issue-classification.md` — it creates `Epic` (`Task`/`Bug`/`Feature` ship as org defaults). Then verify all four resolved; if any is missing (e.g. you are not an org owner), fall back to labels:
+
+```bash
+HAVE=$(gh api "orgs/$OWNER/issue-types" --jq '[.[].name]' 2>/dev/null)
+for t in Epic Feature Task Bug; do
+  printf '%s' "$HAVE" | grep -qi "\"$t\"" || { echo "⚠️ could not provision issue type: $t — falling back to labels"; CLASS_MODE=labels; }
+done
+```
+
+When this falls back, warn that native types need org-owner rights and WTF will use labels instead.
+
+**Step D — create labels.** Always create the lifecycle labels. Create the kind labels (`epic`/`feature`/`task`/`bug`) **only in `labels` mode** — in `types` mode they are intentionally omitted so the label space stays free for your own segmentation. `--force` is idempotent (updates color/description if the label already exists, creates it otherwise):
+
+```bash
+# Lifecycle labels — always, both modes:
+gh label create implemented --color 0e8a16 --description "Implementation complete — ready for QA" --force
+gh label create designed    --color f9d0c4 --description "Design coverage added to the Task"      --force
+gh label create verified    --color 006b75 --description "QA verified — ready for merge"          --force
+
+# Kind labels — labels mode only:
+if [ "$CLASS_MODE" = labels ]; then
+  gh label create epic    --color 5319e7 --description "Strategic initiative spanning multiple features"      --force
+  gh label create feature --color 0075ca --description "User-facing capability delivered as a vertical slice" --force
+  gh label create task    --color e4e669 --description "Implementable vertical slice of a Feature"            --force
+  gh label create bug     --color d73a4a --description "Something is broken"                                  --force
+fi
+```
+
+If any label creation fails (e.g. insufficient permissions), warn the user — the affected skills fall back to creating labels on first use.
+
+**Step D (cont.) — align the issue templates with the mode.** In `types` mode, rewrite each copied `.github/ISSUE_TEMPLATE/*.md` so its kind comes from the native type rather than a label — flip the `labels: <kind>` frontmatter line to `type: <Kind>` (`type` is a supported template frontmatter key alongside `title`/`labels`/`assignees`). This keeps issues opened manually from the GitHub UI typed, not labelled, so the label space stays free. In `labels` mode leave the templates as-is. The rewrite is conservative — it only touches an exact single `labels: <kind>` line, so customized multi-label templates are left alone:
+
+```bash
+if [ "$CLASS_MODE" = types ]; then
+  python3 - <<'PY'
+import re, pathlib
+kinds = {"BUG": ("bug", "Bug"), "EPIC": ("epic", "Epic"), "FEATURE": ("feature", "Feature"), "TASK": ("task", "Task")}
+d = pathlib.Path(".github/ISSUE_TEMPLATE")
+for fname, (lbl, typ) in kinds.items():
+    p = d / f"{fname}.md"
+    if not p.exists():
+        continue
+    text = p.read_text()
+    new = re.sub(rf'(?m)^labels:\s*{lbl}\s*$', f'type: {typ}', text)
+    if new != text:
+        p.write_text(new)
+        print(f"  {fname}.md: labels: {lbl} -> type: {typ}")
+PY
+fi
+```
+
+**Step E — record the mode** so every skill resolves it identically:
+
+```bash
+mkdir -p .wtf
+python3 - ".wtf/config.json" "$CLASS_MODE" <<'PY'
+import json, sys, pathlib
+path, mode = sys.argv[1], sys.argv[2]
+p = pathlib.Path(path)
+data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
+data["classification"] = mode
+p.write_text(json.dumps(data, indent=2) + "\n")
+PY
+```
+
+Commit `.wtf/config.json` so every teammate classifies issues the same way. Record `classification: types|labels` for the status report.
 
 > **Closing convention:** GitHub has no native setting to require PR-based closure, so this is enforced by skill behavior. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (won't implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
@@ -297,7 +372,8 @@ Issue templates
   FEATURE.md              ✅  (or ✅ installed from references)
   TASK.md                 ✅  (or ✅ installed from references)
 PR template               ✅  (or ✅ installed from references)
-GitHub labels             ✅  epic, feature, task, bug, implemented, designed, verified
+Issue classification      ✅  native types (Epic/Feature/Task/Bug)  (or  ✅ labels: epic, feature, task, bug)
+Lifecycle labels          ✅  implemented, designed, verified
 Intervention hook         ✅  installed (global)  (or  ✅ installed (repo)  /  ⚪ skipped  /  ⚠️ manual paste required)
 Body encoding guard       ✅  verified (python3)  (or  ⚠️ Python is 'py'/'python', not 'python3' — alias it or body ops fail  /  ⚠️ Python 3 not found — guard inert, raw-gh fallback  /  ⚠️ helper not copied)
 ─────────────────────────

@@ -20,7 +20,7 @@ Skip this step if gh-setup was already confirmed this session (e.g. when chained
 If an Epic number was passed in as context, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Epic are you breaking into Features?"
 - header: "Epic"
-- options: from recent open Epics via `gh issue list --label epic`
+- options: from recent open Epics — list them per the **List issues of a kind** query (kind `Epic`) in `../references/issue-classification.md` (`--label epic` in labels mode, `--search 'type:"Epic"'` in types mode)
 
 Fetch the Epic with `gh issue view <epic_number>` and extract: Goal, Context, and Success Metrics.
 

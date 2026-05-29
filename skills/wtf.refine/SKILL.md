@@ -23,7 +23,12 @@ If an issue number was passed in as context or a CLI argument, use it directly. 
 - options: from recently-updated open issues across all WTF labels (epic, feature, task), inferred from:
 
 ```bash
-gh issue list --label "epic,feature,task" --state open --json number,title,labels --limit 10
+# Resolve $WTF_CLASS once — see ../references/issue-classification.md.
+if [ "$WTF_CLASS" = types ]; then
+  gh issue list --search 'state:open (type:"Epic" OR type:"Feature" OR type:"Task")' --json number,title --limit 10
+else
+  gh issue list --label "epic,feature,task" --state open --json number,title,labels --limit 10
+fi
 ```
 
 Fetch the issue:
@@ -32,12 +37,12 @@ Fetch the issue:
 gh issue view <issue_number> --json number,title,body,labels,comments,updatedAt
 ```
 
-**Detect the issue type** from its labels:
-- Has label `epic` → type = **Epic**
-- Has label `feature` → type = **Feature**
-- Has label `task` → type = **Task**
-- None of the above → call `AskUserQuestion` (per `../references/questioning-style.md`):
-  - question: "I couldn't detect the type from the labels. What kind of issue is this?"
+**Detect the issue kind** — follow the **Detect the kind of an existing issue** block in `../references/issue-classification.md` (it reads the native issue type in `types` mode and the kind label in `labels` mode; compare case-insensitively):
+- `Epic` → type = **Epic**
+- `Feature` → type = **Feature**
+- `Task` → type = **Task**
+- Indeterminate (no type set and no kind label) → call `AskUserQuestion` (per `../references/questioning-style.md`):
+  - question: "I couldn't detect the kind of this issue. What kind is it?"
   - header: "Issue type"
   - options: **Epic** / **Feature** / **Task**
 

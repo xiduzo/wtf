@@ -76,7 +76,12 @@ Also fetch any relevant wiki pages or in-repo glossary docs for this task's Boun
 **Cross-feature dependency scan:** Fetch sibling Features from the Epic's Feature Breakdown (extracted above) and the Proposed Tasks checklist from each. For sibling Feature bodies, use the per-level fetch in `../references/spec-hierarchy.md`. Then list already-created sibling tasks:
 
 ```bash
-gh issue list --label task --state open --json number,title,body
+# Resolve $WTF_CLASS once — see ../references/issue-classification.md.
+if [ "$WTF_CLASS" = types ]; then
+  gh issue list --search 'type:"Task" state:open' --json number,title,body
+else
+  gh issue list --label task --state open --json number,title,body
+fi
 ```
 
 Filter client-side to tasks whose body references a sibling Feature number. Note any whose scope overlaps with or must precede this task. Keep these candidate dependencies in mind for step 5.
@@ -186,26 +191,14 @@ Apply edits, then proceed.
 Create the Task issue:
 
 ```bash
-# Ensure the label exists before creating the issue
-gh label create task --color e4e669 --description "Implementable vertical slice of a Feature" 2>/dev/null || true
-
 # $BODY is the temp file you wrote the filled body to with the Write tool.
-python3 .wtf/gh-body.py create --title "🛠 Task: <title>" --body-file "$BODY" --label "task"
+# Create the issue WITHOUT a kind label — the classify step below sets the kind.
+python3 .wtf/gh-body.py create --title "🛠 Task: <title>" --body-file "$BODY"
 ```
 
 Print the Task issue URL and number.
 
-**Set native GitHub issue type** — if the repository has issue types configured, set the type to `Task` on the newly created issue:
-
-```bash
-ISSUE_NUMBER=<number from issue URL>
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-ISSUE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issue(number: $ISSUE_NUMBER) { id } } }" --jq '.data.repository.issue.id' 2>/dev/null)
-TYPE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issueTypes(first:10) { nodes { id name } } } }" --jq '.data.repository.issueTypes.nodes[] | select(.name=="Task") | .id' 2>/dev/null)
-[ -n "$ISSUE_ID" ] && [ -n "$TYPE_ID" ] && gh api graphql -f query="mutation { updateIssue(input: { id: \"$ISSUE_ID\", issueTypeId: \"$TYPE_ID\" }) { issue { number } } }" 2>/dev/null || true
-```
-
-If issue types are not configured in the repository, this step is silently skipped — the label alone is sufficient.
+**Classify the issue as `Task`.** Set `TYPE="Task"` and `ISSUE_NUMBER=<number from the URL>`, then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation; in `labels` mode it applies the `task` label. Either way the Task is classified — nothing downstream depends on which mechanism was used.
 
 **Native relationships:** If `gh-sub-issue-available` (from step 0), link this Task as a child of its Feature:
 

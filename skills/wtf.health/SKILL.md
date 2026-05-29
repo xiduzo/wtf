@@ -30,10 +30,19 @@ For Epic or Feature scope, prompt for the issue number with options pre-filled f
 Run in parallel:
 
 ```bash
-gh issue list --label "epic"    --state open --json number,title,labels,updatedAt --limit 50
-gh issue list --label "feature" --state open --json number,title,labels,updatedAt --limit 100
-gh issue list --label "task"    --state open --json number,title,labels,updatedAt --limit 200
-gh issue list --label "bug"     --state open --json number,title,labels,updatedAt --limit 50
+# Resolve $WTF_CLASS once — see ../references/issue-classification.md.
+# labels mode → query by kind label; types mode → query by native issue type.
+if [ "$WTF_CLASS" = types ]; then
+  gh issue list --search 'type:"Epic" state:open'    --json number,title,labels,updatedAt --limit 50
+  gh issue list --search 'type:"Feature" state:open' --json number,title,labels,updatedAt --limit 100
+  gh issue list --search 'type:"Task" state:open'    --json number,title,labels,updatedAt --limit 200
+  gh issue list --search 'type:"Bug" state:open'     --json number,title,labels,updatedAt --limit 50
+else
+  gh issue list --label "epic"    --state open --json number,title,labels,updatedAt --limit 50
+  gh issue list --label "feature" --state open --json number,title,labels,updatedAt --limit 100
+  gh issue list --label "task"    --state open --json number,title,labels,updatedAt --limit 200
+  gh issue list --label "bug"     --state open --json number,title,labels,updatedAt --limit 50
+fi
 ```
 
 Also fetch open PRs to detect tasks with an open PR but no `verified` label:

@@ -7,6 +7,7 @@
 - `skills/wtf.setup/hooks/` — scripts that ride along in the `wtf.setup` payload: `track-interventions.py` (registered into `settings.json`) and `gh-body.py` (a UTF-8-safe gh body utility copied into the repo at `.wtf/gh-body.py`, not a settings hook).
 - `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN) and `docs/spikes/`.
 - `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
+- `.wtf/` — per-repo artifacts `wtf.setup` writes into the consuming repo: `gh-body.py` (the body helper) and `config.json` (`{"classification": "types"|"labels"}` — the issue-classification mode every skill resolves via `skills/references/issue-classification.md`).
 
 ## Canonical skill location
 
@@ -60,6 +61,7 @@ Cross-skill references live in `skills/references/`:
 | `ddd-writing-rules.md` | Ubiquitous-language rules for issue/Gherkin authoring |
 | `gh-body-helper.md` | Cross-platform UTF-8-safe issue/PR body read & write (`.wtf/gh-body.py`) |
 | `gh-setup.md` | `gh` CLI + extension install + sub-issue/dependency cookbook |
+| `issue-classification.md` | Native issue types vs. labels — mode resolve, classify, query, detect |
 | `issue-template-loading.md` | Template verify + halt-or-setup + body-file create pattern |
 | `lifecycle-labels.md` | Label semantics + absent/overwrite gate templates |
 | `questioning-style.md` | How skills should prompt the user |

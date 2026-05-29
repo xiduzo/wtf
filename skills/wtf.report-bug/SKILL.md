@@ -135,20 +135,11 @@ Apply edits, then proceed.
 
 ```bash
 # Write the filled bug body to a temp file with the Write tool; $BUG_TMP is that path.
-python3 .wtf/gh-body.py create --title "🐞 Bug: <title>" --body-file "$BUG_TMP" --label "bug"
+# Create the issue WITHOUT a kind label — the classify step below sets the kind.
+python3 .wtf/gh-body.py create --title "🐞 Bug: <title>" --body-file "$BUG_TMP"
 ```
 
-**Set native GitHub issue type** — if the repository has issue types configured, set the type to `Bug` on the newly created issue:
-
-```bash
-ISSUE_NUMBER=<number from issue URL>
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-ISSUE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issue(number: $ISSUE_NUMBER) { id } } }" --jq '.data.repository.issue.id' 2>/dev/null)
-TYPE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issueTypes(first:10) { nodes { id name } } } }" --jq '.data.repository.issueTypes.nodes[] | select(.name=="Bug") | .id' 2>/dev/null)
-[ -n "$ISSUE_ID" ] && [ -n "$TYPE_ID" ] && gh api graphql -f query="mutation { updateIssue(input: { id: \"$ISSUE_ID\", issueTypeId: \"$TYPE_ID\" }) { issue { number } } }" 2>/dev/null || true
-```
-
-If issue types are not configured in the repository, this step is silently skipped — the label alone is sufficient.
+**Classify the issue as `Bug`.** Set `TYPE="Bug"` and `ISSUE_NUMBER=<number from the URL>`, then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation; in `labels` mode it applies the `bug` label.
 
 If the originating Task is known, write this comment to a temp file with the Write tool, then post it linking the bug:
 
@@ -164,8 +155,6 @@ Print the Bug issue URL and number.
 ```bash
 rm "$BUG_TMP"
 ```
-
-> Note: if the `bug` label does not exist on the repo, create it first with `gh label create bug --color d73a4a` before running `gh issue create`.
 
 ### 9. Offer next steps
 

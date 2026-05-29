@@ -38,7 +38,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Is this spike linked to an existing issue?"
 - header: "Linked issue"
 - options:
-  - Candidates from `gh issue list --label "epic,feature" --state open --limit 5`
+  - Candidates from open Epics/Features — list per the **List issues of a kind** (several kinds) query in `../references/issue-classification.md` (`--label "epic,feature"` in labels mode, `--search 'type:"Epic" OR type:"Feature"'` in types mode)
   - **No linked issue** — standalone investigation
 
 If linked: fetch the issue to extract domain context, constraints, and success metrics that inform the investigation scope.

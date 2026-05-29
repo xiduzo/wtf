@@ -131,26 +131,14 @@ Apply edits, then proceed immediately.
 > **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the Epic's Goal. Pass in the Goal text and ask for a title (no prefix emoji/label needed — that is added below).
 
 ```bash
-# Ensure the label exists before creating the issue
-gh label create epic --color 5319e7 --description "Strategic initiative spanning multiple features" 2>/dev/null || true
-
 # $BODY is the temp file you wrote the filled body to with the Write tool.
-python3 .wtf/gh-body.py create --title "🎯 Epic: <title>" --body-file "$BODY" --label "epic"
+# Create the issue WITHOUT a kind label — the classify step below sets the kind.
+python3 .wtf/gh-body.py create --title "🎯 Epic: <title>" --body-file "$BODY"
 ```
 
 Print the issue URL and number.
 
-**Set native GitHub issue type** — if the repository has issue types configured, set the type to `Epic` on the newly created issue:
-
-```bash
-ISSUE_NUMBER=<number from issue URL>
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
-ISSUE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issue(number: $ISSUE_NUMBER) { id } } }" --jq '.data.repository.issue.id' 2>/dev/null)
-TYPE_ID=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\") { issueTypes(first:10) { nodes { id name } } } }" --jq '.data.repository.issueTypes.nodes[] | select(.name=="Epic") | .id' 2>/dev/null)
-[ -n "$ISSUE_ID" ] && [ -n "$TYPE_ID" ] && gh api graphql -f query="mutation { updateIssue(input: { id: \"$ISSUE_ID\", issueTypeId: \"$TYPE_ID\" }) { issue { number } } }" 2>/dev/null || true
-```
-
-If issue types are not configured in the repository, this step is silently skipped — the label alone is sufficient.
+**Classify the issue as `Epic`.** Set `TYPE="Epic"` and `ISSUE_NUMBER=<number from the URL>`, then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation; in `labels` mode it applies the `epic` label. Either way the Epic is classified — nothing downstream depends on which mechanism was used.
 
 **Native dependency links:** Epics are top-level — no `gh sub-issue` call is needed here. If `gh-issue-dependency-available` (from step 0), create a blocking link for each dependency identified in step 5:
 
