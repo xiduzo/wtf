@@ -42,6 +42,8 @@ For each Task within its phase:
 
 Before starting each task, do a quick re-check against its **internal** blockers from the graph built in step 1. The full dependency validation already ran in step 2d — this check only guards against the case where an earlier task in this run was skipped or its PR wasn't merged before the dependent task starts.
 
+If an internal blocker is a parent node (Feature/Epic — it carries `rolls_up` children), expand it to its descendant Tasks and check those PRs instead: a parent issue stays open until its own feature PR merges, so testing the parent's state mid-run would falsely block.
+
 For each internal blocker of the current task, verify the PR is merged (not just the issue closed):
 
 ```bash

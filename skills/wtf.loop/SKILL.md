@@ -89,10 +89,20 @@ This returns two sets per issue: what it **blocks** and what **blocks it**. Reco
 
 ```
 nodes:  { issue_number → { title, type, feature, labels } }
-edges:  { issue_number → blocks: [issue_numbers], blocked_by: [issue_numbers] }
+edges:  { issue_number → {
+          blocks:     [issue_numbers],   # dependency — from gh issue-dependency
+          blocked_by: [issue_numbers],   # dependency — from gh issue-dependency
+          rolls_up:   [issue_numbers],   # children — added by the roll-up step below
+        } }
 ```
 
-**Classify each dependency as internal or external:**
+**Roll up each parent over its children (so a parent is a join, not a shortcut):**
+
+A sub-issue link is hierarchy, not a blocking edge. Left as-is, a dependency on a *parent* (e.g. Feature B `blocked_by` Feature A) resolves against the parent node alone — which sits shallower than its deepest child Task, so a sibling's Tasks could start before all of Feature A's Tasks merge. To prevent this, add a `rolls_up` edge from every parent to each of its children, using the `gh sub-issue list` traversal already done above. A parent is then satisfied only when **every** descendant — recursively — is satisfied.
+
+`rolls_up` edges are always internal (a parent's children are always pulled into the run) and are kept **separate** from `blocked_by`: they constrain ordering (step 2d.3) but are **not** inherited downward — otherwise a child would inherit a dependency on itself and create a false cycle.
+
+**Classify each dependency edge (`blocks` / `blocked_by`) as internal or external** (`rolls_up` edges are internal by construction):
 
 - **Internal** — the blocking issue is within the current run's node list. Execution order must respect this edge.
 - **External** — the blocking issue is outside the current run (different feature, already-merged task, upstream work). This issue must already be merged before the loop can start.
