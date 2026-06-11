@@ -115,17 +115,27 @@ Required files:
 - `FEATURE.md`
 - `TASK.md`
 
-For each missing file, copy it from this skill's bundled references:
+First resolve where this skill's payload is installed. `npx skills add` drops `wtf.setup` under the skills root (`~/.claude/skills/wtf.setup`, `.claude/skills/wtf.setup`, or the `.agents/skills` equivalent), and the bundled files (`references/`, `shared-references/`, `hooks/`) ride along inside it. Probe in order and keep the first that exists — reuse `$SETUP_DIR` for every copy below:
+
+```bash
+for cand in \
+  "$HOME/.claude/skills/wtf.setup" \
+  "$HOME/.agents/skills/wtf.setup" \
+  "$PWD/.claude/skills/wtf.setup" \
+  "$PWD/.agents/skills/wtf.setup" \
+  "$PWD/skills/wtf.setup"; do
+  [ -d "$cand/references" ] && SETUP_DIR="$cand" && break
+done
+```
+
+For each missing file, copy it from this skill's bundled references at `$SETUP_DIR/references/`:
 
 ```bash
 mkdir -p .github/ISSUE_TEMPLATE
-
-# Copy each missing template from the skill's references folder.
-# The references folder is at: skills/wtf.setup/references/
-cp skills/wtf.setup/references/BUG.md .github/ISSUE_TEMPLATE/BUG.md
-cp skills/wtf.setup/references/EPIC.md .github/ISSUE_TEMPLATE/EPIC.md
-cp skills/wtf.setup/references/FEATURE.md .github/ISSUE_TEMPLATE/FEATURE.md
-cp skills/wtf.setup/references/TASK.md .github/ISSUE_TEMPLATE/TASK.md
+cp "$SETUP_DIR/references/BUG.md"     .github/ISSUE_TEMPLATE/BUG.md
+cp "$SETUP_DIR/references/EPIC.md"    .github/ISSUE_TEMPLATE/EPIC.md
+cp "$SETUP_DIR/references/FEATURE.md" .github/ISSUE_TEMPLATE/FEATURE.md
+cp "$SETUP_DIR/references/TASK.md"    .github/ISSUE_TEMPLATE/TASK.md
 ```
 
 Only copy files that are missing — do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
@@ -138,10 +148,10 @@ Check whether `.github/pull_request_template.md` exists:
 ls .github/pull_request_template.md 2>/dev/null
 ```
 
-If missing, copy it from the skill's bundled references:
+If missing, copy it from the skill's bundled references (using `$SETUP_DIR` resolved in step 5):
 
 ```bash
-cp skills/wtf.setup/references/pull_request_template.md .github/pull_request_template.md
+cp "$SETUP_DIR/references/pull_request_template.md" .github/pull_request_template.md
 ```
 
 Do not overwrite if it already exists.
@@ -352,6 +362,35 @@ Interpret the result for the user:
 
 Record `gh-body-helper: verified|wrong-name|no-python|not-installed` for the status report (`not-installed` if Step B could not copy the file).
 
+### 8c. Install the shared skill references
+
+Every execution skill loads cross-skill docs via `../references/<name>.md` — i.e. a `references/` folder **next to the installed skills**, at the skills root. `npx skills add` installs each `wtf.*` skill directory individually; the repo's `skills/references/` folder has no `SKILL.md`, so it is never shipped, and `<skills-root>/references/` would be empty. To fix that, `wtf.setup` carries a vendored copy at `$SETUP_DIR/shared-references/` and writes it to the skills root here. Without this step, every other skill fails to resolve its references.
+
+**Step A — derive the skills root** (the parent of `$SETUP_DIR`, resolved in step 5):
+
+```bash
+SKILLS_ROOT="$(dirname "$SETUP_DIR")"   # e.g. ~/.claude/skills
+```
+
+**Step B — copy the bundled references into `<skills-root>/references/`:**
+
+```bash
+if [ -d "$SETUP_DIR/shared-references" ]; then
+  mkdir -p "$SKILLS_ROOT/references"
+  cp "$SETUP_DIR/shared-references/"*.md "$SKILLS_ROOT/references/"
+fi
+```
+
+This overwrites prior copies so updates propagate on every `npx skills update` + re-run. When setup runs from the wtf repo itself (`$PWD/skills/wtf.setup`), `$SKILLS_ROOT` is `skills/` and the copy is a harmless no-op refresh. If `$SETUP_DIR/shared-references` is absent (older payload, or `cp` unavailable on Windows without git-bash), tell the user to copy the repo's `skills/references/*.md` into `<skills-root>/references/` manually and note it — other skills cannot resolve `../references/...` until then.
+
+**Step C — verify** at least one known reference landed:
+
+```bash
+[ -f "$SKILLS_ROOT/references/questioning-style.md" ] && echo "shared-references: installed" || echo "shared-references: MISSING"
+```
+
+Record `shared-references: installed|missing` for the status report.
+
 ### 9. Report status
 
 Print a clear status summary covering every check:
@@ -376,6 +415,7 @@ Issue classification      ✅  native types (Epic/Feature/Task/Bug)  (or  ✅ la
 Lifecycle labels          ✅  implemented, designed, verified
 Intervention hook         ✅  installed (global)  (or  ✅ installed (repo)  /  ⚪ skipped  /  ⚠️ manual paste required)
 Body encoding guard       ✅  verified (python3)  (or  ⚠️ Python is 'py'/'python', not 'python3' — alias it or body ops fail  /  ⚠️ Python 3 not found — guard inert, raw-gh fallback  /  ⚠️ helper not copied)
+Shared skill references   ✅  installed (<skills-root>/references)  (or  ⚠️ missing — copy skills/references/*.md manually; other skills can't resolve ../references)
 ─────────────────────────
 Ready to use WTF. Start with `wtf.write-epic` to plan your first initiative.
 ```

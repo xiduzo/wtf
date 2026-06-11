@@ -3,7 +3,8 @@
 ## Repo layout
 
 - `skills/` — **source of truth** for all skill definitions. Always edit here.
-- `skills/references/` — cross-skill reference docs (see below).
+- `skills/references/` — **source of truth** for cross-skill reference docs (see below). Skills load these at runtime via `../references/<name>.md`.
+- `skills/wtf.setup/shared-references/` — **generated** vendored copy of `skills/references/` (minus dev-only `eval-fixture-convention.md`) that rides along in the `wtf.setup` payload. `npx skills add` installs each `wtf.*` skill dir individually, so `skills/references/` (no `SKILL.md`) never ships; `wtf.setup` carries this copy and writes it to `<skills-root>/references/` at setup time so installed skills can resolve `../references/...`. **Never edit by hand** — regenerate with `bash skills/wtf.setup/sync-shared-references.sh` after changing any reference doc.
 - `skills/wtf.setup/hooks/` — scripts that ride along in the `wtf.setup` payload: `track-interventions.py` (registered into `settings.json`) and `gh-body.py` (a UTF-8-safe gh body utility copied into the repo at `.wtf/gh-body.py`, not a settings hook).
 - `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN) and `docs/spikes/`.
 - `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
