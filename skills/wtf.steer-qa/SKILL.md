@@ -5,7 +5,7 @@ description: This skill should be used when a team wants to create or refine the
 
 # Steer QA
 
-Generate or refine `docs/steering/QA.md` — the QA standards document. This document is the canonical reference for test strategy, coverage requirements, test patterns, and the definition of done that every implementer and QA engineer must follow.
+Generate or refine `docs/steering/QA.md` — the QA standards document. This document is the canonical reference for test strategy, coverage requirements, and test patterns. It also defines the definition of done that every implementer and QA engineer must follow.
 
 The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below.
 
@@ -16,7 +16,7 @@ The shared steering-doc flow (exists-check → research → interview → draft 
 
 ## Step 2 — Research checklist
 
-Use the Agent tool to extract QA facts directly. Do not ask the user for things that can be read:
+Use the Agent tool to extract QA facts. Do not ask the user for things you can read:
 
 - **Test framework:** test runner config (`vitest.config.ts`, `jest.config.js`, `pytest.ini`, etc.)
 - **Test scripts:** `package.json` scripts for `test`, `test:watch`, `test:coverage`
@@ -27,7 +27,7 @@ Use the Agent tool to extract QA facts directly. Do not ask the user for things 
 - **CLAUDE.md:** extract any testing rules already defined there
 - **Known flaky areas:** `skip`, `xit`, `@pytest.mark.skip` usage or TODO comments in tests
 
-Also check `docs/steering/TECH.md` if it exists — extract testing-related constraints already documented there.
+Also check `docs/steering/TECH.md` if it exists. Extract testing-related constraints already documented there.
 
 Produce a concrete draft of Test Strategy, Test Patterns, and Commands from research alone.
 
@@ -43,11 +43,11 @@ Ask only about items research could not determine. For each unanswered item, cal
 
 ## Step 4 — Writing rules
 
-- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
-- Coverage thresholds are stated as enforced minimums, not targets.
+- Apply strict STE per `../references/ste-writing.md` before you write any durable body (shared process Step 4 also requires this).
+- Coverage thresholds are stated as enforced minimums. They are not targets.
 - Test commands must be exact and match what CI actually runs.
 - Definition of Done items are written as checkboxes — concrete and binary.
-- Known Flaky Areas is honest, not aspirational — flag real issues.
+- Known Flaky Areas is honest. It is not aspirational. Flag real issues.
 
 ## Step 8 — Continue options
 

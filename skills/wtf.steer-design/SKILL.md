@@ -16,11 +16,11 @@ The shared steering-doc flow (exists-check → research → interview → draft 
 
 ## Step 2 — Research checklist
 
-Use the Agent tool to extract design facts directly. Do not ask the user for things that can be read:
+Use the Agent tool to extract design facts. Do not ask the user for things you can read:
 
 - **Design system:** Storybook config, component library imports, design-system packages in `package.json`
 - **Tokens:** CSS custom properties (`--color-*`, `--spacing-*`), Tailwind config, theme files, token definition files
-- **Components:** existing UI components (look for `components/`, `ui/`, `src/components/`)
+- **Components:** existing UI components (check `components/`, `ui/`, `src/components/`)
 - **Figma links:** any Figma URLs in README, existing issues, or `docs/`
 - **Accessibility:** existing WCAG references, axe configs, jest-axe usage
 - **Responsive breakpoints:** Tailwind config, CSS media queries, layout files
@@ -40,11 +40,11 @@ Ask only about items research could not determine. For each unanswered item, cal
 
 ## Step 4 — Writing rules
 
-- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
-- Tokens must reflect what is actually defined in the codebase — not aspirational values.
+- Apply strict STE per `../references/ste-writing.md` before you write any durable body (shared process Step 4 also requires this).
+- Tokens must reflect what is actually defined in the codebase. Do not use aspirational values.
 - Component patterns reference real component paths where they exist.
 - Accessibility section always includes the baseline rules from the project's `CLAUDE.md` (if present) plus any additions.
-- Principles are written as design directives, not engineering constraints.
+- Principles are written as design directives. They are not engineering constraints.
 
 ## Step 8 — Continue options
 

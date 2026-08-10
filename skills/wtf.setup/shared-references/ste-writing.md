@@ -5,9 +5,36 @@ description: Strict ASD-STE100 Simplified Technical English for every durable WT
 
 # STE Writing (strict)
 
-Apply these rules before you write any **durable** artifact: issue bodies, PR bodies, review comments, release notes, changelog entries, steering docs, spike docs, and commit-message subject/body prose.
+Apply these rules before you write any **durable** artifact. Durable artifacts include issue bodies, PR bodies, review comments, release notes, changelog entries, steering docs, spike docs, and commit-message subject/body prose.
 
 Do **not** apply STE to live chat replies or `AskUserQuestion` prompts (see `questioning-style.md`).
+
+## Skill authoring voice (STE-flavored)
+
+Write all `skills/wtf.*/SKILL.md` procedural prose and all `skills/references/*.md` procedure text in **STE-flavored** mode.
+
+Apply the structural self-lint checks 1–12 below. Skip dictionary grep (check 13). Skill and software terms stay.
+
+Rules that always apply:
+
+- One instruction per sentence. Max 20 words for an instruction. Max 25 for a descriptive sentence.
+- No semicolons. Write two sentences instead.
+- No contractions in procedure text.
+- Active voice. Imperative for steps.
+- No phrasal verbs. Prefer a plain verb (`start`, `open`, `add`, `remove`).
+- One topic per paragraph. Max six sentences.
+- Condition before command.
+- American spelling. No marketing adjectives.
+
+Leave these tokens unchanged:
+
+- Fenced code, bash, `gh`, and Python snippets
+- Inline paths and `` `../references/...` `` links
+- YAML frontmatter keys and values that the runtime reads
+- AskUserQuestion option **labels** (UX strings)
+- Label names, branch patterns, and template paths
+
+Durable artifacts that skills produce still use **strict** mode (dictionary + DDD allowlist) in the sections below. Authoring voice does not relax that.
 
 ## Copyright
 
@@ -15,7 +42,7 @@ ASD-STE100 is free to read and copyrighted ([asd-ste100.org](https://asd-ste100.
 
 ## Mode
 
-Always **strict**: structural rules **and** dictionary grep. Do not silently fall back to STE-flavored mode.
+Always use **strict** mode. Apply structural rules **and** dictionary grep. Do not fall back to STE-flavored mode in silence.
 
 ## Resolve the STE dictionary
 
@@ -27,21 +54,21 @@ Grep — do not read whole — this file (first path that exists):
 
 If **no** dictionary file is found: **halt** durable writing. Tell the user to install the `ste-writing` skill (so its `references/dictionary.md` is available), then retry. Do not draft the durable body without the dictionary.
 
-Header of that file says "Do not redistribute" — leave it in place; only grep it.
+Header of that file says "Do not redistribute" — leave it in place. Only grep it.
 
 ## Build the DDD allowlist (session set)
 
-Domain terms enter STE as technical nouns (TN) and technical verbs (TV). Build the allowlist **before** drafting:
+Domain terms enter STE as technical nouns (TN) and technical verbs (TV). Build the allowlist **before** you draft:
 
 1. If `docs/glossary.md` exists, read it. Prefer the greppable term list (see **Glossary shape** below). Add every listed term.
 2. If `docs/steering/VISION.md` exists, extract Target Users (actors) and Bounded Contexts (context names, key domain objects). Add them.
 3. If the skill has a parent Epic / Feature / Task in hierarchy, extract named actors, domain verbs, and domain objects from those bodies. Add them.
 4. If a Bounded Context wiki page or other in-repo glossary was already fetched for this skill, add its terms.
-5. Merge into one session set. One name per thing (Rule 1.11) — if two aliases appear, pick the glossary form and use only that.
+5. Merge into one session set. Use one name per thing (Rule 1.11). If two aliases appear, pick the glossary form and use only that.
 
 ### Glossary shape (`docs/glossary.md`)
 
-When creating or updating the glossary, keep a flat greppable list so allowlist extraction is reliable:
+When you create or update the glossary, keep a flat greppable list. That makes allowlist extraction reliable:
 
 ```markdown
 ## STE allowlist
@@ -53,7 +80,7 @@ When creating or updating the glossary, keep a flat greppable list so allowlist 
 | Settlement | object | ... | Epic #12 |
 ```
 
-Kinds: `actor` | `verb` | `object` | `context` | `event`. Add rows under that table; do not bury terms only in prose paragraphs.
+Kinds: `actor` | `verb` | `object` | `context` | `event`. Add rows under that table. Do not bury terms only in prose paragraphs.
 
 ## Word approval order
 
@@ -69,7 +96,7 @@ For each content word in durable prose:
 
 - **DDD** (`ddd-writing-rules.md`) chooses *which* domain term (actor, verb, object, event).
 - **STE** (this file) governs sentence mechanics and every non-domain word.
-- Domain terms from DDD feed the allowlist; they do not relax sentence caps, voice, or tense rules.
+- Domain terms from DDD feed the allowlist. They do not relax sentence caps, voice, or tense rules.
 
 ## Structural rules (always)
 
@@ -122,7 +149,7 @@ For error messages, destructive prompts, migration notes:
 
 ## Commit messages and PR titles
 
-Keep Conventional Commits structure (`commit-conventions.md`). Apply STE only to the free-text description and optional body — not to the `type`, optional `(scope)`, or `!`.
+Keep Conventional Commits structure (`commit-conventions.md`). Apply STE only to the free-text description and optional body. Do not change the `type`, optional `(scope)`, or `!`.
 
 ## Self-lint (before write)
 

@@ -5,19 +5,26 @@ description: This skill should be used when a developer or tech lead wants to re
 
 # PR Review
 
-Review a pull request as a tech lead. Core value: reads the diff against the linked Task spec (Gherkin, Contracts, Impacted Areas) to catch spec drift, missing test coverage, and contract violations before merge — not by running the software, but by reading the code.
+Review a pull request as a tech lead.
 
-**Distinct from `wtf.verify-task`:** `wtf.verify-task` is a QA engineer running the implemented behavior against Gherkin scenarios (does the software do what it says?). This skill is a developer reviewing the code itself (is the code written correctly against the spec?).
+This skill reads the diff against the linked Task spec (Gherkin, Contracts, Impacted Areas).
+It catches spec drift, missing test coverage, and contract violations before merge.
+It does this by reading the code, not by running the software.
+
+**Distinct from `wtf.verify-task`:** `wtf.verify-task` is a QA engineer running the implemented behavior against Gherkin scenarios (does the software do what it says?).
+This skill is a developer reviewing the code itself (is the code written correctly against the spec?).
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated.
+Run steps 1–2 of `../references/gh-setup.md`.
+Stop if `gh` is not installed or not authenticated.
 
 ### 1. Identify the PR
 
-If a PR number was passed in, use it directly. Otherwise:
+If a PR number was passed in, use it directly.
+Otherwise:
 
 ```bash
 gh pr list --state open --json number,title,headRefName --limit 20
@@ -36,7 +43,10 @@ gh pr view <pr_number> --json number,title,body,headRefName,baseRefName,addition
 
 ### 2. Fetch the spec hierarchy
 
-Extract a Task number from the PR body (`Closes #<n>` or `Fixes #<n>`) per the PR-extraction recipe in `../references/spec-hierarchy.md`. If found, walk Task → Feature → Epic per the same reference to extract Gherkin, Contracts, Impacted Areas, DoD (Task) and ACs / Goal / constraints (Feature, Epic).
+Extract a Task number from the PR body (`Closes #<n>` or `Fixes #<n>`) per the PR-extraction recipe in `../references/spec-hierarchy.md`.
+If found, walk Task → Feature → Epic per the same reference.
+Extract Gherkin, Contracts, Impacted Areas, and DoD from the Task.
+Extract ACs, Goal, and constraints from the Feature and Epic.
 
 If no Task number is found, call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Is there a Task issue linked to this PR?"
@@ -49,7 +59,8 @@ If there is no linked Task, the review proceeds from diff context alone (step 4 
 
 ### 3. Load the technical steering document
 
-Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md`. Apply its patterns, constraints, and conventions as the baseline for code quality judgements throughout this review.
+Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md`.
+Apply its patterns, constraints, and conventions as the baseline for code quality judgements throughout this review.
 
 ### 4. Inspect the diff
 
@@ -58,14 +69,16 @@ git diff <base_branch>...<pr_branch> --stat
 git diff <base_branch>...<pr_branch>
 ```
 
-Read the full diff. Note:
+Read the full diff.
+Note:
 - Which files changed and which layers they touch
 - What was added vs. removed vs. moved
 - Whether the changes stay within the Impacted Areas listed in the Task
 
 ### 5. Run the review checklist
 
-Evaluate each dimension. Record findings as PASS / FAIL / WARN per item.
+Evaluate each dimension.
+Record findings as PASS / FAIL / WARN per item.
 
 **a. Spec adherence**
 
@@ -142,7 +155,8 @@ Verdicts:
 
 ### 7. Review with user
 
-Show the summary. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+Show the summary.
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Does this look right? Should I post this as a GitHub PR review?"
 - header: "Post review"
 - options:
@@ -156,7 +170,8 @@ Apply any edits, then proceed.
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-Write the review body to a temp file (`$BODY`) with the Write tool, then post it through the gh body helper (`../references/gh-body-helper.md`) so it survives UTF-8 on Windows:
+Write the review body to a temp file (`$BODY`) with the Write tool.
+Then post it through the gh body helper (`../references/gh-body-helper.md`) so it survives UTF-8 on Windows:
 
 ```bash
 # $BODY is the temp file you wrote the review body to with the Write tool.

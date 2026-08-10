@@ -5,15 +5,15 @@ description: This skill should be used when a user wants to create a task, write
 
 # Write Task
 
-Create a GitHub Task issue — the implementable unit of work. Core value: derives Gherkin scenarios directly from the parent Feature's Acceptance Criteria, so nothing gets lost in translation.
+Create a GitHub Task issue — the implementable unit of work. Derive Gherkin scenarios from the parent Feature's Acceptance Criteria so nothing is lost in translation.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created in step 10.
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. That result controls whether native sub-issue and dependency links are created in step 10.
 
-Skip this step if invoked from `wtf.feature-to-tasks` or `wtf.write-feature` (the orchestrator already ran it), or on re-invocations within the same session (e.g. "Write next Task" loop in step 11).
+If invoked from `wtf.feature-to-tasks` or `wtf.write-feature`, skip this step. The orchestrator already ran it. Also skip on re-invocations in the same session (e.g. "Write next Task" loop in step 11).
 
 ### 1. Identify the parent Feature
 
@@ -34,7 +34,7 @@ Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract 
 - question: "How would you like to define this task?"
 - header: "Task source"
 - options:
-  - **Propose from ACs** → based on Feature ACs, existing tasks, and Proposed Tasks checklist; propose the next unimplemented task and confirm (default)
+  - **Propose from ACs** → based on Feature ACs, existing tasks, and Proposed Tasks checklist. Propose the next unimplemented task and confirm (default)
   - **Describe myself** → I'll provide a one-sentence description
 
 **If invoked standalone** (no Feature context), call `AskUserQuestion` (per `../references/questioning-style.md`):
@@ -44,7 +44,7 @@ Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract 
 
 ### 3. Clarify ambiguity before proceeding
 
-**Critically assess** whether you have enough information to define a single, focused, implementable task. Cross-check the user's input against the Feature's Acceptance Criteria, Edge Cases, and the Epic's Goal.
+Assess whether you have enough information to define a single, focused, implementable task. Cross-check the user's input against the Feature's Acceptance Criteria, Edge Cases, and the Epic's Goal.
 
 Topics that may require clarification (in priority order):
 
@@ -57,7 +57,7 @@ Topics that may require clarification (in priority order):
 - What **domain Events** does this Task emit?
 - If this Task touches an integration boundary, which Bounded Contexts are involved?
 
-For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough to write a complete draft — do not invent answers or assume away ambiguity.
+For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough to write a complete draft. Do not invent answers or assume away ambiguity.
 
 ### 4. Explore the codebase and wiki
 
@@ -71,7 +71,7 @@ Use the Agent tool to search the codebase for:
 - The Aggregate classes or modules relevant to this task — note their invariant-enforcement logic
 - Any existing domain Event definitions to reuse rather than invent
 
-Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context — check `docs/glossary.md`, GitHub wiki pages matching the context name, or any ADR files. Use these to verify Ubiquitous Language terms before writing Gherkin scenarios. If no wiki or glossary exists, proceed without comment.
+Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context. Check `docs/glossary.md`, GitHub wiki pages matching the context name, or any ADR files. Use these to verify Ubiquitous Language terms before writing Gherkin scenarios. If no wiki or glossary exists, proceed without comment.
 
 **Cross-feature dependency scan:** Fetch sibling Features from the Epic's Feature Breakdown (extracted above) and the Proposed Tasks checklist from each. For sibling Feature bodies, use the per-level fetch in `../references/spec-hierarchy.md`. Then list already-created sibling tasks:
 
@@ -88,17 +88,17 @@ Filter client-side to tasks whose body references a sibling Feature number. Note
 
 ### 5. Vertical slice assessment
 
-Run Stage 1 of `../references/scope-gates.md` on the codebase findings from step 4. The Task-specific bar: touches every layer needed for one observable, user-facing behavior end-to-end (e.g. DB schema → service logic → API → UI) and is independently shippable without another unmerged task.
+Run Stage 1 of `../references/scope-gates.md` on the codebase findings from step 4. Task bar: touches every layer needed for one observable, user-facing behavior end-to-end (e.g. DB schema → service logic → API → UI). It must be independently shippable without another unmerged task.
 
 Evaluate:
 
 - **Passes** → proceed.
 - **Too broad** → propose smaller slices and confirm with the user.
 - **Has dependencies** → identify them explicitly, including tasks from **sibling Features** in the same Epic (surfaced in step 4):
-  - Tasks this task **depends on** (must be merged first — check if the code path exists yet; these may belong to the same Feature or a different Feature in the Epic)
+  - Tasks this task **depends on** (must be merged first — check if the code path exists yet. These may belong to the same Feature or a different Feature in the Epic)
   - Tasks that **depend on this task** (will be blocked until this merges)
 
-For each cross-feature dependency found, state explicitly: "Task #X (in Feature #Y) must be completed first because [reason]." This makes the inter-feature ordering visible before committing to it.
+For each cross-feature dependency found, state explicitly: "Task #X (in Feature #Y) must be completed first because [reason]." Make the inter-feature ordering visible before you commit to it.
 
 Document all dependencies in the draft with GitHub issue references. For cross-feature deps, annotate the reason inline:
 
@@ -127,7 +127,7 @@ For each Acceptance Criterion in the parent Feature:
 - Write at least one Scenario (happy path)
 - Write a failure or edge case Scenario if the Feature listed one
 
-Reference the contracts gathered in step 6 when writing scenarios — use the exact domain Event names, API operation names, and field names from those contracts in Given/When/Then steps so the scenarios align precisely with the implementation contracts.
+Reference the contracts gathered in step 6 when writing scenarios. Use the exact domain Event names, API operation names, and field names from those contracts in Given/When/Then steps. Keep the scenarios aligned with the implementation contracts.
 
 Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 
@@ -143,17 +143,17 @@ Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-Load the TASK template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
+Load the TASK template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
 
 Section-specific guidance:
 
-- **Design Reference**: Link the Figma frame if one exists; otherwise write "N/A — no design for this task."
+- **Design Reference**: Link the Figma frame if one exists. Otherwise write "N/A — no design for this task."
 - **Observability**: Fill Logs, Metrics, and Alerts from the codebase patterns found in step 4. If the task has no production observability requirements, state "None required for this task" rather than leaving blank.
-- **Rollout**: Fill Feature flag, Backward compatibility, and Data migration only if applicable; otherwise write "N/A" for each.
+- **Rollout**: Fill Feature flag, Backward compatibility, and Data migration only if applicable. Otherwise write "N/A" for each.
 
 ### 9. Scope gate
 
-Run Stage 2 of `../references/scope-gates.md` on the written draft. Step 5 catches tasks that cannot ship alone; this step catches tasks that are simply too large.
+Run Stage 2 of `../references/scope-gates.md` on the written draft. Step 5 catches tasks that cannot ship alone. This step catches tasks that are simply too large.
 
 **Task-level split signals** (heuristics — use judgement, not rigid thresholds):
 
@@ -164,11 +164,11 @@ Run Stage 2 of `../references/scope-gates.md` on the written draft. Step 5 catch
 
 **Split strategy by signal:**
 
-- Migration + behavior → propose the migration as task A and the behavior as task B; task B depends on task A.
+- Migration + behavior → propose the migration as task A and the behavior as task B. Task B depends on task A.
 - Broad modules → split along deployment boundaries (backend task + frontend task, or data-layer + service-layer).
 - Too many Gherkin scenarios → split by user journey, keeping each task's scenarios tightly grouped around one observable outcome.
 
-If no signals fire, proceed to user review. If one or more fire, follow the Stage 2 procedure: state the signals, explain the risk (large tasks increase review friction, merge conflict surface, and rollback complexity), propose a concrete split using the matching strategy, and use the keep/split/stop ask from `../references/scope-gates.md`.
+If no signals fire, proceed to user review. If one or more fire, follow the Stage 2 procedure. State the signals. Explain the risk (large tasks increase review friction, merge conflict surface, and rollback complexity). Propose a concrete split using the matching strategy. Use the keep/split/stop ask from `../references/scope-gates.md`.
 
 On **Split it** → return to step 2 with the chosen focused task description as the seed, reusing the same parent Feature. Carry forward codebase findings from step 4.
 
@@ -182,11 +182,11 @@ Show the draft. Pay specific attention to Gherkin. Then call `AskUserQuestion` (
   - **Missing edge cases** → add more scenarios
   - **Other changes** → adjust something else
 
-Apply edits, then proceed.
+Apply edits. Then proceed.
 
 ### 11. Create the issue and link to Feature
 
-> Note: Write the body to a temp file (`$BODY`) with the Write tool, then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
+> Note: Write the body to a temp file (`$BODY`) with the Write tool. Then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the task description. Pass in the task description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence task description provided in step 2.
 
@@ -197,10 +197,9 @@ Create the Task issue:
 # Create the issue WITHOUT a kind label — the classify step below sets the kind.
 python3 .wtf/gh-body.py create --title "🛠 Task: <title>" --body-file "$BODY"
 ```
-
 Print the Task issue URL and number.
 
-**Classify the issue as `Task`.** Set `TYPE="Task"` and `ISSUE_NUMBER=<number from the URL>`, then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation; in `labels` mode it applies the `task` label. Either way the Task is classified — nothing downstream depends on which mechanism was used.
+**Classify the issue as `Task`.** Set `TYPE="Task"` and `ISSUE_NUMBER=<number from the URL>`. Then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation. In `labels` mode it applies the `task` label. Either way the Task is classified. Nothing downstream depends on which mechanism was used.
 
 **Native relationships:** If `gh-sub-issue-available` (from step 0), link this Task as a child of its Feature:
 
@@ -215,7 +214,7 @@ If `gh-issue-dependency-available`, create a blocking link for each dependency i
 gh issue-dependency add <task_number> --blocked-by <blocker_number>
 ```
 
-If either extension is unavailable, warn the user — do not write relationship references into the issue body.
+If either extension is unavailable, warn the user. Do not write relationship references into the issue body.
 
 ### 12. Offer to continue
 

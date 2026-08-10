@@ -4,38 +4,38 @@ How any wtf skill should use `AskUserQuestion` when gathering context from the u
 
 ## Load the tool schema — do this now
 
-`AskUserQuestion` is a deferred tool. Call this **immediately upon loading this reference** — before any research or skill steps begin:
+`AskUserQuestion` is a deferred tool. Call this **immediately upon loading this reference**. Do it before any research or skill steps begin:
 
 ```
 ToolSearch(query: "select:AskUserQuestion")
 ```
 
-Don't wait until the first `Ask`. By then you've processed thousands of tokens of research and the instruction has faded from salience. One call now keeps the schema loaded for the whole session.
+Do not wait until the first `Ask`. By then you have processed thousands of tokens of research. The instruction has faded from salience. One call now keeps the schema loaded for the whole session.
 
 ## Core rules
 
-1. **One question at a time.** Wait for the answer before asking the next. Do not batch questions into a single message — it makes the UI confusing and the answers hard to route.
+1. **One question at a time.** Wait for the answer before asking the next. Do not batch questions into a single message. Batching makes the UI confusing. It also makes the answers hard to route.
 
-2. **Always use `AskUserQuestion`** — including for open-ended questions like "What are the success criteria?" or "Who is the stakeholder?". Free-text-only prompts make research-backed suggestions invisible to the user and skip a chance to narrow the answer space.
+2. **Always use `AskUserQuestion`**. Include open-ended questions like "What are the success criteria?" or "Who is the stakeholder?". Free-text-only prompts make research-backed suggestions invisible to the user. They also skip a chance to narrow the answer space.
 
-3. **Pre-fill options from research.** For each question, infer 1–2 likely answers from the codebase, issue history, or prior conversation and pass them as `options`. The user can still type a free-text answer — the UI automatically appends an "Other (type your answer)" escape hatch, so do NOT add one manually.
+3. **Pre-fill options from research.** For each question, infer 1–2 likely answers from the codebase, issue history, or prior conversation. Pass them as `options`. The user can still type a free-text answer. The UI appends an "Other (type your answer)" escape hatch. Do NOT add one manually.
 
-4. **Prioritize by urgency.** Ask the questions that most constrain the draft first. Stop when you have enough to write a complete draft — do not run through every possible question.
+4. **Prioritize by urgency.** Ask the questions that most constrain the draft first. Stop when you have enough to write a complete draft. Do not run through every possible question.
 
 5. **Skip what research answered.** Topics already addressed by research, prior answers, or loaded context (Epic/Feature/steering docs) must be skipped silently. Re-asking them costs trust.
 
-6. **Acknowledge briefly between answers.** One sentence max. Do not re-explain the prior answer — move on.
+6. **Acknowledge briefly between answers.** One sentence max. Do not re-explain the prior answer. Move on.
 
 ## Compact notation in skill files
 
-Skill files describe asks in a compact form. When you reach an `Ask` step, **stop and call `AskUserQuestion` immediately** — do not output text. The compact notation maps directly to tool parameters:
+Skill files describe asks in a compact form. When you reach an `Ask` step, **stop and call `AskUserQuestion` immediately**. Do not output text. The compact notation maps directly to tool parameters:
 
 Call `AskUserQuestion` with:
 - **question** — the literal text in straight double quotes
 - **header** — the value after `header` (in backticks in the notation)
 - **options** — derived from the sub-list or inferred from research (see core rule 3)
 
-**NEVER output question options as plain text.** This applies to every `Ask` in a skill — including "Offer to continue" / "next step" routing questions at the end of a skill. Printing bullet points instead of calling `AskUserQuestion` is always wrong, regardless of how the skill labels the section.
+**NEVER output question options as plain text.** This applies to every `Ask` in a skill. It includes "Offer to continue" and "next step" routing questions at the end of a skill. Printing bullet points instead of calling `AskUserQuestion` is always wrong. The skill label of the section does not matter.
 
 Wrong — outputs text bullets:
 ```
@@ -82,11 +82,11 @@ AskUserQuestion(
 
 ### Conventions
 
-- Wrap the question in straight double quotes — it is the literal user-facing text.
-- Wrap the header in backticks — it is the UI tag the user sees.
-- Drop the "1–2 likely options" boilerplate; rule 3 enforces it.
+- Wrap the question in straight double quotes. It is the literal user-facing text.
+- Wrap the header in backticks. It is the UI tag the user sees.
+- Drop the "1–2 likely options" boilerplate. Rule 3 enforces it.
 - For conditional asks ("if X is present, ask…"), put the condition before the `Ask` clause.
 
 ## When to ask in a single message instead
 
-Rare. Only when three conditions all hold: the questions are tightly coupled, the answers are short, and no answer changes which other questions are needed. Even then, prefer `AskUserQuestion` with options when at least one question has a constrained answer space.
+Rare. Only when three conditions all hold. The questions are tightly coupled. The answers are short. No answer changes which other questions are needed. Even then, prefer `AskUserQuestion` with options when at least one question has a constrained answer space.

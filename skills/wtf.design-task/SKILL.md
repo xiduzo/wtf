@@ -5,9 +5,9 @@ description: This skill should be used when a designer is picking up a Task issu
 
 # Design Task
 
-Pick up an existing Task as a designer. Core value: reads the Gherkin scenarios to identify every UI state that needs design coverage, then helps you document the design references back into the issue so developers have a single source of truth.
+Take an existing Task as a designer. Read the Gherkin scenarios. Find every UI state that needs design coverage. Document the design references in the issue so developers have one source of truth.
 
-See `references/component-spec-template.md` for the expected structure when scaffolding a component spec without Figma frames.
+See `references/component-spec-template.md` for the structure when you scaffold a component spec without Figma frames.
 
 ## Process
 
@@ -19,29 +19,29 @@ Skip this step if invoked from `wtf.write-task` or another skill that already ra
 
 ### 1. Identify the Task
 
-If the user provided an issue number in their request, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+If the user gave an issue number, use it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Task are you designing?"
 - header: "Task"
 - options: from recent open issues labeled `task`
 
-Walk Task → Feature per `../references/spec-hierarchy.md` to extract Functional Description, Gherkin, Design Reference (Task) and user stories / ACs / visual context (Feature).
+Walk Task → Feature per `../references/spec-hierarchy.md`. Extract Functional Description, Gherkin, and Design Reference from the Task. Extract user stories, ACs, and visual context from the Feature.
 
 ### 2. Lifecycle check
 
-Apply the **present-label overwrite gate** from `../references/lifecycle-labels.md` for the `designed` label on the Task — output is "Design Reference", re-run verb is "Redesign". If absent, continue silently.
+Apply the **present-label overwrite gate** from `../references/lifecycle-labels.md` for the `designed` label on the Task. Output is "Design Reference". Re-run verb is "Redesign". If the label is absent, continue.
 
 ### 3. Load the design steering document
 
-Load `docs/steering/DESIGN.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-design`). Apply its design principles, tokens, component patterns, and accessibility standards silently throughout this session.
+Load `docs/steering/DESIGN.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-design`). Apply its design principles, tokens, component patterns, and accessibility standards for this session.
 
 ### 4. Explore the design system
 
-Use the Agent tool with these concrete searches (run in parallel):
+Use the Agent tool with these searches (run in parallel):
 
-- `Glob('src/components/**/*', 'src/**/components/**/*', 'components/**/*')` — existing UI components; note file names that match domain objects or UI states in the Task
+- `Glob('src/components/**/*', 'src/**/components/**/*', 'components/**/*')` — existing UI components. Note file names that match domain objects or UI states in the Task
 - `Glob('**/{tokens,theme,variables,design-tokens}.{css,scss,ts,js,json}')` + `Grep` for CSS custom property declarations (`--`) or Tailwind config keys — design tokens in use (colors, spacing, typography)
 - `Glob('src/**/*.{stories,story}.{ts,tsx,js,jsx,mdx}')` — Storybook stories as pattern references for similar screens or flows
-- `Grep` for `figma.com` URLs across all `.md`, `.mdx`, and issue body files in the repo — existing Figma references linked in related issues or docs
+- `Grep` for `figma.com` URLs across `.md`, `.mdx`, and issue body files — existing Figma references in related issues or docs
 
 ### 5. Identify UI states from Gherkin
 
@@ -50,7 +50,7 @@ For each Gherkin scenario in the Task:
 - Identify the UI state it represents (e.g. empty, loading, error, success, disabled, edge case)
 - Note any interaction or transition implied by the When/Then steps
 
-List these states explicitly — this becomes the design coverage checklist.
+List these states. This list is the design coverage checklist.
 
 ### 6. Ask about design assets
 
@@ -58,10 +58,10 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "How would you like to handle design assets for this task?"
 - header: "Design assets"
 - options:
-  - **I have Figma frames** → provide frame URLs; I'll validate coverage against Gherkin scenarios (Path A)
+  - **I have Figma frames** → provide frame URLs. Validate coverage against Gherkin scenarios (Path A)
   - **Generate designs for me** → use Figma MCP to generate frames from the Gherkin scenarios and design system (Path B)
-  - **Scaffold a spec only** → no Figma; produce a text component spec from the scenarios (Path C)
-  - **Partial — some states designed** → provide available frames; remaining states go to generate or scaffold
+  - **Scaffold a spec only** → no Figma. Produce a text component spec from the scenarios (Path C)
+  - **Partial — some states designed** → provide available frames. Send remaining states to generate or scaffold
 
 **Path A — Human provides frames:**
 Collect frame URLs. For each Gherkin scenario from step 5, check whether a frame covers it. Flag any scenario with no matching frame as a gap. Present the coverage matrix: scenario → frame URL (or ⚠ gap). If gaps exist, call `AskUserQuestion` (per `../references/questioning-style.md`):
@@ -72,20 +72,20 @@ Collect frame URLs. For each Gherkin scenario from step 5, check whether a frame
   - **Leave as pending** → record gaps in the Design Reference and continue
 
 **Path B — AI generates via Figma MCP:**
-Check whether the Figma MCP tool `generate_figma_design` is available. If unavailable, warn the user and fall back to Path C (scaffold).
+Check whether the Figma MCP tool `generate_figma_design` is available. If it is unavailable, warn the user and use Path C (scaffold).
 
 If available: for each uncovered UI state, call `generate_figma_design` with:
 - The Gherkin scenario as the design brief
 - Component patterns and tokens from `docs/steering/DESIGN.md` (loaded in step 3)
-- Any shared components identified in the parent Feature's Design Handoff (if available)
+- Any shared components from the parent Feature's Design Handoff (if available)
 
-Collect the generated frame URLs and treat them as Path A frames from this point forward.
+Collect the generated frame URLs. Treat them as Path A frames from this point.
 
 **Path C — Scaffold spec only:**
-Draft a component spec using the structure in `references/component-spec-template.md`, listing each state with its required UI elements and interactions. No Figma frames — this is a text-only design brief for the developer.
+Draft a component spec with the structure in `references/component-spec-template.md`. List each state with its required UI elements and interactions. No Figma frames. This is a text-only design brief for the developer.
 
 **Partial:**
-Collect available frame URLs, run Path A validation on covered states. For uncovered states, call `AskUserQuestion` (per `../references/questioning-style.md`):
+Collect available frame URLs. Run Path A validation on covered states. For uncovered states, call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "How should I handle the remaining states?"
 - header: "Remainder"
 - options:
@@ -94,7 +94,7 @@ Collect available frame URLs, run Path A validation on covered states. For uncov
 
 ### 7. Draft the Design Reference
 
-Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+Apply strict STE per `../references/ste-writing.md` before you write any durable body.
 
 Produce the content for the Design Reference section of the Task:
 
@@ -115,11 +115,11 @@ Show the draft. Then call `AskUserQuestion` (per `../references/questioning-styl
   - **Missing states** → add more coverage
   - **Other changes** → adjust something else
 
-Apply edits, then proceed.
+Apply edits. Then proceed.
 
 ### 9. Update the Task issue
 
-> Note: read the current body with the gh body helper, replace only the Design Reference section with the new content (Read + Edit tools), and preserve all other sections unchanged. See `../references/gh-body-helper.md`.
+> Note: read the current body with the gh body helper. Replace only the Design Reference section with the new content (Read + Edit tools). Preserve all other sections. See `../references/gh-body-helper.md`.
 
 ```bash
 python3 .wtf/gh-body.py read <task_number>        # prints a temp path; Read it, edit the Design Reference section
@@ -142,8 +142,8 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - options:
   - **Implement this Task** → run `wtf.implement-task` for this Task now (default)
   - **Design another Task** → design another Task for the same Feature
-  - **Stop here** → exit, no further action
+  - **Stop here** → exit. No further action
 
-- **Implement this Task** → follow the `wtf.implement-task` process, passing the Task number in as context so the user is not asked for it again.
-- **Design another Task** → restart this skill from step 1, reusing the same Feature context.
+- **Implement this Task** → follow the `wtf.implement-task` process. Pass the Task number as context so the user is not asked for it again.
+- **Design another Task** → restart this skill from step 1. Reuse the same Feature context.
 - **Stop here** → exit.

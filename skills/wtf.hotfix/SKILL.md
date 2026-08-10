@@ -5,7 +5,10 @@ description: This skill should be used when something is broken in production an
 
 # Hotfix
 
-Emergency fix path that bypasses the normal Epic→Feature→Task hierarchy. Core value: gets a narrow, well-understood fix into production as fast as possible while still maintaining a test, a commit trail, and a PR review.
+Emergency fix path that skips the normal Epic→Feature→Task hierarchy.
+
+This skill moves a narrow, well-understood fix into production as fast as possible.
+It still keeps a test, a commit trail, and a PR review.
 
 ## When to use vs. when not to use
 
@@ -17,7 +20,8 @@ Emergency fix path that bypasses the normal Epic→Feature→Task hierarchy. Cor
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated.
+Run steps 1–2 of `../references/gh-setup.md`.
+Stop if `gh` is not installed or not authenticated.
 
 ### 1. Identify the bug
 
@@ -33,12 +37,14 @@ If no issue exists yet, ask in a single message:
 - "What is the user impact? (e.g. data loss, revenue impact, all users blocked, subset of users)"
 - "Is there an existing bug issue, or should I create one?"
 
-If no issue exists, follow the **Fast path** section of `wtf.report-bug` (Gherkin derivation and Ubiquitous Language mapping are skipped — the goal is to file the issue fast).
+If no issue exists, follow the **Fast path** section of `wtf.report-bug`.
+Skip Gherkin derivation and Ubiquitous Language mapping.
+The goal is to file the issue fast.
 
 ### 2. Confirm hotfix scope
 
 A hotfix must be:
-- **Narrow**: touches the minimum files necessary to fix the specific breakage
+- **Narrow**: changes the minimum files necessary to fix the specific breakage
 - **Non-breaking**: no API contract changes, no schema migrations unless strictly required
 - **Testable**: at least one automated test can verify the fix
 
@@ -49,15 +55,18 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
   - **Yes — proceed** → create the hotfix branch and start the fix
   - **Not sure — it may be larger than that** → use the normal workflow instead
 
-If "Not sure" → exit. Suggest `wtf.write-task` as the next step.
+If "Not sure" → exit.
+Suggest `wtf.write-task` as the next step.
 
 ### 3. Load the technical steering document
 
-Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md`. If present, apply its stack constraints, coding patterns, and test commands silently throughout this session.
+Load `docs/steering/TECH.md` per the **best-effort consumer-side load** in `../references/steering-doc-process.md`.
+If present, apply its stack constraints, coding patterns, and test commands silently throughout this session.
 
 ### 4. Set up the hotfix branch
 
-Set up the hotfix branch per `../references/branch-setup.md` ("Hotfix branch — direct from main" section). Print the branch name.
+Set up the hotfix branch per `../references/branch-setup.md` ("Hotfix branch — direct from main" section).
+Print the branch name.
 
 ### 5. Explore the codebase
 
@@ -67,22 +76,26 @@ Use the Agent tool to find:
 - Existing tests covering the broken behavior (or noting their absence)
 - Contracts or interfaces the fix must preserve without changing
 
-Do not expand scope based on what you find. If the fix turns out to be larger than expected, surface it as a gate in step 6.
+Do not expand scope from what you find.
+If the fix turns out larger than expected, report it as a gate in step 6.
 
 ### 6. Scope gate
 
-If exploration reveals the fix touches more than 3–4 files, requires changing an API contract, or requires a schema migration, surface it before writing any code:
+If exploration shows the fix changes more than 3–4 files, report it before writing any code.
+Also report it if the fix requires an API contract change or a schema migration:
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "This fix is larger than a typical hotfix — [describe what was found]. How do you want to proceed?"
 - header: "Scope gate"
 - options:
-  - **Proceed as hotfix** → accept the larger scope; I understand the risk
+  - **Proceed as hotfix** → accept the larger scope. The user understands the risk.
   - **Switch to normal flow** → exit and use `write-epic` + `write-task` instead
 
 ### 7. Implement the fix
 
-Write the failing test first (one test per broken behavior), then implement the minimum fix to make it pass. Follow the TDD cycle from `wtf.implement-task` step 8.
+Write the failing test first (one test per broken behavior).
+Then implement the minimum fix to make it pass.
+Follow the TDD cycle from `wtf.implement-task` step 8.
 
 Run the full test suite after the fix:
 
@@ -92,7 +105,9 @@ Run the full test suite after the fix:
 
 If unrelated tests fail: do not block — record them in the PR body as pre-existing failures.
 
-Commit per `../references/commit-conventions.md`. The commit message uses a `Bug:` trailer; the `Closes #<n>` keyword lives in the PR body, not the commit:
+Commit per `../references/commit-conventions.md`.
+The commit message uses a `Bug:` trailer.
+The `Closes #<n>` keyword lives in the PR body, not the commit:
 
 ```bash
 git add <changed files>
@@ -105,7 +120,8 @@ Bug: #<bug_number>"
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body (PR body and commit subject/body prose).
 
-Write the body to a temp file (`$BODY`) with the Write tool, then create the PR targeting `main` via the gh body helper (`../references/gh-body-helper.md`):
+Write the body to a temp file (`$BODY`) with the Write tool.
+Then create the PR targeting `main` via the gh body helper (`../references/gh-body-helper.md`):
 
 ```bash
 # Ensure the hotfix label exists
@@ -124,7 +140,7 @@ PR body must include:
 - **Related**: closure keywords per `../references/commit-conventions.md` — one `Closes #<n>` per line, always include `Closes #<bug_number>`.
 - **Impact**: what was broken and who was affected.
 - **Root cause**: what caused it.
-- **Fix**: what was changed and why it's safe.
+- **Fix**: what was changed and why it is safe.
 - **Risk**: what could be affected by this change.
 - **Pre-existing failures** (if any): unrelated tests that were already failing before this change.
 

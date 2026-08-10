@@ -1,36 +1,36 @@
 ---
 name: wtf.epic-to-features
-description: This skill should be used when a user wants to decompose an Epic into its complete set of Features all at once, invoked automatically after write-epic completes, or triggered by phrases like "create all features for this epic", "walk me through all the features", "let's break down this epic", or "plan the features for epic #N". Use this skill for bulk Feature decomposition; use `wtf.write-feature` for creating a single Feature in isolation.
+description: This skill should be used when a user wants to decompose an Epic into its complete set of Features all at once, invoked automatically after write-epic completes, or triggered by phrases like "create all features for this epic", "walk me through all the features", "let's break down this epic", or "plan the features for epic #N". Use this skill for bulk Feature decomposition. Use `wtf.write-feature` for creating a single Feature in isolation.
 ---
 
 # Epic to Features
 
-Break an Epic down into its full set of Features and create them one by one. Core value: proposes the complete feature list upfront, then walks through writing each Feature with full user control.
+Break an Epic down into its full set of Features. Create them one by one. Propose the complete feature list first. Then write each Feature with full user control.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native sub-issue and dependency links are created downstream (via `wtf.write-feature` and `wtf.write-task`).
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. This determines whether native sub-issue and dependency links are created downstream (via `wtf.write-feature` and `wtf.write-task`).
 
 Skip this step if gh-setup was already confirmed this session (e.g. when chained from `wtf.write-epic`).
 
 ### 1. Identify the Epic
 
-If an Epic number was passed in as context, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+If an Epic number was passed in as context, use it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Epic are you breaking into Features?"
 - header: "Epic"
-- options: from recent open Epics — list them per the **List issues of a kind** query (kind `Epic`) in `../references/issue-classification.md` (`--label epic` in labels mode, `--search 'type:"Epic"'` in types mode)
+- options: from recent open Epics. List them per the **List issues of a kind** query (kind `Epic`) in `../references/issue-classification.md`. Use `--label epic` in labels mode. Use `--search 'type:"Epic"'` in types mode.
 
-Fetch the Epic with `gh issue view <epic_number>` and extract: Goal, Context, and Success Metrics.
+Fetch the Epic with `gh issue view <epic_number>`. Extract Goal, Context, and Success Metrics.
 
-List Features already created under this Epic via `gh sub-issue list <epic_number>` per the cookbook in `../references/gh-setup.md`. Note which Features already exist — do not re-propose or re-create them.
+List Features already created under this Epic via `gh sub-issue list <epic_number>` per the cookbook in `../references/gh-setup.md`. Note which Features already exist. Do not re-propose or re-create them.
 
 ### 2. Propose the full Feature list
 
-Based on the Epic's Goal, Context, and Success Metrics, derive a proposed list of Features that together deliver the Epic's outcome. Each Feature must follow the pattern: **[Domain Actor] can [domain verb] [domain object]**.
+From the Epic's Goal, Context, and Success Metrics, derive a proposed list of Features that together deliver the Epic's outcome. Each Feature must follow the pattern: **[Domain Actor] can [domain verb] [domain object]**.
 
-If the Epic already has partially-created Features (found via `gh sub-issue list`), open the list with a note: "Epic #N already has [X] Features created: [list with issue numbers]. Here are the remaining Features I'd propose:"
+If the Epic already has partially-created Features (found via `gh sub-issue list`), open the list with a note. Use this form: "Epic #N already has [X] Features created: [list with issue numbers]. Here are the remaining Features I'd propose:"
 
 Present the remaining (or full, if none exist yet) list as plain numbered text, for example:
 
@@ -50,7 +50,7 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 
 Wait for the user to confirm or adjust the list. Apply any changes.
 
-### 3. Walk through Features one by one
+### 3. Process Features one by one
 
 For each Feature in the confirmed list, in order:
 
@@ -58,15 +58,15 @@ For each Feature in the confirmed list, in order:
 2. Follow the `wtf.write-feature` process, passing:
    - The Epic number (skip step 1 of write-feature — Epic is already fetched)
    - The capability name as the pre-filled answer to step 2 of write-feature
-   - **Abbreviated clarification**: because the capability name already follows the `[Actor] can [verb] [object]` pattern and the Epic context is already in hand, skip write-feature step 3 (clarification questions) unless something is genuinely ambiguous from the Epic. Write-feature step 4 (user story derivation) and step 5 (DDD Language Guard) should still run silently. Resume from write-feature step 6 (vertical slice assessment).
-3. Before moving to the next Feature, call `AskUserQuestion` (per `../references/questioning-style.md`):
+   - **Abbreviated clarification**: the capability name already follows the `[Actor] can [verb] [object]` pattern and the Epic context is already in hand. Skip write-feature step 3 (clarification questions) unless something is genuinely ambiguous from the Epic. Write-feature step 4 (user story derivation) and step 5 (DDD Language Guard) should still run. Resume from write-feature step 6 (vertical slice assessment).
+3. Before you move to the next Feature, call `AskUserQuestion` (per `../references/questioning-style.md`):
    - question: "Feature [N] created. Ready to continue to Feature [N+1]: _[next capability name]_?"
    - header: "Continue?"
    - options:
      - **Yes, continue** → proceed to the next Feature (default)
-     - **Pause here** → exit; print a summary of which Features were created and which remain; suggest `/clear` before resuming
+     - **Pause here** → exit. Print a summary of which Features were created and which remain. Suggest `/clear` before resuming
      - **Skip this feature** → mark as skipped in the list and move to the next
-     - **Add a new feature** → call `AskUserQuestion` with question "What is the new feature capability?", header "New feature", options from capability names inferred from the Epic's Goal or Success Metrics not yet in the list; add the confirmed feature, then continue
+     - **Add a new feature** → call `AskUserQuestion` with question "What is the new feature capability?", header "New feature". Offer options from capability names inferred from the Epic's Goal or Success Metrics not yet in the list. Add the confirmed feature. Then continue
 
 ### 4. Completion
 
@@ -82,6 +82,6 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - options:
   - **Break down first Feature** → follow `wtf.feature-to-tasks` with the first created Feature number (default)
   - **Break down next Feature** → follow `wtf.feature-to-tasks` with a different Feature number
-  - **Stop here** → exit, no further action
+  - **Stop here** → exit. No further action
 
 > Suggest `/clear` before continuing if the conversation has grown long.

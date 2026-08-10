@@ -5,19 +5,25 @@ description: This skill should be used when a developer wants to open a pull req
 
 # Create PR
 
-Open a pull request for a completed task branch. Core value: reads the full spec hierarchy (Task + Feature + Epic) and the branch diff to write a PR description that explains _why_ the change exists — not just what it does.
+Open a pull request for a completed task branch.
+
+This skill reads the full spec hierarchy (Task + Feature + Epic) and the branch diff.
+It writes a PR description that explains why the change exists, not only what it does.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
+Run steps 1–2 of `../references/gh-setup.md` (install check and auth check).
+Stop if `gh` is not installed or not authenticated.
+Extensions are not required for this skill.
 
 Skip this step if invoked from `wtf.verify-task` or another skill that already ran gh-setup this session.
 
 ### 1. Confirm the branch
 
-Check the current branch and verify it is not `main`:
+Check the current branch.
+Verify it is not `main`:
 
 ```bash
 git branch --show-current
@@ -63,41 +69,55 @@ If not found or the user says no, call `AskUserQuestion` (per `../references/que
 
 If no Task is linked, skip this step.
 
-Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `verified` label on the Task — recommended skill `wtf.verify-task`, header `Verify first?`. On **Verify first** → follow `wtf.verify-task` passing the Task number as context. On **Open PR anyway** → proceed.
+Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `verified` label on the Task — recommended skill `wtf.verify-task`, header `Verify first?`.
+On **Verify first** → follow `wtf.verify-task` passing the Task number as context.
+On **Open PR anyway** → proceed.
 
 ### 4. Fetch the spec hierarchy
 
-**If a Task issue is known**, walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, DoD, Test Mapping (Task) and ACs / Goal / constraints (Feature, Epic).
+**If a Task issue is known**, walk Task → Feature → Epic per `../references/spec-hierarchy.md`.
+Extract Gherkin, Contracts, DoD, and Test Mapping from the Task.
+Extract ACs, Goal, and constraints from the Feature and Epic.
 
-**If no Task issue**, skip hierarchy fetch. The PR will be written from diff context alone (step 5).
+**If no Task issue**, skip hierarchy fetch.
+The PR will be written from diff context alone (step 5).
 
 ### 5. Inspect the diff
 
-Determine the base branch using the same logic as step 8 (task/* → parent feature branch; feature/* → main), then collect the branch diff against that base:
+Determine the base branch using the same logic as step 8.
+For `task/*`, use the parent feature branch.
+For `feature/*`, use `main`.
+Then collect the branch diff against that base:
 
 ```bash
 git log <base_branch>..HEAD --oneline
 git diff <base_branch>...HEAD --stat
 ```
 
-This avoids including unrelated merged commits when the branch has a long history against main. Use `--stat` output only unless a specific commit message is ambiguous and cannot be resolved without the diff.
+This avoids unrelated merged commits when the branch has a long history against main.
+Use `--stat` output only unless a specific commit message is ambiguous and cannot be resolved without the diff.
 
 ### 6. Draft the PR
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model — apply `../references/subagent-protocol.md` for the spawn — to generate a PR title per `../references/commit-conventions.md`. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly following the same rules. Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
+**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model — apply `../references/subagent-protocol.md` for the spawn — to generate a PR title per `../references/commit-conventions.md`.
+Pass in the task title (if available), the commit log, and whether this is a breaking change.
+If the subagent returns nothing usable, generate the title directly following the same rules.
+Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
 
-**Body:** Load the PR template per `../references/issue-template-loading.md` (verify `.github/pull_request_template.md` exists, halt-or-setup if missing). Fill in all sections:
+**Body:** Load the PR template per `../references/issue-template-loading.md` (verify `.github/pull_request_template.md` exists, halt-or-setup if missing).
+Complete all sections:
 
-- **Summary**: derived from the Task's Intent + Functional Description (or commit messages if no Task). Explain the _why_.
+- **Summary**: derived from the Task's Intent + Functional Description (or commit messages if no Task). Explain the why.
 - **Changes**: grouped logical summary of `git diff --stat` output — not a file list.
 - **Test plan**: if a Task exists, derive checklist items from the Gherkin scenario names. If no Task, derive from changed files and commit messages. At minimum one item per observable behavior changed.
 - **Related**: closure keywords per `../references/commit-conventions.md`. If a Task exists, include `Closes #<task_number>`. If the PR also closes the parent Feature (all sibling tasks already merged), add `Closes #<feature_number>` on its own line.
 
 ### 7. Review with user
 
-Show the draft title and body. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+Show the draft title and body.
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Does this look right?"
 - header: "Review"
 - options:
@@ -117,7 +137,8 @@ Determine the base branch from the current branch name:
   - header: "Base branch"
   - options: from `git branch -r`
 
-Write the body to a temp file (`$BODY`) with the Write tool, then create the PR via the gh body helper (`../references/gh-body-helper.md`) so the description survives UTF-8 on Windows:
+Write the body to a temp file (`$BODY`) with the Write tool.
+Then create the PR via the gh body helper (`../references/gh-body-helper.md`) so the description survives UTF-8 on Windows:
 
 ```bash
 # $BODY is the temp file you wrote the PR body to with the Write tool.

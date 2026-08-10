@@ -5,7 +5,9 @@ description: This skill should be used when a designer wants to produce a holist
 
 # Design Feature
 
-Pick up a Feature as a designer and produce a holistic design covering the full user journey before tasks are cut. Core value: maps every user story to screens and states, identifies shared components across the feature, and writes a complete Design Handoff back into the Feature issue — so `wtf.feature-to-tasks` can derive better tasks and `wtf.design-task` inherits feature-level decisions rather than reinventing them.
+Take a Feature as a designer. Produce a full design for the user journey before tasks are cut.
+
+Map every user story to screens and states. Find shared components across the feature. Write a complete Design Handoff into the Feature issue. Then `wtf.feature-to-tasks` can derive better tasks. Then `wtf.design-task` can reuse feature-level decisions.
 
 ## Process
 
@@ -13,16 +15,16 @@ Pick up a Feature as a designer and produce a holistic design covering the full 
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from another skill that already ran gh-setup this session.
+Skip this step if another skill already ran gh-setup this session.
 
 ### 1. Identify the Feature
 
-If the user provided an issue number in their request, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+If the user gave an issue number, use it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Feature are you designing?"
 - header: "Feature"
 - options: from recent open issues labeled `feature`
 
-Walk Feature → Epic per `../references/spec-hierarchy.md` to extract user stories, ACs, Edge Cases, Domain Events (Feature) and Goal, Context, Design Artifacts (Epic — strategic input).
+Walk Feature → Epic per `../references/spec-hierarchy.md`. Extract user stories, ACs, Edge Cases, and Domain Events from the Feature. Extract Goal, Context, and Design Artifacts from the Epic.
 
 Extract and hold in context:
 - Feature capability name (Actor + verb + object)
@@ -30,26 +32,26 @@ Extract and hold in context:
 - All Acceptance Criteria
 - Edge Cases
 - Domain Events (emitted/consumed)
-- Epic's Design Artifacts (any Figma links or research docs — these are upstream constraints)
+- Epic Design Artifacts (Figma links or research docs — these are upstream constraints)
 
 ### 2. Lifecycle check
 
-Apply the **present-label overwrite gate** from `../references/lifecycle-labels.md` for the `designed` label on the Feature — output is "Design Handoff", re-run verb is "Redesign". If absent, continue silently.
+Apply the **present-label overwrite gate** from `../references/lifecycle-labels.md` for the `designed` label on the Feature. Output is "Design Handoff". Re-run verb is "Redesign". If the label is absent, continue.
 
 ### 3. Load the design steering document
 
-Load `docs/steering/DESIGN.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-design`). Apply its design principles, tokens, component patterns, and accessibility standards silently throughout this session.
+Load `docs/steering/DESIGN.md` per the **strict consumer-side load** in `../references/steering-doc-process.md` (recommended skill: `wtf.steer-design`). Apply its design principles, tokens, component patterns, and accessibility standards for this session.
 
 ### 4. Explore the design system and codebase
 
 Use the Agent tool with these searches (run in parallel):
 
-- `Glob('src/components/**/*', 'src/**/components/**/*', 'components/**/*')` — existing UI components; flag any that map to domain objects in this Feature's user stories
+- `Glob('src/components/**/*', 'src/**/components/**/*', 'components/**/*')` — existing UI components. Flag any that map to domain objects in this Feature's user stories
 - `Glob('**/{tokens,theme,variables,design-tokens}.{css,scss,ts,js,json}')` — design tokens
 - `Glob('src/**/*.{stories,story}.{ts,tsx,js,jsx,mdx}')` — Storybook stories as pattern references for similar flows
 - `Grep` for `figma.com` URLs across `.md`, `.mdx` files — existing Figma references in related issues or docs
 
-Note which existing components can be reused vs which are new. This feeds step 7.
+Note which existing components you can reuse. Note which components are new. This feeds step 7.
 
 ### 5. Map the full user journey
 
@@ -63,9 +65,9 @@ For each user story ("As a [Actor], I want [action] so that [outcome]"), derive:
 Also map:
 - **Cross-story transitions** — screens shared between multiple user stories
 - **Edge case screens** — one screen per Edge Case from the Feature issue
-- **Domain Event surfaces** — where in the UI does each emitted Domain Event become visible to the actor?
+- **Domain Event surfaces** — where in the UI each emitted Domain Event becomes visible to the actor
 
-Produce a journey map as a structured list — do not ask the user, derive from user stories and ACs.
+Produce a journey map as a structured list. Do not ask the user. Derive the map from user stories and ACs.
 
 ### 6. Ask about design assets
 
@@ -73,10 +75,10 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "How would you like to handle designs for this feature?"
 - header: "Design assets"
 - options:
-  - **I have Figma frames** → provide frame URLs; I'll validate coverage against the full journey map (Path A)
+  - **I have Figma frames** → provide frame URLs. Validate coverage against the full journey map (Path A)
   - **Generate designs for me** → use Figma MCP to generate frames from the user stories and design system (Path B)
-  - **Scaffold a brief only** → no Figma; produce a text screen inventory and component map (Path C)
-  - **Partial — some screens designed** → provide available frames; remaining screens go to generate or scaffold
+  - **Scaffold a brief only** → no Figma. Produce a text screen inventory and component map (Path C)
+  - **Partial — some screens designed** → provide available frames. Send remaining screens to generate or scaffold
 
 **Path A — Human provides frames:**
 Collect the top-level Figma file URL plus individual frame URLs. For each screen in the journey map (step 5), check whether a frame covers it. Present a coverage matrix: screen → frame URL (or ⚠ gap). If gaps exist, call `AskUserQuestion` (per `../references/questioning-style.md`):
@@ -86,29 +88,29 @@ Collect the top-level Figma file URL plus individual frame URLs. For each screen
   - **Generate missing frames** → run Path B for the gaps
   - **Leave as pending** → record gaps in the Design Handoff and continue
 
-Also validate provided frames against spec:
+Also validate provided frames against the spec:
 - Every user story has at least one matching frame
 - Every edge case from the Feature issue has a matching error/boundary state frame
-- Every Domain Event surface identified in step 5 is represented
+- Every Domain Event surface from step 5 is represented
 
-Flag any validation failures as gaps in the coverage matrix.
+Flag any validation failure as a gap in the coverage matrix.
 
 **Path B — AI generates via Figma MCP:**
-Check whether the Figma MCP tool `generate_figma_design` is available. If unavailable, warn the user and fall back to Path C (scaffold).
+Check whether the Figma MCP tool `generate_figma_design` is available. If it is unavailable, warn the user and use Path C (scaffold).
 
 If available: for each screen in the journey map without a frame, call `generate_figma_design` with:
 - The screen's user story and entry/exit points as the design brief
 - Component patterns and tokens from `docs/steering/DESIGN.md` (loaded in step 3)
-- Shared components identified in step 7 as reuse constraints
+- Shared components from step 7 as reuse constraints
 - Any Figma URLs from the Epic's Design Artifacts as style reference
 
-Collect the generated frame URLs and treat them as Path A frames for the coverage matrix and Design Handoff.
+Collect the generated frame URLs. Treat them as Path A frames for the coverage matrix and Design Handoff.
 
 **Path C — Scaffold brief only:**
-For each screen in the journey map, produce a text brief listing required UI elements, interactions, and relevant design tokens. This is a Figma-free design brief a designer or developer can execute against. Use `references/component-spec-template.md` as the structure if available.
+For each screen in the journey map, produce a text brief. List required UI elements, interactions, and relevant design tokens. This is a Figma-free design brief a designer or developer can execute. Use `references/component-spec-template.md` as the structure if available.
 
 **Partial:**
-Collect available frame URLs, run Path A validation on covered screens. For uncovered screens, call `AskUserQuestion` (per `../references/questioning-style.md`):
+Collect available frame URLs. Run Path A validation on covered screens. For uncovered screens, call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "How should I handle the remaining screens?"
 - header: "Remainder"
 - options:
@@ -119,15 +121,15 @@ Collect available frame URLs, run Path A validation on covered screens. For unco
 
 Across all screens in the journey map, identify:
 
-- **Reused existing components** — already in the codebase (found in step 4); list component path + which screens use it
-- **New shared components** — appear on 2+ screens but do not exist yet; name them using domain language
-- **Screen-specific components** — appear on only one screen; note them but do not detail here (that is `wtf.design-task`'s job)
+- **Reused existing components** — already in the codebase (found in step 4). List component path and which screens use it
+- **New shared components** — appear on 2+ screens but do not exist yet. Name them with domain language
+- **Screen-specific components** — appear on only one screen. Note them. Do not detail them here. That is the job of `wtf.design-task`
 
-This component map reduces duplication when `wtf.design-task` runs per-task.
+This component map reduces duplication when `wtf.design-task` runs per task.
 
 ### 8. Draft the Design Handoff
 
-Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+Apply strict STE per `../references/ste-writing.md` before you write any durable body.
 
 Produce content for the **Design Handoff** section of the Feature issue. Use the structure in `references/design-handoff-template.md`.
 
@@ -141,11 +143,11 @@ Show the draft. Then call `AskUserQuestion` (per `../references/questioning-styl
   - **Missing screens or states** → add coverage
   - **Other changes** → adjust something else
 
-Apply edits, then proceed.
+Apply edits. Then proceed.
 
 ### 10. Update the Feature issue
 
-Read the current body with the gh body helper, replace only the **Design Handoff** section with the new content (Read + Edit tools), preserve all other sections. See `../references/gh-body-helper.md`:
+Read the current body with the gh body helper. Replace only the **Design Handoff** section with the new content (Read + Edit tools). Preserve all other sections. See `../references/gh-body-helper.md`:
 
 ```bash
 python3 .wtf/gh-body.py read <feature_number>     # prints a temp path; Read it, edit the Design Handoff section
@@ -160,7 +162,7 @@ Add the `designed` label when either:
 gh issue edit <feature_number> --add-label "designed"
 ```
 
-If Path A/B has open gaps, do not add `designed` — note it will be added once gaps are closed.
+If Path A/B has open gaps, do not add `designed`. Note that you will add it once gaps are closed.
 
 This fulfills the Feature DoR gate: "Design handoff complete".
 
@@ -172,10 +174,10 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:
-  - **Break into Tasks** → run `feature-to-tasks`; design context will inform task breakdown (default)
+  - **Break into Tasks** → run `feature-to-tasks`. Design context will inform task breakdown (default)
   - **Design another Feature** → design another Feature for the same Epic
-  - **Stop here** → exit, no further action
+  - **Stop here** → exit. No further action
 
-- **Break into Tasks** → follow the `wtf.feature-to-tasks` skill, passing the Feature number in as context. Note to the user that `wtf.design-task` will inherit the shared component map from this Design Handoff.
-- **Design another Feature** → restart from step 1, reusing the same Epic context.
+- **Break into Tasks** → follow the `wtf.feature-to-tasks` skill. Pass the Feature number as context. Tell the user that `wtf.design-task` will inherit the shared component map from this Design Handoff.
+- **Design another Feature** → restart from step 1. Reuse the same Epic context.
 - **Stop here** → exit.

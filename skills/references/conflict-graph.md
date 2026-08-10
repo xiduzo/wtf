@@ -1,16 +1,16 @@
 # File-Conflict Graph Coloring
 
-Partition a set of parallelizable tasks into sub-phases where no two tasks in the same sub-phase touch overlapping files. Use this before spawning parallel sub-agents with worktree isolation.
+Partition a set of parallelizable tasks into sub-phases. No two tasks in the same sub-phase touch overlapping files. Use this before spawning parallel sub-agents with worktree isolation.
 
 ## When to use
 
-Any time multiple sub-agents will each modify files:
+Use this any time multiple sub-agents will each modify files:
 
 - `wtf.loop` — parallel task execution within a phase
 - `wtf.verify-task` Full Feature mode — parallel QA across tasks
 - `wtf.refine` cascade — parallel refinement across affected children
 
-Without this step, parallel worktrees can race on the same file and produce dirty merges.
+Without this step, parallel worktrees can race on the same file. That produces dirty merges.
 
 ## Algorithm
 
@@ -22,7 +22,7 @@ For **every** issue in the input set — Task, Feature, Epic, Bug, or any loose/
 gh issue view <issue_number> --json body --jq '.body'
 ```
 
-Parse the `## Impacted Areas` section — collect all file paths, modules, and components listed. Bugs and loose issues often skip this section; treat them like any other node below.
+Parse the `## Impacted Areas` section. Collect all file paths, modules, and components listed. Bugs and loose issues often skip this section. Treat them like any other node below.
 
 **Inherit from parents (when a parent exists).** A node's *effective* impacted set is the union of:
 
@@ -50,9 +50,9 @@ Assign tasks to sub-phases in issue-number order (stable):
 
 ### 4. Handle missing Impacted Areas
 
-If an issue has no `## Impacted Areas` *and* inherits nothing from any ancestor (common for bugs and loose issues), treat it as conflicting with all others — assign it to its own sub-phase. Note this in the execution plan so the user understands why it is serialized.
+If an issue has no `## Impacted Areas` *and* inherits nothing from any ancestor, treat it as conflicting with all others. This is common for bugs and loose issues. Assign it to its own sub-phase. Note this in the execution plan so the user understands why it is serialized.
 
-If the issue is empty but an ancestor declares impacted areas, use the inherited set (step 1) — do not serialize unnecessarily.
+If the issue is empty but an ancestor declares impacted areas, use the inherited set (step 1). Do not serialize unnecessarily.
 
 ## Output shape
 
@@ -67,10 +67,10 @@ Sub-phases execute sequentially. Tasks within a single sub-phase spawn in parall
 
 ## Advancement gate
 
-Before advancing to the next sub-phase, all PRs from the current sub-phase must be merged so the next worktree branches off a tree that already contains the prior work. Poll each PR until its state is `MERGED`:
+Before advancing to the next sub-phase, all PRs from the current sub-phase must be merged. The next worktree then branches off a tree that already contains the prior work. Poll each PR until its state is `MERGED`:
 
 ```bash
 gh pr view <pr_number> --json state,mergedAt --jq '"\(.state) \(.mergedAt)"'
 ```
 
-Skills that do not produce PRs (e.g. `wtf.refine`) adapt this gate: wait for all sub-agents in the current sub-phase to complete (including any `NEEDS_INPUT` resolution) before starting the next sub-phase.
+Skills that do not produce PRs (for example `wtf.refine`) adapt this gate. Wait for all sub-agents in the current sub-phase to complete. Include any `NEEDS_INPUT` resolution. Then start the next sub-phase.

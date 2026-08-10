@@ -5,17 +5,17 @@ description: This skill should be used when a developer or QA engineer wants to 
 
 # Report Bug
 
-File a structured Bug issue from a QA finding. Core value: the Gherkin scenario that failed becomes the reproducible test evidence, and the originating Task and Feature are linked automatically so nothing loses its context.
+File a structured Bug issue from a QA finding. The failed Gherkin scenario becomes the reproducible test evidence. The originating Task and Feature are linked so context is kept.
 
 ## Fast path (for wtf.hotfix)
 
-When invoked from `wtf.hotfix`, skip the Gherkin-derivation and Ubiquitous-Language mapping work — the goal is to file the issue fast so the fix can start. Run only:
+When invoked from `wtf.hotfix`, skip the Gherkin-derivation and Ubiquitous-Language mapping work. The goal is to file the issue fast so the fix can start. Run only:
 
 - Step 0 — GitHub CLI setup (skip if already confirmed this session).
 - Step 1 — Identify the source (one-sentence bug, impact, optional task link).
-- Step 3 — Gather bug details, but only `a. Observed behavior`, `b. Expected behavior`, and `c. Reproduction steps`. Skip contract violation / regression risk / suggested fix questions — the hotfix will uncover those.
+- Step 3 — Gather bug details, but only `a. Observed behavior`, `b. Expected behavior`, and `c. Reproduction steps`. Skip contract violation / regression risk / suggested fix questions. The hotfix will uncover those.
 - Step 6 — Draft the Bug report with only the sections the fast path produced (leave Contracts Violated, Regression Risk, Suggested Fix blank or marked "Fast path — to be captured during hotfix").
-- Step 7 — Review briefly (or skip if the caller signalled non-interactive).
+- Step 7 — Review briefly (or skip if the caller signaled non-interactive).
 - Step 8 — Create the issue.
 
 Return the bug issue number to the caller. Do not run the offer-next-steps prompt in step 9.
@@ -26,7 +26,7 @@ Return the bug issue number to the caller. Do not run the offer-next-steps promp
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf.verify-task` or another skill that already ran gh-setup this session.
+If invoked from `wtf.verify-task` or another skill that already ran gh-setup this session, skip this step.
 
 ### 1. Identify the source
 
@@ -39,7 +39,7 @@ Ask in a single message:
 - "What is the bug? (one sentence)"
 - "Which Task does this trace back to? (issue number, or 'unknown')"
 
-If a task number is known, walk Task → Feature per `../references/spec-hierarchy.md` to extract Gherkin, Contracts, ACs, DoD (Task) and ACs / user stories (Feature) for expected-behavior context.
+If a task number is known, walk Task → Feature per `../references/spec-hierarchy.md`. Extract Gherkin, Contracts, ACs, and DoD from the Task. Extract ACs and user stories from the Feature for expected-behavior context.
 
 ### 2. Identify the failing scenario(s)
 
@@ -48,7 +48,7 @@ If the Task has Gherkin, present the full scenario list and call `AskUserQuestio
 - header: "Failing scenarios"
 - options:
   - One option per scenario name from the Task
-  - **New — not covered by existing scenarios** — this bug isn't covered by the current Gherkin
+  - **New — not covered by existing scenarios** — this bug is not covered by the current Gherkin
 
 For each failing scenario, note:
 
@@ -67,7 +67,7 @@ Otherwise, for each unknown item below (omitting any already known), call `AskUs
 - **a. Observed behavior** — question: "What was the exact behavior you observed?" / header: "Actual behavior" / options: from plausible failure descriptions inferred from the scenario context.
 - **b. Expected behavior** — question: "What did you expect to happen instead?" / header: "Expected behavior" / options: from the relevant Gherkin `Then` step or AC text if available.
 - **c. Reproduction steps** — question: "What are the reproduction steps?" / header: "Repro steps" / options: **I'll type them out** — enter numbered steps.
-- **d. Contract violation** — question: "Is any contract violated?" / header: "Contract" / options: candidates from contract names in the Task; **None identified**.
+- **d. Contract violation** — question: "Is any contract violated?" / header: "Contract" / options: candidates from contract names in the Task. **None identified**.
 - **e. Regression risk** — question: "What else might break if we fix this?" / header: "Regression risk" / options: from adjacent areas found in the codebase or related Aggregates.
 - **f. Suggested fix** — question: "Do you have a suggested fix in mind?" / header: "Suggested fix" / options: **No suggestion** — leave blank.
 
@@ -92,7 +92,7 @@ List each file found with a one-line description of what it covers. These become
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-Load the BUG template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections:
+Load the BUG template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill all sections:
 
 **Related**
 
@@ -101,7 +101,7 @@ Load the BUG template per `../references/issue-template-loading.md` (verify exis
 - Failing test(s): list each file path (or "manual" with reproduction steps)
 
 **Expected Behavior**
-Quote the relevant Gherkin `Then` step or Feature AC verbatim, then add a plain-language restatement.
+Quote the relevant Gherkin `Then` step or Feature AC verbatim. Then add a plain-language restatement.
 
 **Actual Behavior**
 Describe in domain terms what happened instead. Include any observable symptom (error message, wrong state, missing event).
@@ -127,11 +127,11 @@ Show the draft. Then call `AskUserQuestion` (per `../references/questioning-styl
   - **Yes — create the issue** → proceed with bug creation
   - **I have changes** → adjust first
 
-Apply edits, then proceed.
+Apply edits. Then proceed.
 
 ### 8. Create the issue
 
-> Note: the commands below are pseudo-code. Write each body to a temp file with the Write tool, then create it through the gh body helper (`.wtf/gh-body.py`) so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
+> Note: the commands below are pseudo-code. Write each body to a temp file with the Write tool. Then create it through the gh body helper (`.wtf/gh-body.py`) so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the bug's one-sentence description. Pass in the description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence description.
 
@@ -141,7 +141,7 @@ Apply edits, then proceed.
 python3 .wtf/gh-body.py create --title "🐞 Bug: <title>" --body-file "$BUG_TMP"
 ```
 
-**Classify the issue as `Bug`.** Set `TYPE="Bug"` and `ISSUE_NUMBER=<number from the URL>`, then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation; in `labels` mode it applies the `bug` label.
+**Classify the issue as `Bug`.** Set `TYPE="Bug"` and `ISSUE_NUMBER=<number from the URL>`. Then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation. In `labels` mode it applies the `bug` label.
 
 If the originating Task is known, write this comment to a temp file with the Write tool, then post it linking the bug:
 

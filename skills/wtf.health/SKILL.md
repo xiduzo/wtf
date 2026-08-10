@@ -5,13 +5,17 @@ description: This skill should be used when a developer or lead wants a project 
 
 # Health
 
-Project health dashboard. Core value: gives a full-stack view of open WTF issues in under a minute — surfaces what is blocked, what is stale, and what the clear next action is for each problem found.
+Project health dashboard.
+
+This skill gives a full-stack view of open WTF issues in under a minute.
+It reports what is blocked, what is stale, and the clear next action for each problem found.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated.
+Run steps 1–2 of `../references/gh-setup.md`.
+Stop if `gh` is not installed or not authenticated.
 
 ### 1. Choose the scope
 
@@ -84,7 +88,9 @@ For each issue, check its labels against the expected lifecycle:
 | Open, no task linked in body | ⚠️ Bug not linked to a task |
 | Open > 14 days | 🕐 Stale bug |
 
-Staleness threshold for tasks is 7 days since last update; for bugs, 14 days. These are heuristics — flag but do not auto-close anything.
+Staleness threshold for tasks is 7 days since last update.
+For bugs, it is 14 days.
+These are heuristics — flag but do not auto-close anything.
 
 ### 4. Render the health report
 

@@ -1,23 +1,23 @@
 # Sub-Agent Protocol
 
-Rules for any skill that spawns sub-agents via the Agent tool to execute wtf skill steps in parallel (e.g. `wtf.loop`, `wtf.verify-task` in Full Feature mode, `wtf.refine` during cascade).
+Rules for any skill that spawns sub-agents via the Agent tool to execute wtf skill steps in parallel. Examples: `wtf.loop`, `wtf.verify-task` in Full Feature mode, `wtf.refine` during cascade.
 
 ## Why this matters
 
-Sub-agents do NOT inherit the parent session's loaded skills. A sub-agent spawned from `wtf.loop` cannot see `wtf.implement-task`'s instructions unless those instructions are embedded in its prompt. Referencing a skill by name from inside a sub-agent prompt will fail — the sub-agent has no way to resolve it.
+Sub-agents do NOT inherit the parent session's loaded skills. A sub-agent spawned from `wtf.loop` cannot see `wtf.implement-task`'s instructions unless those instructions are embedded in its prompt. Referencing a skill by name from inside a sub-agent prompt will fail. The sub-agent has no way to resolve it.
 
 ## Rules
 
 ### 1. Embed instructions inline
 
-When a sub-agent needs to execute the steps of another wtf skill, the parent must Read that skill's `SKILL.md` at runtime and paste the relevant step-range into the sub-agent's prompt. Do not reference the skill by name — sub-agents cannot load skills.
+When a sub-agent needs to execute the steps of another wtf skill, the parent must Read that skill's `SKILL.md` at runtime. Paste the relevant step-range into the sub-agent's prompt. Do not reference the skill by name. Sub-agents cannot load skills.
 
 The practical pattern is:
 
-1. Read the target skill file (e.g. `skills/wtf.implement-task/SKILL.md`) at the moment the sub-agent is spawned.
+1. Read the target skill file (for example `skills/wtf.implement-task/SKILL.md`) at the moment the sub-agent is spawned.
 2. Extract the body (skip YAML frontmatter).
 3. Paste it into the sub-agent's prompt under a heading like "# Inline instructions — execute the steps below".
-4. Prepend an override section that replaces interactive behavior (see rule 2) and passes any already-known context (task number, branch name, parent feature) so the sub-agent doesn't re-ask.
+4. Prepend an override section that replaces interactive behavior (see rule 2). Pass any already-known context (task number, branch name, parent feature) so the sub-agent does not re-ask.
 
 Reading at runtime (rather than hard-coding the steps in the orchestrator skill) keeps the sub-agent in sync with the underlying skill without manual mirroring.
 
@@ -31,7 +31,7 @@ Sub-agents MUST NOT call `AskUserQuestion`. All interactive prompts are replaced
 
 ### 3. NEEDS_INPUT return block
 
-If a genuine blocker or ambiguity requires human input (test failures, missing contracts, codebase mismatches, approach conflicts), the sub-agent must return a structured result instead of asking:
+If a genuine blocker or ambiguity requires human input, the sub-agent must return a structured result instead of asking. Examples: test failures, missing contracts, codebase mismatches, approach conflicts.
 
 ```
 NEEDS_INPUT
@@ -41,11 +41,11 @@ options: <list of options>
 context: <relevant details>
 ```
 
-The orchestrator collects all `NEEDS_INPUT` results after each phase, groups them by task, presents them to the user via a single `AskUserQuestion` call, and re-dispatches the affected sub-agents with the answers embedded in their prompts before continuing.
+The orchestrator collects all `NEEDS_INPUT` results after each phase. It groups them by task. It presents them to the user via a single `AskUserQuestion` call. It re-dispatches the affected sub-agents with the answers embedded in their prompts before continuing.
 
 ### 4. Mandatory side effects still run
 
-Lifecycle label updates must always execute in the sub-agent — they cannot be deferred to the orchestrator. If the `gh` command fails, record it in the sub-agent result so the orchestrator can retry.
+Lifecycle label updates must always execute in the sub-agent. They cannot be deferred to the orchestrator. If the `gh` command fails, record it in the sub-agent result so the orchestrator can retry.
 
 The mandatory label transitions are:
 
@@ -57,7 +57,7 @@ The mandatory label transitions are:
 
 ### 5. Isolation and worktree
 
-When multiple sub-agents run in parallel, use `isolation: "worktree"` so each agent works on an independent copy of the repo. The worktree is branched from the current feature branch at spawn time. Instruct the sub-agent to run `git pull --rebase origin <feature_branch>` before starting work — it should not assume any particular local state.
+When multiple sub-agents run in parallel, use `isolation: "worktree"`. Each agent then works on an independent copy of the repo. The worktree is branched from the current feature branch at spawn time. Instruct the sub-agent to run `git pull --rebase origin <feature_branch>` before starting work. It should not assume any particular local state.
 
 See `./conflict-graph.md` for how to schedule sub-agents so overlapping files never run in parallel.
 

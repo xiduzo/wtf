@@ -23,19 +23,19 @@ If the template is missing, apply `./questioning-style.md` and ask "`<TEMPLATE_P
 - **Run `/wtf.setup`** → invoke `wtf.setup` to scaffold all templates, then halt this skill so the user can re-invoke it
 - **Cancel** → halt without scaffolding
 
-Both branches halt the current skill. Do not fall back to drafting without the template — section names and structure are the contract that downstream skills consume.
+Both branches halt the current skill. Do not fall back to drafting without the template. Section names and structure are the contract that downstream skills consume.
 
 ## 3. Read the template body
 
-Use only the markdown body **below the second `---` delimiter**. Ignore the YAML frontmatter at the top — it is GitHub issue-form metadata, not part of the body the user sees in the rendered issue.
+Use only the markdown body **below the second `---` delimiter**. Ignore the YAML frontmatter at the top. It is GitHub issue-form metadata. It is not part of the body the user sees in the rendered issue.
 
 ## 4. Fill placeholders
 
-Replace every `[PLACEHOLDER]` (or any section the template treats as fillable) with the gathered context. Preserve every section heading and structural element exactly — downstream skills parse these by name.
+Replace every `[PLACEHOLDER]` (or any section the template treats as fillable) with the gathered context. Preserve every section heading and structural element exactly. Downstream skills parse these by name.
 
 ## 5. Write the body to a temp file, then create via the gh body helper
 
-Multi-line bodies must go through a temp file (never an inline `--body`), and every create must go through the **gh body helper** so UTF-8 content survives on Windows. See `./gh-body-helper.md`.
+Multi-line bodies must go through a temp file (never an inline `--body`). Every create must go through the **gh body helper** so UTF-8 content survives on Windows. See `./gh-body-helper.md`.
 
 1. Use the Write tool to write the filled body to a temp file `$BODY` (any path under the OS temp dir).
 2. Create through the helper:
@@ -48,6 +48,6 @@ Multi-line bodies must go through a temp file (never an inline `--body`), and ev
    python3 .wtf/gh-body.py create --pr --title "<title>" --body-file "$BODY" --base "<base_branch>"
    ```
 
-If `.wtf/gh-body.py` is absent (repo hasn't run `wtf.setup` since the guard shipped), use the raw-`gh` fallback documented in `./gh-body-helper.md` — works on macOS/Linux, unguarded on Windows.
+If `.wtf/gh-body.py` is absent, use the raw-`gh` fallback in `./gh-body-helper.md`. That means the repo has not run `wtf.setup` since the guard shipped. That fallback works on macOS/Linux. It is unguarded on Windows.
 
-The exact title prefix (`🎯 Epic:`, `🚀 Feature:`, `🛠 Task:`, `🐞 Bug:`) and label name are skill-specific — see each skill's create step. The Read → Write-temp → helper pattern is universal.
+The exact title prefix (`🎯 Epic:`, `🚀 Feature:`, `🛠 Task:`, `🐞 Bug:`) and label name are skill-specific. See each skill's create step. The Read → Write-temp → helper pattern is universal.

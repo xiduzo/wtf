@@ -5,24 +5,32 @@ description: This skill should be used when a developer or tech lead needs to in
 
 # Spike
 
-Run a time-boxed technical investigation. Core value: turns an unknown into a decision — produces concrete findings and a recommendation so the team can write specs confidently rather than guessing.
+Run a time-boxed technical investigation.
+
+This skill turns an unknown into a decision.
+It produces concrete findings and a recommendation.
+The team can then write specs with confidence rather than guess.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
+Run steps 1–2 of `../references/gh-setup.md` (install check and auth check).
+Stop if `gh` is not installed or not authenticated.
+Extensions are not required for this skill.
 
 Skip this step if gh-setup was already confirmed this session.
 
 ### 1. Define the question
 
-If the user described the investigation in their request, extract the core question from it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+If the user described the investigation in their request, extract the core question from it.
+Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What question should this spike answer?"
 - header: "Spike question"
 - options: specific questions inferred from any context provided (e.g. linked Epic, conversation)
 
-The question must be specific and answerable — scoped to a decision the team actually needs to make.
+The question must be specific and answerable.
+Scope it to a decision the team actually needs to make.
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "How much time should this spike take?"
@@ -38,7 +46,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Is this spike linked to an existing issue?"
 - header: "Linked issue"
 - options:
-  - Candidates from open Epics/Features — list per the **List issues of a kind** (several kinds) query in `../references/issue-classification.md` (`--label "epic,feature"` in labels mode, `--search 'type:"Epic" OR type:"Feature"'` in types mode)
+  - Candidates from open Epics/Features — list per the **List issues of a kind** (several kinds) query in `../references/issue-classification.md`. Use `--label "epic,feature"` in labels mode. Use `--search 'type:"Epic" OR type:"Feature"'` in types mode.
   - **No linked issue** — standalone investigation
 
 If linked: fetch the issue to extract domain context, constraints, and success metrics that inform the investigation scope.
@@ -55,7 +63,8 @@ Run all research in parallel using the Agent tool:
 **External research (if available):**
 - Use WebSearch/WebFetch for relevant documentation, benchmarks, or known trade-offs
 
-Synthesise findings internally. Do not dump raw research at the user.
+Synthesise findings internally.
+Do not dump raw research at the user.
 
 ### 4. Derive 2–3 concrete approaches
 
@@ -74,11 +83,13 @@ State a single recommendation:
 
 > "Recommend [Approach N] because [1–2 key reasons]. Main risk: [X], mitigated by [Y]."
 
-If evidence is genuinely ambiguous or the spike revealed the question is harder than expected, say so clearly — recommend a proof of concept or a follow-up spike with a narrower question.
+If evidence is genuinely ambiguous or the spike revealed the question is harder than expected, say so clearly.
+Recommend a proof of concept or a follow-up spike with a narrower question.
 
 ### 6. Review with user
 
-Show the full analysis (approaches + recommendation). Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+Show the full analysis (approaches + recommendation).
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Does this answer the question well enough to proceed?"
 - header: "Spike review"
 - options:
@@ -140,7 +151,8 @@ Print the file path.
 
 ### 8. Post to linked issue (if applicable)
 
-If a linked issue exists, write this comment to a temp file with the Write tool, then post it via the gh body helper (`../references/gh-body-helper.md`):
+If a linked issue exists, write this comment to a temp file with the Write tool.
+Then post it via the gh body helper (`../references/gh-body-helper.md`):
 
 > 🔬 Spike concluded: **<question>** → Recommendation: <one-line summary>. Full findings: docs/spikes/<filename>.md
 
@@ -157,4 +169,4 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - options:
   - **Write an Epic from this** → follow `wtf.write-epic`, seeding it with the spike's recommendation (default)
   - **Write a Task from this** → follow `wtf.write-task` with the spike recommendation as the task description
-  - **Stop here** → exit; the team will decide separately
+  - **Stop here** → exit. The team will decide separately.

@@ -5,7 +5,9 @@ description: This skill should be used when a developer is ready to implement a 
 
 # Implement Task
 
-Pick up an existing Task as a developer. Core value: reads the full spec (Task + Feature + Epic), maps it to the actual codebase, proposes a concrete technical approach, then drives implementation test-first against each Gherkin scenario.
+Start an existing Task as a developer.
+
+Read the full spec (Task + Feature + Epic). Map it to the actual codebase. Propose a concrete technical approach. Drive implementation test-first against each Gherkin scenario.
 
 The expected Task issue body structure is defined in @.github/ISSUE_TEMPLATE/TASK.md.
 
@@ -13,13 +15,14 @@ The expected Task issue body structure is defined in @.github/ISSUE_TEMPLATE/TAS
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Extensions are not required for this skill.
+Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). If `gh` is not installed or not authenticated, stop. Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf.verify-task` or another skill that already ran gh-setup this session.
+If this skill was invoked from `wtf.verify-task` or another skill that already ran gh-setup this session, skip this step.
 
 ### 1. Identify the Task
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
+
 - question: "Which Task are you implementing?"
 - header: "Task"
 - options: from recent open issues labeled `task`
@@ -28,7 +31,11 @@ Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract 
 
 ### 2. Lifecycle check
 
-Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `designed` label on the Task — recommended skill `wtf.design-task`, header `Design check`. On **Design it first** → follow `wtf.design-task` passing the Task number as context. On **Skip design** → proceed. If present, continue silently.
+Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `designed` label on the Task.
+
+Recommended skill: `wtf.design-task`. Header: `Design check`.
+
+On **Design it first** → follow `wtf.design-task` and pass the Task number as context. On **Skip design** → continue. If the label is present, continue silently.
 
 ### 3. Load the technical steering document
 
@@ -36,11 +43,11 @@ Load `docs/steering/TECH.md` per the **strict consumer-side load** in `../refere
 
 ### 4. Set up the branch
 
-Set up the feature branch and task branch per `../references/branch-setup.md` (slug generation, feature-branch create-or-checkout, task-branch create-or-resume). Resolve any conflicts before proceeding.
+Set up the feature branch and task branch per `../references/branch-setup.md` (slug generation, feature-branch create-or-checkout, task-branch create-or-resume). Resolve any conflicts before you continue.
 
 ### 5. Explore the codebase
 
-Before exploring, identify the test framework setup by reading a sample of existing test files. Record the following in a working scratchpad before proceeding — these govern every test written in step 8:
+Before you explore, identify the test framework setup. Read a sample of existing test files. Record the following in a working scratchpad before you continue. These govern every test written in step 8:
 
 | Field             | Value                                          |
 | ----------------- | ---------------------------------------------- |
@@ -58,11 +65,11 @@ Use the Agent tool with these concrete searches (run in parallel):
 - `Glob` matching the test file pattern from the scratchpad (e.g. `**/*.test.ts`) near the integration points found above — surfaces existing tests covering adjacent behavior
 - `Grep` for any import of the domain objects or services this task depends on — identifies dependencies that must exist first
 
-Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context. Use these to ensure the implementation and test naming aligns with the team's Ubiquitous Language.
+Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context. Use these so the implementation and test naming align with the team's Ubiquitous Language.
 
 ### 6. Draft the Technical Approach
 
-Apply strict STE per `../references/ste-writing.md` before writing any durable body (Technical Approach prose and later issue updates). Commit subject/body prose follows STE via `../references/commit-conventions.md`.
+Apply strict STE per `../references/ste-writing.md` before you write any durable body (Technical Approach prose and later issue updates). Commit subject/body prose follows STE via `../references/commit-conventions.md`.
 
 Produce a concrete Technical Approach with actual file paths (not generic layer names):
 
@@ -74,6 +81,7 @@ Produce a concrete Technical Approach with actual file paths (not generic layer 
 ### 7. Review approach with user
 
 Show the Technical Approach. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+
 - question: "Does this align with how you'd approach it?"
 - header: "Approach review"
 - options:
@@ -92,11 +100,11 @@ python3 .wtf/gh-body.py edit <task_number> --body-file "<path-from-read>"
 
 ### 8. Drive the TDD cycle
 
-For each Gherkin scenario in the Task, work through them in order. Match the project's established test patterns discovered in step 5. Reference the Contracts & Interfaces section for exact request/response shapes.
+For each Gherkin scenario in the Task, process them in order. Match the project's established test patterns discovered in step 5. Reference the Contracts & Interfaces section for exact request/response shapes.
 
 1. **Write the failing test** for the scenario.
 2. **Implement the minimum code** to make it pass.
-3. **Refactor** if needed — keep functions under 40 lines, no deep nesting.
+3. **Refactor** if needed. Keep functions under 40 lines. Avoid deep nesting.
 4. **Commit** — atomic semantic commit per `../references/commit-conventions.md`. Use the `Scenario:` and `Task:` trailers:
 
    ```bash
@@ -107,25 +115,27 @@ For each Gherkin scenario in the Task, work through them in order. Match the pro
    Task: #<task_number>"
    ```
 
-5. Do not skip ahead — each scenario is a checkpoint.
+5. Do not skip ahead. Each scenario is a checkpoint.
 
-Once all scenarios are green, run the full lint and type-check gate once across all changes. Check `package.json` for `lint`, `typecheck`, `type-check`, or `check` script keys and run whichever exist:
+Once all scenarios are green, run the full lint and type-check gate once across all changes. Check `package.json` for `lint`, `typecheck`, `type-check`, or `check` script keys. Run whichever exist:
 
 ```bash
 # e.g. npm run lint && npm run typecheck
 ```
 
-Fix any issues before proceeding to coverage.
+Fix any issues before you continue to coverage.
 
 ### 9. Verify coverage
 
-Once all scenarios pass, confirm unit test coverage meets the minimum threshold for all new and modified code. Use the threshold specified in `docs/steering/QA.md` if it exists; default to 80% if the document is absent or does not define a threshold:
+Once all scenarios pass, confirm unit test coverage meets the minimum threshold for all new and modified code.
+
+Use the threshold specified in `docs/steering/QA.md` if it exists. Default to 80% if the document is absent or does not define a threshold:
 
 ```bash
 # Run the project's coverage command (check package.json scripts)
 ```
 
-If coverage is below 80% on any new or modified file, add targeted tests before proceeding. Every public function must have at least one happy-path and one error-path test.
+If coverage is below 80% on any new or modified file, add targeted tests before you continue. Every public function must have at least one happy-path and one error-path test.
 
 ### 10. Update Test Mapping
 
@@ -146,7 +156,7 @@ Print the updated Task issue URL.
 
 ### 11. Mark implemented and offer to continue
 
-Add the `implemented` lifecycle label — this is mandatory regardless of invocation mode:
+Add the `implemented` lifecycle label. This is mandatory regardless of invocation mode:
 
 ```bash
 gh issue edit <task_number> --add-label "implemented"
@@ -155,6 +165,7 @@ gh issue edit <task_number> --add-label "implemented"
 If invoked from the loop (non-interactive mode), skip the ask below and return control to the loop.
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
+
 - question: "What's next?"
 - header: "Next step"
 - options:

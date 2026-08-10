@@ -5,19 +5,25 @@ description: Use when new insights change the scope, acceptance criteria, domain
 
 # Refine
 
-Update an existing Epic, Feature, or Task issue based on new insights. Core value: merges insights from any source, determines exactly which sections change, re-runs only the validations those changes require, shows you a precise diff before touching anything, and cascades to children so nothing goes stale.
+Update an existing Epic, Feature, or Task issue from new insights.
+
+This skill merges insights from any source. It finds which sections change. It re-runs only the validations those changes need. It shows a precise diff before it writes. It offers cascade to children so nothing goes stale.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md` (install check and auth check). Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — they are used in step 1 (hierarchy fetch) and step 9 (cascade).
+Run steps 1–2 of `../references/gh-setup.md` (install check and auth check).
+Stop if `gh` is not installed or not authenticated.
+Note whether the extensions are available.
+They are used in step 1 (hierarchy fetch) and step 9 (cascade).
 
 Skip this step if gh-setup was already confirmed this session.
 
 ### 1. Identify the issue and its hierarchy
 
-If an issue number was passed in as context or a CLI argument, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+If an issue number was passed in as context or a CLI argument, use it directly.
+Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which issue are you refining?"
 - header: "Issue"
 - options: from recently-updated open issues across all WTF labels (epic, feature, task), inferred from:
@@ -37,7 +43,9 @@ Fetch the issue:
 gh issue view <issue_number> --json number,title,body,labels,comments,updatedAt
 ```
 
-**Detect the issue kind** — follow the **Detect the kind of an existing issue** block in `../references/issue-classification.md` (it reads the native issue type in `types` mode and the kind label in `labels` mode; compare case-insensitively):
+**Detect the issue kind** — follow the **Detect the kind of an existing issue** block in `../references/issue-classification.md`.
+It reads the native issue type in `types` mode and the kind label in `labels` mode.
+Compare case-insensitively:
 - `Epic` → type = **Epic**
 - `Feature` → type = **Feature**
 - `Task` → type = **Task**
@@ -56,15 +64,19 @@ gh sub-issue list <issue_number> --relation parent
 gh sub-issue list <issue_number>
 ```
 
-For the parent issue, fetch its body to extract goal, bounded context, and success metrics — these inform whether a change in the child conflicts with the parent's intent.
+For the parent issue, fetch its body.
+Extract goal, bounded context, and success metrics.
+These show whether a child change conflicts with the parent intent.
 
 ### 2. Gather insights from all sources
 
-Merge insights from every available source into a single consolidated list. Process all sources in parallel:
+Merge insights from every available source into one list.
+Process all sources in parallel:
 
 **a. CLI argument / conversation context**
 
-If the user passed insight text in the invocation (e.g. `refine #42 "scope changed — exclude mobile"`), treat that as the primary insight. If nothing was passed, call `AskUserQuestion` (per `../references/questioning-style.md`):
+If the user passed insight text in the invocation (e.g. `refine #42 "scope changed — exclude mobile"`), treat that as the primary insight.
+If nothing was passed, call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What changed or what new insight should I incorporate?"
 - header: "Insight"
 - options: from plausible changes inferred from recent issue comments (e.g. the last comment's key point)
@@ -78,7 +90,10 @@ gh issue view <issue_number> --json comments,updatedAt \
   --jq '.updatedAt as $bodyUpdatedAt | .comments[] | select(.createdAt > $bodyUpdatedAt) | "[\(.author.login)] \(.body)"'
 ```
 
-Read each comment and extract actionable insights — discard discussion noise ("+1", "agreed", "thanks"). Synthesise into concrete change signals (e.g. "Stakeholder comment: settlement must support multi-currency").
+Read each comment.
+Extract actionable insights.
+Discard discussion noise ("+1", "agreed", "thanks").
+Synthesise into concrete change signals (e.g. "Stakeholder comment: settlement must support multi-currency").
 
 **c. Referenced files**
 
@@ -91,7 +106,8 @@ Extract the relevant change signals from each document.
 
 **d. Consolidate**
 
-Merge all signals into a numbered list of insights. Present them briefly to the user:
+Merge all signals into a numbered list of insights.
+Present them briefly to the user:
 
 > "I found [n] insight(s) to incorporate:
 > 1. [insight summary]
@@ -104,13 +120,16 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - options:
   - **Yes — proceed** → continue with these insights
   - **Add more** → I have additional context to provide
-  - **Remove one** → some of these aren't relevant
+  - **Remove one** → some of these are not relevant
 
-Apply any adjustments before continuing.
+Apply any adjustments before you continue.
 
 ### 3. Classify the changes
 
-For each insight, determine which sections of the issue it affects and what type of change it is. This classification drives which validations run in step 4 and which sections are rewritten in step 5.
+For each insight, determine which sections of the issue it affects.
+Also determine what type of change it is.
+This classification drives which validations run in step 4.
+It also drives which sections are rewritten in step 5.
 
 **Change types and their affected sections:**
 
@@ -138,35 +157,47 @@ Change map:
 
 ### 4. Re-run relevant validations only
 
-Using the change map from step 3, run only the validations that apply. Skip the rest — do not re-validate unchanged sections.
+Using the change map from step 3, run only the validations that apply.
+Skip the rest.
+Do not re-validate unchanged sections.
 
 **Scope changed → Vertical slice + Scope gate**
 
-Re-run both stages defined in `../references/scope-gates.md` on the refined intent, then on the rewritten sections. The per-level split signals live in the matching write-* skill:
+Re-run both stages defined in `../references/scope-gates.md` on the refined intent, then on the rewritten sections.
+The per-level split signals live in the matching write-* skill:
 
 - Epic → `wtf.write-epic` step 7
 - Feature → `wtf.write-feature` step 9
 - Task → `wtf.write-task` step 9
 
-If a split signal fires on the **refined** issue, present it as a refinement concern (not a blocker). Use the same keep / split / stop ask the write-* skill uses (see `../references/scope-gates.md`).
+If a split signal fires on the **refined** issue, present it as a refinement concern (not a blocker).
+Use the same keep / split / stop ask the write-* skill uses (see `../references/scope-gates.md`).
 
 **Domain language changed → DDD Language Guard**
 
-Re-run the checks from `../references/ddd-writing-rules.md` on any section whose text is being rewritten. Flag and correct violations silently; note corrections in the diff (step 5).
+Re-run the checks from `../references/ddd-writing-rules.md` on any section whose text is being rewritten.
+Flag and correct violations silently.
+Note corrections in the diff (step 5).
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body (rewritten sections and the audit trail comment).
 
 **ACs changed (Feature or Task) → Gherkin re-derivation**
 
-If Feature ACs changed, mark the Proposed Tasks section as potentially stale — note which tasks may need re-scoping. Do not automatically update child Tasks here; that is handled in step 9 (cascade).
+If Feature ACs changed, mark the Proposed Tasks section as potentially stale.
+Note which tasks may need re-scoping.
+Do not automatically update child Tasks here.
+That is handled in step 9 (cascade).
 
-If Task ACs changed, re-derive only the Gherkin scenarios that map to the changed AC(s). Keep unchanged scenarios exactly as they are.
+If Task ACs changed, re-derive only the Gherkin scenarios that map to the changed AC(s).
+Keep unchanged scenarios exactly as they are.
 
 ### 5. Draft the section updates and show a diff
 
-Produce the updated content for each section in the change map. Do not touch sections that are not in the change map.
+Produce the updated content for each section in the change map.
+Do not touch sections that are not in the change map.
 
-Present a **section-by-section before/after diff** for every changed section. Format each section's diff as:
+Present a **section-by-section before/after diff** for every changed section.
+Format each section's diff as:
 
 ```
 ## [Section name]
@@ -184,7 +215,7 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - options:
   - **Looks good — apply it** → write the changes to the issue
   - **I have corrections** → adjust one or more sections
-  - **Start over** → the insights were wrong; re-describe what changed
+  - **Start over** → the insights were wrong. Re-describe what changed.
 
 Apply any corrections, then proceed.
 
@@ -210,19 +241,23 @@ If any stale labels are present, call `AskUserQuestion` (per `../references/ques
 - header: "Stale labels"
 - options:
   - **Strip stale labels** → remove the labels that no longer reflect reality (recommended)
-  - **Keep labels as-is** → leave labels unchanged; I'll manage them manually
+  - **Keep labels as-is** → leave labels unchanged. The user will manage them manually.
 
 Record the decision for the audit comment in step 8.
 
 ### 7. Apply the changes
 
-Read the current issue body, merge only the changed sections (preserving all unchanged content), and write the updated body — through the gh body helper (`../references/gh-body-helper.md`):
+Read the current issue body.
+Merge only the changed sections.
+Preserve all unchanged content.
+Write the updated body through the gh body helper (`../references/gh-body-helper.md`):
 
 ```bash
 python3 .wtf/gh-body.py read <issue_number>       # prints a temp path
 ```
 
-Use the Edit tool to replace each changed section in the printed temp file with its updated content. Preserve all other sections verbatim.
+Use the Edit tool to replace each changed section in the printed temp file with its updated content.
+Preserve all other sections verbatim.
 
 ```bash
 python3 .wtf/gh-body.py edit <issue_number> --body-file "<path-from-read>"
@@ -239,7 +274,7 @@ Print the updated issue URL.
 
 ### 8. Post the audit trail comment
 
-Post a structured comment summarising the refinement:
+Post a structured comment that summarises the refinement:
 
 ```bash
 # Write the audit comment to a temp file with the Write tool; $COMMENT is that path.
@@ -276,15 +311,16 @@ Using the hierarchy fetched in step 1, determine which children are affected by 
 - Tasks whose Gherkin scenarios directly test the changed ACs
 - Tasks whose Proposed Tasks checklist entry was modified or removed
 
-Present the affected children as a numbered list. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+Present the affected children as a numbered list.
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "These child issues may be out of sync with the updated spec: [list]. How would you like to handle them?"
 - header: "Cascade"
 - options:
   - **Refine each one now** → walk through `wtf.refine` for each affected child in order (default)
-  - **I'll handle them manually** → exit; I'll open each child and update it myself
+  - **I'll handle them manually** → exit. The user will open each child and update it.
   - **Skip** → leave children as-is
 
-- **Refine each one now** → partition the affected children into conflict-free sub-groups using `../references/conflict-graph.md` (sub-groups here play the role of sub-phases). For each sub-group, spawn one sub-agent per child in parallel using the Agent tool, following `../references/subagent-protocol.md` — read `skills/wtf.refine/SKILL.md` at spawn time and paste steps 2 onward into each sub-agent prompt. Pass in the child issue number and the parent insight as pre-loaded context so the user is not re-asked. Wait for all sub-agents in a sub-group to complete (resolving any `NEEDS_INPUT` responses) before starting the next sub-group. After all sub-groups complete, summarise results.
+- **Refine each one now** → partition the affected children into conflict-free sub-groups using `../references/conflict-graph.md` (sub-groups here play the role of sub-phases). For each sub-group, spawn one sub-agent per child in parallel using the Agent tool, following `../references/subagent-protocol.md`. Read `skills/wtf.refine/SKILL.md` at spawn time. Paste steps 2 onward into each sub-agent prompt. Pass in the child issue number and the parent insight as pre-loaded context so the user is not re-asked. Wait for all sub-agents in a sub-group to complete (resolving any `NEEDS_INPUT` responses). Then start the next sub-group. After all sub-groups complete, summarise results.
 - **I'll handle them manually** / **Skip** → exit.
 
 If no children are affected, skip this step entirely.

@@ -5,17 +5,24 @@ description: This skill should be used when a team wants to close out a complete
 
 # Retro
 
-Close out a completed Epic with a structured retrospective. Core value: compares what was planned (original Epic spec) against what shipped (closed Tasks + PRs), surfaces deviations, routes learnings into steering docs, and formally closes the Epic so the team starts the next initiative with a clean slate.
+Close a completed Epic with a structured retrospective.
+
+This skill compares what was planned (original Epic spec) against what shipped (closed Tasks + PRs).
+It reports deviations.
+It routes learnings into steering docs.
+It closes the Epic so the team starts the next initiative with a clean slate.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run steps 1–2 of `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated.
+Run steps 1–2 of `../references/gh-setup.md`.
+Stop if `gh` is not installed or not authenticated.
 
 ### 1. Identify the Epic
 
-If an Epic number was passed in, use it directly. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+If an Epic number was passed in, use it directly.
+Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Epic are you closing out?"
 - header: "Epic"
 - options: from open Epics — list them per the **List issues of a kind** query (kind `Epic`) in `../references/issue-classification.md` (`--label epic` in labels mode, `--search 'type:"Epic"'` in types mode)
@@ -41,7 +48,7 @@ Also fetch:
 
 ### 2. Check completion status
 
-Verify all work is actually done before running a retro:
+Verify all work is actually done before you run a retro:
 
 - All child Features are closed
 - All child Tasks are closed (or explicitly marked `won't implement`)
@@ -51,8 +58,8 @@ If anything is still open, call `AskUserQuestion` (per `../references/questionin
 - question: "Not all work is closed yet — [list open items]. Run the retro anyway?"
 - header: "Incomplete work"
 - options:
-  - **Run retro anyway** → some items are open; note them as incomplete
-  - **Wait until complete** → exit; finish the remaining work first
+  - **Run retro anyway** → some items are open. Note them as incomplete.
+  - **Wait until complete** → exit. Finish the remaining work first.
 
 ### 3. Compare planned vs. shipped
 
@@ -73,11 +80,12 @@ Identify deviations:
 - Features planned but not built (descoped or deferred)
 - Features added that were not in the original breakdown (scope growth)
 - Tasks that took significantly more iterations than expected (PR re-open, multiple verify cycles)
-- Success Metrics: were they actually achieved? (state what you can verify from the spec; flag ones that require manual measurement)
+- Success Metrics: were they actually achieved? State what you can verify from the spec. Flag ones that require manual measurement.
 
 ### 4. Gather learnings
 
-Only ask what isn't already evident from the issue history. For each question below, call `AskUserQuestion` (per `../references/questioning-style.md`).
+Only ask what is not already evident from the issue history.
+For each question below, call `AskUserQuestion` (per `../references/questioning-style.md`).
 
 **Q1 — What was harder than expected?**
 
@@ -116,7 +124,7 @@ For each learning gathered, determine where it belongs using the same routing ta
 | Test failure pattern, QA gap | `QA.md` |
 | Design inconsistency, component misuse | `DESIGN.md` |
 | Scope confusion, domain language drift | `VISION.md` |
-| Doesn't clearly fit | `TECH.md` (default) |
+| Does not clearly fit | `TECH.md` (default) |
 
 For each target doc, append under `## Hard-Won Lessons` using the format:
 
@@ -131,7 +139,9 @@ git add docs/steering/
 git commit -m "docs(steering): lessons from Epic #<epic_number>"
 ```
 
-If any domain model insights were gathered (Q3), also update the glossary via the same pattern as `wtf.write-epic` step 10 (including the greppable **STE allowlist** table in `docs/glossary.md` per `../references/ste-writing.md`).
+If any domain model insights were gathered (Q3), also update the glossary.
+Use the same pattern as `wtf.write-epic` step 10.
+Include the greppable **STE allowlist** table in `docs/glossary.md` per `../references/ste-writing.md`.
 
 ### 6. Write the retro summary
 
@@ -183,13 +193,14 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - header: "Changelog"
 - options:
   - **Yes — run changelog** → run `wtf.changelog` for this Epic (recommended)
-  - **Not now** → skip; I'll handle the release notes separately
+  - **Not now** → skip. The user will handle the release notes separately.
 
 If yes → follow the `wtf.changelog` process with the Epic number pre-loaded as context.
 
 ### 8. Close the Epic
 
-The Epic closes automatically when all child Feature PRs contain `Closes #<feature_number>`, which in turn contains `Closes #<epic_number>` — via GitHub's auto-close chain. Confirm this has happened:
+The Epic closes automatically when all child Feature PRs contain `Closes #<feature_number>`, which in turn contains `Closes #<epic_number>` — via GitHub's auto-close chain.
+Confirm this has happened:
 
 ```bash
 gh issue view <epic_number> --json state -q .state
@@ -197,14 +208,14 @@ gh issue view <epic_number> --json state -q .state
 
 If the Epic is already `CLOSED` → print: "Epic #<n> is already closed via merged PRs. Retro complete."
 
-If still open (e.g. auto-close chain didn't fire): ask the user whether to close it via a merged PR reference or directly:
+If still open (e.g. auto-close chain did not fire): ask the user whether to close it via a merged PR reference or directly:
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Epic #<n> is still open. How would you like to close it?"
 - header: "Close Epic"
 - options:
-  - **Close as completed** → mark as closed; all work is done
-  - **Leave open** → I'll close it separately
+  - **Close as completed** → mark as closed. All work is done.
+  - **Leave open** → the user will close it separately.
 
 If "Close as completed":
 ```bash

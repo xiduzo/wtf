@@ -12,9 +12,9 @@ Run `../references/gh-setup.md`. Stop if `gh` is not installed or not authentica
 
 Skip this entire step if **any** of the following is true:
 
-- The calling orchestrator already ran gh-setup this session (e.g. `wtf.epic-to-features` → `wtf.write-feature`, `wtf.implement-task` → `wtf.verify-task`). The orchestrator passes along the confirmation implicitly by not re-asking.
+- The calling orchestrator already ran gh-setup this session (e.g. `wtf.epic-to-features` → `wtf.write-feature`, `wtf.implement-task` → `wtf.verify-task`). The orchestrator passes the confirmation when it does not ask again.
 - A prior wtf skill in the same session ran gh-setup and succeeded.
-- The skill is re-invoking itself in a loop (e.g. "Write next Task" → restart from step 2).
+- The skill re-invokes itself in a loop (e.g. "Write next Task" → restart from step 2).
 
 ## Which sections apply to which skills
 
@@ -28,7 +28,7 @@ Skip this entire step if **any** of the following is true:
 gh --version
 ```
 
-If not found: tell the user `gh` CLI is required and link them to https://cli.github.com. Stop — do not proceed.
+If not found: tell the user `gh` CLI is required and link them to https://cli.github.com. Stop. Do not continue.
 
 ## 2. Verify `gh` is authenticated
 
@@ -36,7 +36,7 @@ If not found: tell the user `gh` CLI is required and link them to https://cli.gi
 gh auth status
 ```
 
-If not authenticated: tell the user to run `gh auth login` and stop. Do not proceed until authentication is confirmed.
+If not authenticated: tell the user to run `gh auth login` and stop. Do not continue until authentication is confirmed.
 
 ## 3. Check and install required extensions
 
@@ -44,7 +44,7 @@ If not authenticated: tell the user to run `gh auth login` and stop. Do not proc
 gh extension list
 ```
 
-Check the output for both of the following extensions. For each that is missing, install it:
+Check the output for both extensions below. For each that is missing, install it:
 
 ```bash
 # Sub-issue hierarchy (epic → feature → task)
@@ -57,21 +57,22 @@ gh extension install xiduzo/gh-issue-dependency
 If installation fails (e.g. network error, permissions), warn the user that relationship tracking is unavailable until the extension is installed. **Do not fall back to writing `Depends on #X` or `Blocks #Y` into issue bodies** — body-text relationship references are not used in this workflow.
 
 After this step, record two booleans for use in the rest of the session:
+
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
 - `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
 
-All callers reference these flags when deciding whether to create native links.
+All callers use these flags when they decide whether to create native links.
 
 ## 4. Confirm command syntax (first install only)
 
-After installing an extension for the first time, verify the available commands:
+After you install an extension for the first time, verify the available commands:
 
 ```bash
 gh sub-issue --help
 gh issue-dependency --help
 ```
 
-Skip this step on subsequent sessions if the extensions were already confirmed working. Use the output to confirm the exact flag names. The reference signatures below are expected but may vary by extension version:
+Skip this step on later sessions if the extensions already work. Use the output to confirm the exact flag names. The reference signatures below are expected but may vary by extension version:
 
 ```md
 List issues related to the specified issue based on relationship type.
@@ -183,11 +184,13 @@ If the `--help` output shows different flags, use those instead.
 gh repo view --json nameWithOwner -q .nameWithOwner
 ```
 
-Store the result as `<owner>/<repo>` for use in all subsequent extension calls in this session.
+Store the result as `<owner>/<repo>` for all later extension calls in this session.
 
 ## Appendix — Sub-issue and dependency cookbook
 
-Canonical call shapes for the two extensions installed above. Skills cite this section rather than re-documenting the patterns. All commands assume `gh-sub-issue-available` / `gh-issue-dependency-available` is true — when false, do not write `Depends on #X` / `Blocks #Y` into issue bodies, warn the user that relationship tracking is unavailable.
+Canonical call shapes for the two extensions installed above. Skills cite this section rather than re-document the patterns.
+
+All commands assume `gh-sub-issue-available` / `gh-issue-dependency-available` is true. When false, do not write `Depends on #X` / `Blocks #Y` into issue bodies. Warn the user that relationship tracking is unavailable.
 
 ### Hierarchy — `gh sub-issue`
 
@@ -245,4 +248,4 @@ Typical wtf usage:
 | `wtf.write-task` | `gh issue-dependency add <task> --blocked-by <n>` | Cross-feature task dep |
 | `wtf.loop` step 1 | `gh issue-dependency list <n>` per node | Build DAG for topo sort |
 
-For the full traversal pattern (Task → Feature → Epic walk), see `./spec-hierarchy.md` rather than reimplementing per skill.
+For the full traversal pattern (Task → Feature → Epic walk), see `./spec-hierarchy.md`. Do not reimplement that walk per skill.

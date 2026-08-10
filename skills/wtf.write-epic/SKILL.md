@@ -5,15 +5,15 @@ description: This skill should be used when a user wants to create, draft, or pl
 
 # Write Epic
 
-Create a GitHub Epic issue capturing a strategic initiative with stakeholders, goals, success metrics, and a feature breakdown scaffold.
+Create a GitHub Epic issue for a strategic initiative. Capture stakeholders, goals, success metrics, and a feature breakdown scaffold.
 
 ## Process
 
 ### 0. GitHub CLI setup
 
-Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available — this determines whether native dependency links are created in step 8.
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. That result controls whether native dependency links are created in step 8.
 
-Skip this step if gh-setup was already confirmed this session (e.g. when this skill is re-invoked via `wtf.write-feature` step 11 "Write another Epic").
+If gh-setup was already confirmed this session, skip this step. Example: this skill is re-invoked via `wtf.write-feature` step 11 "Write another Epic".
 
 ### 1. Capture the seed idea
 
@@ -22,44 +22,44 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - header: "Initiative"
 - options: infer 1–2 candidates from recent open Epics or README context if available
 
-Do not ask follow-up questions yet. Acknowledge the idea briefly and move straight to research.
+Do not ask follow-up questions yet. Acknowledge the idea briefly. Move to research.
 
 ### 2. Deep research
 
-Run in parallel using the Agent tool and GitHub issue search:
+Run in parallel with the Agent tool and GitHub issue search.
 
 **Codebase exploration:**
 
-Use the Agent tool with these concrete searches (run in parallel):
+Use the Agent tool with these searches. Run them in parallel:
 
 - `Glob('**/{README,readme}.md')` + `Glob('docs/**/*.md')` + `Glob('**/*.{adr,ADR}.md')` — for existing product descriptions, ADRs, and architectural notes
 - `Glob('src/**', 'lib/**', 'packages/**')` — to understand the module structure and which systems exist
 - `Grep` for the initiative's key domain nouns across `*.{ts,tsx,js,jsx,py,go,rb,java,cs}` files — to find existing implementations, prior attempts, or integration points
-- `Glob('**/{GLOSSARY,glossary,ubiquitous-language,domain}.md')` + `Glob('.github/**/*.md')` — for any existing domain glossary, ubiquitous language docs, or prior DDD artefacts
+- `Glob('**/{GLOSSARY,glossary,ubiquitous-language,domain}.md')` + `Glob('.github/**/*.md')` — for any existing domain glossary, ubiquitous language docs, or prior DDD artifacts
 
 **Wiki / glossary fetch:**
-Fetch relevant GitHub wiki pages or in-repo glossary docs. Search for pages matching the initiative's domain area. Use these to:
+Fetch relevant GitHub wiki pages or in-repo glossary docs. Search for pages that match the initiative domain area. Use these to:
 
 - Identify existing Ubiquitous Language terms the team already uses
-- Avoid introducing synonyms for already-named concepts
+- Avoid new synonyms for named concepts
 - Surface any existing Bounded Context definitions
 
 **Related issues (optional — if GitHub is unavailable, skip this sub-step without comment):**
 
-- Open and closed issues/epics that overlap or inform this initiative
+- Open and closed issues or epics that overlap or inform this initiative
 - Prior discussions, decisions, or rejected approaches
 
-Synthesise findings internally. Do not dump raw research at the user.
+Synthesize findings internally. Do not dump raw research at the user.
 
 ### 3. Grill the user
 
-Using what research revealed, ask targeted follow-up questions to close the remaining gaps. For each unanswered item below, call `AskUserQuestion` (per `../references/questioning-style.md`).
+Use research findings. Ask targeted follow-up questions to close remaining gaps. For each unanswered item below, call `AskUserQuestion` (per `../references/questioning-style.md`).
 
 Completeness checklist (ask only about unanswered items):
 
 - Scope boundaries (what is explicitly out of scope?)
-- Success criteria (how will we know we're done?)
-- Stakeholders (Product Owner, Lead Designer, Tech Lead — skip any that don't apply)
+- Success criteria (how will we know we are done?)
+- Stakeholders (Product Owner, Lead Designer, Tech Lead — skip any that do not apply)
 - Constraints or deadlines that must shape the approach
 - Any known risks or dependencies the research surfaced that need confirmation
 - **Bounded Context:** Which domain context(s) does this initiative live in? (Ask last — use an option list if multiple contexts were found in research.)
@@ -71,18 +71,18 @@ Before drafting, review the seed idea and all gathered context against the rules
 
 - Does the Epic title describe a **business outcome**, not a technology action?
 - Does the Goal use domain vocabulary — not engineering jargon?
-- Reframe any tech terms as business outcomes — the implementation detail belongs in Tasks.
-- Flag any ambiguous or undefined term and propose the domain-correct alternative.
+- Reframe any tech terms as business outcomes. Implementation detail belongs in Tasks.
+- Flag any ambiguous or undefined term. Propose the domain-correct alternative.
 
 ### 5. Vertical slice assessment
 
-Run Stage 1 of `../references/scope-gates.md` on the gathered context. The Epic-specific bar: a coherent, independently deliverable strategic initiative that produces real user or business value on its own, not only as a dependency for another epic.
+Run Stage 1 of `../references/scope-gates.md` on the gathered context. Epic bar: a coherent strategic initiative that delivers user or business value alone. It must not exist only as a dependency for another epic.
 
 Evaluate:
 
 - **Passes** → proceed to draft.
 - **Too broad** → propose focused epics and confirm with the user before continuing.
-- **Has dependencies** → identify Epics this epic depends on and Epics that depend on this one. Record each dependency issue number for step 8; do not write them into the body yet.
+- **Has dependencies** → identify Epics this epic depends on and Epics that depend on this one. Record each dependency issue number for step 8. Do not write them into the body yet.
 
 ### 6. Draft the Epic
 
@@ -90,30 +90,30 @@ Produce a complete draft. Success Metrics must be specific and measurable. Featu
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-Load the EPIC template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context.
+Load the EPIC template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill all sections with the gathered context.
 
 **DDD writing rules for this draft:**
 
-- **Bounded Context:** Fill in the Bounded Context field. If the epic spans multiple contexts, name each and describe where the seam is.
+- **Bounded Context:** Fill the Bounded Context field. If the epic spans multiple contexts, name each and describe where the seam is.
 - **Context and Goal sections:** Every sentence must use Ubiquitous Language. No tech jargon.
 - **Success Metrics:** Phrase as business-observable outcomes ("Merchants can view settlement status within 2 minutes of payment"), not system metrics ("API latency < 200ms").
 - **Risks:** Frame risks in domain terms ("Dispute resolution rules differ by jurisdiction") before listing technical risks.
 
 ### 7. Scope gate
 
-Run Stage 2 of `../references/scope-gates.md` on the written draft. Even if step 5 passed, run this — drafting sometimes reveals bundled objectives that were invisible in the abstract.
+Run Stage 2 of `../references/scope-gates.md` on the written draft. Run this even if step 5 passed. Drafting can reveal bundled objectives that were invisible in the abstract.
 
 **Epic-level split signals** (heuristics — use judgement, not rigid thresholds):
 
-- The Goal statement contains multiple distinct business objectives joined by "and" — each could stand alone as a separate initiative.
-- The Feature Breakdown has more than 8 proposed features — treat this as a signal worth scrutiny, not an automatic trigger (8 tightly related features in one domain can be fine).
+- The Goal statement contains multiple distinct business objectives joined by "and". Each could stand alone as a separate initiative.
+- The Feature Breakdown has more than 8 proposed features. Treat this as a signal worth scrutiny, not an automatic trigger. Eight tightly related features in one domain can be fine.
 - The Epic spans more than one Bounded Context without a clear seam or handoff point.
 - Success Metrics describe outcomes that belong to completely different user journeys.
 - The epic's beneficiary cannot be stated in a single sentence without using "and" to cover unrelated groups.
 
-If no signals fire, proceed to creation. If one or more fire, follow the Stage 2 procedure: state the signals, explain the risk, propose a concrete split (two or three focused epic titles with a one-line goal each), and use the keep/split/stop ask from `../references/scope-gates.md`.
+If no signals fire, proceed to creation. If one or more fire, follow the Stage 2 procedure. State the signals. Explain the risk. Propose a concrete split (two or three focused epic titles with a one-line goal each). Use the keep/split/stop ask from `../references/scope-gates.md`.
 
-On **Split it** → return to step 3 with the chosen focused Epic as the seed. Carry forward all research and codebase findings already gathered — only re-ask stakeholder questions that the narrowed scope makes ambiguous. Note the remaining proposed sub-epics to the user as follow-on work.
+On **Split it** → return to step 3 with the chosen focused Epic as the seed. Carry forward all research and codebase findings already gathered. Only re-ask stakeholder questions that the narrowed scope makes ambiguous. Note the remaining proposed sub-epics to the user as follow-on work.
 
 ### 8. Review with user
 
@@ -124,11 +124,11 @@ Show the draft. Then call `AskUserQuestion` (per `../references/questioning-styl
   - **Looks good — create the issue** → proceed with issue creation
   - **I have changes** → adjust first
 
-Apply edits, then proceed immediately.
+Apply edits. Then proceed immediately.
 
 ### 9. Create the issue
 
-> Note: Write the issue body to a temp file (`$BODY`) with the Write tool, then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
+> Note: Write the issue body to a temp file (`$BODY`) with the Write tool. Then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
 > **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the Epic's Goal. Pass in the Goal text and ask for a title (no prefix emoji/label needed — that is added below).
 
@@ -140,27 +140,27 @@ python3 .wtf/gh-body.py create --title "🎯 Epic: <title>" --body-file "$BODY"
 
 Print the issue URL and number.
 
-**Classify the issue as `Epic`.** Set `TYPE="Epic"` and `ISSUE_NUMBER=<number from the URL>`, then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation; in `labels` mode it applies the `epic` label. Either way the Epic is classified — nothing downstream depends on which mechanism was used.
+**Classify the issue as `Epic`.** Set `TYPE="Epic"` and `ISSUE_NUMBER=<number from the URL>`. Then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation. In `labels` mode it applies the `epic` label. Either way the Epic is classified. Nothing downstream depends on which mechanism was used.
 
-**Native dependency links:** Epics are top-level — no `gh sub-issue` call is needed here. If `gh-issue-dependency-available` (from step 0), create a blocking link for each dependency identified in step 5:
+**Native dependency links:** Epics are top-level. No `gh sub-issue` call is needed here. If `gh-issue-dependency-available` (from step 0), create a blocking link for each dependency identified in step 5:
 
 ```bash
 # For each issue this epic depends on (must ship first):
 gh issue-dependency add <this_epic_number> --blocked-by <blocker_number>
 ```
 
-If the extension is unavailable, warn the user — do not write dependency references into the issue body.
+If the extension is unavailable, warn the user. Do not write dependency references into the issue body.
 
 ### 10. Update the wiki / glossary
 
-If this Epic introduced or refined any **Bounded Context** definitions or **Ubiquitous Language** terms (domain actors, domain verbs, domain objects), update the project's glossary:
+If this Epic introduced or refined **Bounded Context** definitions or **Ubiquitous Language** terms, update the project glossary:
 
 - Check whether a wiki page or in-repo glossary doc exists for this Bounded Context (e.g. `docs/glossary.md`, GitHub wiki page matching the context name).
 - If a page exists: add or update the relevant term definitions, linking back to the Epic issue number.
 - If no page exists: create one (prefer the GitHub wiki if available, otherwise `docs/glossary.md`), seeding it with the terms defined in this Epic.
 - Always keep (or add) the greppable **STE allowlist** table in `docs/glossary.md` per the **Glossary shape** in `../references/ste-writing.md` — one row per term with Kind `actor` | `verb` | `object` | `context` | `event` and a Source pointing at this Epic.
 
-Skip without comment if no terms were introduced. Report only the page name and terms added if an update was made.
+If no terms were introduced, skip without comment. If an update was made, report only the page name and terms added.
 
 ### 11. Offer to continue
 

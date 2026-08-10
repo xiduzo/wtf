@@ -5,7 +5,10 @@ description: This skill should be used when a developer wants to generate releas
 
 # Changelog
 
-Generate a changelog entry or GitHub Release from merged work. Core value: derives user-facing language from the spec hierarchy (Epic → Feature → Task Gherkin) rather than raw commit messages — so the output reads as product changes, not implementation details.
+Generate a changelog entry or GitHub Release from merged work.
+
+This skill derives user-facing language from the spec hierarchy (Epic → Feature → Task Gherkin), not from raw commit messages.
+The output reads as product changes, not implementation details.
 
 Shared behavior:
 
@@ -17,13 +20,15 @@ Shared behavior:
 
 ### 0. GitHub CLI setup
 
-Run `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated.
+Run `../references/gh-setup.md`.
+Stop if `gh` is not installed or not authenticated.
 
 ### 1. Identify the release scope
 
 If an Epic or Feature number was already passed in as context (e.g. from `wtf.retro`), skip the question and use it directly.
 
-Otherwise ask the user whether the changelog covers a Feature, an Epic, or a date range. Each scope has distinct follow-up queries:
+Otherwise ask the user whether the changelog covers a Feature, an Epic, or a date range.
+Each scope has distinct follow-up queries:
 
 - **Feature scope** — walk the Feature and its closed child tasks per `../references/spec-hierarchy.md` to extract Gherkin and Functional Description per task.
 - **Epic scope** — walk Epic → Features → Tasks per the same reference, in parallel at each level.
@@ -55,7 +60,9 @@ For every closed Feature or Task in scope, do two things in one pass:
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-Follow [Keep a Changelog](https://keepachangelog.com) conventions. Omit any section with no entries. For Epic-level changelogs, group entries under Feature headings if there are more than 5 entries.
+Follow [Keep a Changelog](https://keepachangelog.com) conventions.
+Omit any section with no entries.
+For Epic-level changelogs, group entries under Feature headings if there are more than 5 entries.
 
 ```markdown
 ## [<version or date>] — <YYYY-MM-DD>
@@ -81,7 +88,8 @@ Follow [Keep a Changelog](https://keepachangelog.com) conventions. Omit any sect
 
 ### 4. Review with user
 
-Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+Show the draft.
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Does this accurately describe what shipped?"
 - header: "Draft review"
 - options:
@@ -103,7 +111,8 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 
 ### 6. Write CHANGELOG.md (if selected)
 
-Read the current file (or create it with a `# Changelog` header if missing). Prepend the new entry after the `# Changelog` heading, above any existing entries.
+Read the current file (or create it with a `# Changelog` header if missing).
+Prepend the new entry after the `# Changelog` heading, above any existing entries.
 
 Commit per `../references/commit-conventions.md`:
 
@@ -117,9 +126,10 @@ git commit -m "chore(changelog): add release notes for <scope>"
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which tag should I use for this release?"
 - header: "Release tag"
-- options: from `git tag --sort=-version:refname | head -5`; user can type a new tag
+- options: from `git tag --sort=-version:refname | head -5`. The user can type a new tag.
 
-Write the entry to a temp file (`$NOTES`) with the Write tool, then create the release via the gh body helper (`../references/gh-body-helper.md`) so the notes survive UTF-8 on Windows:
+Write the entry to a temp file (`$NOTES`) with the Write tool.
+Then create the release via the gh body helper (`../references/gh-body-helper.md`) so the notes survive UTF-8 on Windows:
 
 ```bash
 # $NOTES is the temp file you wrote the release notes to with the Write tool.
@@ -130,7 +140,8 @@ python3 .wtf/gh-body.py release <tag> \
 
 ### 8. Report and offer to continue
 
-Print the release URL and/or `CHANGELOG.md` path. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+Print the release URL and/or `CHANGELOG.md` path.
+Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:

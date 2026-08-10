@@ -7,7 +7,7 @@ Shared label semantics and gate templates for any skill that reads or writes lif
 | Label | Meaning | Set by |
 |---|---|---|
 | `designed` | Design coverage produced (Design Reference / Handoff written) | `wtf.design-task`, `wtf.design-feature` |
-| `implemented` | Code complete; all Gherkin scenarios passing | `wtf.implement-task` |
+| `implemented` | Code complete. All Gherkin scenarios pass. | `wtf.implement-task` |
 | `verified` | QA verified against Gherkin + Edge Cases | `wtf.verify-task` |
 | `merged` | PR merged to main (closes the issue) | GitHub on PR merge |
 
@@ -19,7 +19,7 @@ The recommended end-to-end flow:
 write-task → design-task → implement-task → verify-task → create-pr
 ```
 
-Render this flow string verbatim inside gate prompts — the user is trained to recognize it.
+Render this flow string verbatim inside gate prompts. The user is trained to recognize it.
 
 ## Read labels
 
@@ -31,7 +31,7 @@ gh issue view <issue_number> --json labels --jq '.labels[].name'
 
 Use when a skill that consumes a lifecycle stage finds the expected label **absent**:
 
-> If `<label>` is **absent**, warn the user that the task hasn't been `<verb>` yet and that the recommended flow is **write-task → design-task → implement-task → verify-task → create-pr**. Then apply `./questioning-style.md` and ask the question — header `<header>`:
+> If `<label>` is **absent**, warn the user that the task has not been `<verb>` yet and that the recommended flow is **write-task → design-task → implement-task → verify-task → create-pr**. Then apply `./questioning-style.md` and ask the question — header `<header>`:
 >
 > - **Run `<recommended-skill>`** → invoke that skill, passing the issue number in as context (default)
 > - **Skip** → continue without it
@@ -42,7 +42,7 @@ Use when a skill that consumes a lifecycle stage finds the expected label **abse
 | `wtf.verify-task` | `implemented` | `wtf.implement-task` | `Implement first?` |
 | `wtf.create-pr` | `verified` | `wtf.verify-task` | `Verify first?` |
 
-If the label is present, continue silently — do not announce.
+If the label is present, continue silently. Do not announce.
 
 ## Gate template — present label (producer overwrite)
 
@@ -60,10 +60,10 @@ Use when a skill that **writes** a lifecycle output finds the label already pres
 
 ## Mark transition (write side)
 
-After producing the output, set the lifecycle label:
+After you produce the output, set the lifecycle label:
 
 ```bash
 gh issue edit <issue_number> --add-label "<label>"
 ```
 
-This call is **mandatory** — the consuming skill's gate depends on it. In sub-agent contexts the label call is non-skippable per `./subagent-protocol.md` rule 4.
+This call is **mandatory**. The consuming skill's gate depends on it. In sub-agent contexts the label call is non-skippable per `./subagent-protocol.md` rule 4.

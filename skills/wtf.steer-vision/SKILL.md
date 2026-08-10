@@ -5,7 +5,7 @@ description: This skill should be used when a team wants to create or refine the
 
 # Steer Vision
 
-Generate or refine `docs/steering/VISION.md` — the product constitution. This document is the highest-level steering artifact: it captures why the product exists, who it serves, and what principles govern every decision.
+Generate or refine `docs/steering/VISION.md` — the product constitution. This document is the highest-level steering artifact. It captures why the product exists, who it serves, and what principles govern every decision.
 
 The shared steering-doc flow (exists-check → research → interview → draft → review → write → wiki sync → continue) lives in `../references/steering-doc-process.md`. Follow that process with the skill-specific inputs below.
 
@@ -16,7 +16,7 @@ The shared steering-doc flow (exists-check → research → interview → draft 
 
 ## Step 2 — Research checklist
 
-Run in parallel using the Agent tool:
+Run in parallel with the Agent tool:
 
 **Codebase signals:**
 
@@ -28,9 +28,9 @@ Run in parallel using the Agent tool:
 **GitHub signals (optional — skip if unavailable):**
 
 - Open and closed Epics (issues labeled `epic`) for strategic intent
-- Any issues or discussions referencing product goals or principles
+- Any issues or discussions that reference product goals or principles
 
-Synthesise internally. Do not dump raw research at the user.
+Synthesize internally. Do not dump raw research at the user.
 
 ## Step 3 — Gap-topic list
 
@@ -45,11 +45,11 @@ Ask only about items research could not determine, in priority order. For each u
 
 ## Step 4 — Writing rules
 
-- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
+- Apply strict STE per `../references/ste-writing.md` before you write any durable body (shared process Step 4 also requires this).
 - Every sentence uses domain language — the words domain experts and stakeholders use.
-- Target users are named domain actors, never "users" or "admins".
-- Strategic goals are business outcomes, not features or technical tasks.
-- Bounded context names are consistent with vocabulary found in the codebase.
+- Target users are named domain actors. Never write "users" or "admins".
+- Strategic goals are business outcomes. They are not features or technical tasks.
+- Bounded context names stay consistent with vocabulary found in the codebase.
 
 ## Step 8 — Continue options
 

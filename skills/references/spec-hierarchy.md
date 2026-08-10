@@ -1,6 +1,6 @@
 # Spec Hierarchy Traversal
 
-Shared procedure for fetching the Task → Feature → Epic chain when a skill needs upstream context.
+Shared procedure to fetch the Task → Feature → Epic chain when a skill needs upstream context.
 
 Used by `wtf.write-task`, `wtf.write-feature`, `wtf.feature-to-tasks`, `wtf.implement-task`, `wtf.pr-review`, `wtf.design-task`, `wtf.design-feature`, `wtf.create-pr`, `wtf.changelog`, `wtf.verify-task`.
 
@@ -49,7 +49,7 @@ If `gh-sub-issue-available` is false, parse the issue body's `## Context` sectio
 - Epic: #<epic_number>
 ```
 
-Use `gh issue view <n> --json body --jq .body` and a regex extracting `#(\d+)` after `Feature:` / `Epic:`. If the body lacks a Context section, ask the user — do not invent the parent.
+Use `gh issue view <n> --json body --jq .body` and a regex that extracts `#(\d+)` after `Feature:` / `Epic:`. If the body has no Context section, ask the user. Do not invent the parent.
 
 ## Extracting from a PR or branch
 
@@ -63,7 +63,7 @@ git rev-parse --abbrev-ref HEAD | grep -oE '^task/[0-9]+' | grep -oE '[0-9]+'
 
 ## Caching across a session
 
-Once fetched, each issue body is stable for the session. Skills that re-invoke each other (e.g. `wtf.feature-to-tasks` → `wtf.write-task`, `wtf.implement-task` → `wtf.verify-task`) should pass parent issue numbers via context rather than re-traversing — every walk costs API calls. Re-fetch only when the body may have changed (after a `gh issue edit`).
+Once fetched, each issue body is stable for the session. Skills that re-invoke each other (e.g. `wtf.feature-to-tasks` → `wtf.write-task`, `wtf.implement-task` → `wtf.verify-task`) should pass parent issue numbers via context rather than re-traverse. Every walk costs API calls. Re-fetch only when the body may have changed (after a `gh issue edit`).
 
 ## What to extract per level
 

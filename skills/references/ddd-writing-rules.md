@@ -5,22 +5,26 @@ description: Shared DDD vocabulary and anti-pattern rules for writing Epics, Fea
 
 # DDD Writing Rules
 
-Apply these rules whenever writing or reviewing Epic, Feature, or Task content.
+Apply these rules whenever you write or review Epic, Feature, or Task content.
 
 ## Prose mechanics (STE)
 
-Sentence shape, tense, voice, and non-domain vocabulary follow strict STE in `ste-writing.md`. DDD chooses *which* domain term (actor, verb, object, event). Those terms feed the STE DDD allowlist as technical nouns and technical verbs. Apply both references before writing durable bodies.
+Sentence shape, tense, voice, and non-domain vocabulary follow strict STE in `ste-writing.md`.
+
+DDD chooses *which* domain term (actor, verb, object, event). Those terms feed the STE DDD allowlist as technical nouns and technical verbs.
+
+Apply both references before you write durable bodies.
 
 ## Domain Actor Naming
 
-Use named domain roles — never generic terms:
+Use named domain roles. Never use generic terms:
 
 - ✅ "Fulfilment Manager", "Payment Auditor", "Merchant"
 - ❌ "user", "admin", "the system"
 
 ## Domain Verb vs CRUD
 
-Use business actions — not generic CRUD verbs:
+Use business actions. Do not use generic CRUD verbs:
 
 - ✅ allocate, settle, reconcile, dispute, approve, fulfil, cancel
 - ❌ create, update, delete, store, query, render, process
@@ -34,7 +38,7 @@ Events must use **past-tense domain names** from the **domain's perspective**:
 
 ## Business Outcomes, Not System States
 
-Describe observable business results — not technical system state:
+Describe observable business results. Do not describe technical system state:
 
 - ✅ "The Merchant receives a settlement notification within 2 minutes"
 - ❌ "The `orders` table has `status = 'settled'`", "HTTP 200 returned"
@@ -47,7 +51,7 @@ Remove these from any domain-facing content (Epic goals, Feature ACs, Gherkin sc
 - Mock, stub, endpoint, microservice, lambda
 - Any implementation framework name in a business description
 
-Reframe in business terms before writing.
+Reframe in business terms before you write.
 
 ## Bounded Context Seams
 
@@ -55,4 +59,4 @@ Name every bounded context explicitly. When a Feature or Task crosses a seam:
 
 - Identify which context **emits** and which **consumes**
 - Use each context's own vocabulary on its side of the seam
-- Example: "Sales Context emits `OrderPlaced`; Warehouse Context consumes it"
+- Example: "Sales Context emits `OrderPlaced`. Warehouse Context consumes it."

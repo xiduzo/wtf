@@ -16,7 +16,7 @@ The shared steering-doc flow (exists-check → research → interview → draft 
 
 ## Step 2 — Research checklist
 
-Use the Agent tool to extract technical facts directly. Do not ask the user for things that can be read:
+Use the Agent tool to extract technical facts. Do not ask the user for things you can read:
 
 - **Stack:** `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `*.csproj`, or equivalent — languages, frameworks, versions
 - **Architecture:** module structure, folder layout, layer separation patterns
@@ -26,7 +26,7 @@ Use the Agent tool to extract technical facts directly. Do not ask the user for 
 - **Conventions:** naming patterns, import paths, test file locations
 - `CLAUDE.md` and any existing architectural docs
 
-Produce a concrete draft of Stack, Commands, and Code Conventions from research alone — these sections should require no user input.
+Produce a concrete draft of Stack, Commands, and Code Conventions from research alone. These sections should need no user input.
 
 ## Step 3 — Gap-topic list
 
@@ -38,11 +38,11 @@ Ask only about items research could not determine. For each unanswered item, cal
 
 ## Step 4 — Writing rules
 
-- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
-- Commands must be exact and tested — stale commands are worse than no commands.
-- Architecture description reflects what the codebase actually does, not aspirations.
+- Apply strict STE per `../references/ste-writing.md` before you write any durable body (shared process Step 4 also requires this).
+- Commands must be exact and tested. Stale commands are worse than no commands.
+- Architecture description reflects what the codebase actually does. It does not state aspirations.
 - Constraints are written as imperatives ("No synchronous I/O on the request path").
-- ADRs link to source files where they exist; inline only the decision and rationale.
+- ADRs link to source files where they exist. Inline only the decision and rationale.
 
 ## Step 8 — Continue options
 

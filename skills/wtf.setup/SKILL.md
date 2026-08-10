@@ -5,7 +5,13 @@ description: This skill should be used when a user wants to set up WTF in a new 
 
 # Setup
 
-Pre-flight check and installer for the WTF workflow. Validates the GitHub CLI, installs required extensions, ensures `.github/ISSUE_TEMPLATE/` contains all required templates, sets up issue classification (native GitHub issue types or labels) and the lifecycle labels, and installs the PR template so both agents and humans can create structured issues and pull requests.
+Pre-flight check and installer for the WTF workflow.
+
+Validate the GitHub CLI. Install required extensions. Make sure `.github/ISSUE_TEMPLATE/` holds all required templates.
+
+Set up issue classification (native GitHub issue types or labels) and the lifecycle labels.
+
+Install the PR template. Agents and humans can then create structured issues and pull requests.
 
 ## Process
 
@@ -15,7 +21,7 @@ Pre-flight check and installer for the WTF workflow. Validates the GitHub CLI, i
 gh --version
 ```
 
-If not found: tell the user that the GitHub CLI is required, link them to https://cli.github.com, and stop. Do not proceed until `gh` is confirmed installed.
+If `gh` is not found, tell the user that the GitHub CLI is required. Link them to https://cli.github.com. Stop. Do not continue until `gh` is installed.
 
 ### 2. Verify `gh` is authenticated
 
@@ -23,7 +29,7 @@ If not found: tell the user that the GitHub CLI is required, link them to https:
 gh auth status
 ```
 
-If not authenticated: tell the user to run `gh auth login` and stop. Do not proceed until authentication is confirmed.
+If `gh` is not authenticated, tell the user to run `gh auth login`. Stop. Do not continue until authentication is confirmed.
 
 ### 3. Check and install required extensions
 
@@ -31,7 +37,7 @@ If not authenticated: tell the user to run `gh auth login` and stop. Do not proc
 gh extension list
 ```
 
-Check the output for both of the following extensions. For each that is missing, install it:
+Check the output for both extensions below. If an extension is missing, install it:
 
 ```bash
 # Sub-issue hierarchy (epic → feature → task)
@@ -41,9 +47,9 @@ gh extension install yahsan2/gh-sub-issue
 gh extension install xiduzo/gh-issue-dependency
 ```
 
-If installation fails (e.g. network error, permissions), warn the user that relationship tracking will be unavailable until the extension is installed. Note the failure — it will be included in the final status report.
+If installation fails (for example network error or permissions), warn the user. Relationship tracking stays unavailable until the extension is installed. Note the failure for the final status report.
 
-After attempting installation, verify the command syntax for any newly installed extension:
+After you try installation, verify the command syntax for each newly installed extension:
 
 ```bash
 gh sub-issue --help
@@ -51,6 +57,7 @@ gh issue-dependency --help
 ```
 
 Record two booleans for the final report:
+
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
 - `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
 
@@ -60,11 +67,13 @@ Record two booleans for the final report:
 gh repo view --json nameWithOwner -q .nameWithOwner
 ```
 
-If this fails (not inside a git repo, or no GitHub remote), warn the user and note that issue creation will not work until the repo is connected to GitHub. Continue to the template check regardless.
+If this fails (not inside a git repo, or no GitHub remote), warn the user. Note that issue creation will not work until the repo is connected to GitHub. Continue to the template check anyway.
 
 ### 4b. Verify GitHub permissions
 
-The workflow requires the authenticated user to manage labels and create issue relationships (sub-issues, dependencies). Both need **write access** to the repo and a token with the `repo` scope (or `public_repo` for public repos).
+The workflow needs the authenticated user to manage labels and create issue relationships (sub-issues, dependencies).
+
+Both need **write access** to the repo. The token needs the `repo` scope (or `public_repo` for public repos).
 
 **Check token scopes:**
 
@@ -73,16 +82,17 @@ gh auth status 2>&1 | grep -i "token scopes"
 ```
 
 Required scopes (any of):
+
 - `repo` — full control (private + public repos)
 - `public_repo` — sufficient for public repos only
 
-If neither scope is present, instruct the user to refresh auth with the right scopes:
+If neither scope is present, tell the user to refresh auth with the right scopes:
 
 ```bash
 gh auth refresh -h github.com -s repo
 ```
 
-…and stop until re-run.
+Stop until the user re-runs setup.
 
 **Check repo write permission:**
 
@@ -91,31 +101,35 @@ gh api "repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)" \
   --jq '.permissions | {admin, maintain, push, triage, pull}'
 ```
 
-The user must have `admin: true`, `maintain: true`, or `push: true`. If only `triage` or `pull`, warn:
+The user must have `admin: true`, `maintain: true`, or `push: true`. If the user has only `triage` or `pull`, warn:
 
 > ⚠️ You have read-only access to this repo. Label creation and issue linking will fail. Ask a maintainer for write access or fork the repo.
 
 Record two booleans for the final report:
-- `token-scopes-ok`: true if `repo` or `public_repo` scope present
+
+- `token-scopes-ok`: true if `repo` or `public_repo` scope is present
 - `repo-write-ok`: true if `admin`, `maintain`, or `push` is true
 
-If either is false, skip label creation in step 7 and warn that sub-issue / dependency creation will fail at runtime.
+If either is false, skip label creation in step 7. Warn that sub-issue and dependency creation will fail at runtime.
 
 ### 5. Check issue templates
 
-Check whether `.github/ISSUE_TEMPLATE/` exists and contains all four required templates:
+Check whether `.github/ISSUE_TEMPLATE/` exists and holds all four required templates:
 
 ```bash
 ls .github/ISSUE_TEMPLATE/
 ```
 
 Required files:
+
 - `BUG.md`
 - `EPIC.md`
 - `FEATURE.md`
 - `TASK.md`
 
-First resolve where this skill's payload is installed. `npx skills add` drops `wtf.setup` under the skills root (`~/.claude/skills/wtf.setup`, `.claude/skills/wtf.setup`, or the `.agents/skills` equivalent), and the bundled files (`references/`, `shared-references/`, `hooks/`) ride along inside it. Probe in order and keep the first that exists — reuse `$SETUP_DIR` for every copy below:
+First resolve where this skill's payload is installed. `npx skills add` drops `wtf.setup` under the skills root (`~/.claude/skills/wtf.setup`, `.claude/skills/wtf.setup`, or the `.agents/skills` equivalent). The bundled files (`references/`, `shared-references/`, `hooks/`) are included inside it.
+
+Probe in order. Keep the first that exists. Reuse `$SETUP_DIR` for every copy below:
 
 ```bash
 for cand in \
@@ -138,7 +152,7 @@ cp "$SETUP_DIR/references/FEATURE.md" .github/ISSUE_TEMPLATE/FEATURE.md
 cp "$SETUP_DIR/references/TASK.md"    .github/ISSUE_TEMPLATE/TASK.md
 ```
 
-Only copy files that are missing — do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
+Copy only files that are missing. Do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
 
 ### 6. Check PR template
 
@@ -148,17 +162,21 @@ Check whether `.github/pull_request_template.md` exists:
 ls .github/pull_request_template.md 2>/dev/null
 ```
 
-If missing, copy it from the skill's bundled references (using `$SETUP_DIR` resolved in step 5):
+If it is missing, copy it from the skill's bundled references (use `$SETUP_DIR` from step 5):
 
 ```bash
 cp "$SETUP_DIR/references/pull_request_template.md" .github/pull_request_template.md
 ```
 
-Do not overwrite if it already exists.
+Do not overwrite the file if it already exists.
 
 ### 7. Choose the issue-classification mode and provision it
 
-WTF classifies every issue as an **Epic**, **Feature**, **Task**, or **Bug**. There are two mechanisms — native **GitHub issue types** (an organization-only feature, with labels left free for your own segmentation) or the `epic`/`feature`/`task`/`bug` **labels** (portable to any repo). See `../references/issue-classification.md`. Pick the mode once here and record it in `.wtf/config.json` so every skill resolves it identically. Lifecycle labels (`implemented`, `designed`, `verified`) are always created regardless of mode.
+WTF classifies every issue as an **Epic**, **Feature**, **Task**, or **Bug**.
+
+There are two mechanisms. One is native **GitHub issue types** (an organization-only feature). That leaves labels free for your own segmentation. The other is the `epic`/`feature`/`task`/`bug` **labels** (portable to any repo).
+
+See `../references/issue-classification.md`. Pick the mode once here. Record it in `.wtf/config.json` so every skill resolves it the same way. Lifecycle labels (`implemented`, `designed`, `verified`) are always created in both modes.
 
 **Step A — detect the owner type:**
 
@@ -169,7 +187,7 @@ OWNER_TYPE=$(gh api "users/$OWNER" --jq '.type' 2>/dev/null)   # "User" or "Orga
 
 **Step B — pick the mode.**
 
-- If `OWNER_TYPE` is **not** `Organization` (a personal account, or detection failed): native issue types are unavailable — GitHub gates them to organizations. Set `CLASS_MODE=labels` and tell the user plainly: *"This is a personal-account repo, so GitHub issue types aren't available (they're org-only). WTF will classify with the `epic`/`feature`/`task`/`bug` labels."* Skip to Step D.
+- If `OWNER_TYPE` is **not** `Organization` (a personal account, or detection failed): native issue types are unavailable. GitHub gates them to organizations. Set `CLASS_MODE=labels` and tell the user plainly: *"This is a personal-account repo, so GitHub issue types are not available (they are org-only). WTF will classify with the `epic`/`feature`/`task`/`bug` labels."* Skip to Step D.
 
 - If `OWNER_TYPE` is `Organization` **and** `repo-write-ok` and `token-scopes-ok` (from step 4b) are both true, call `AskUserQuestion` (per `../references/questioning-style.md`):
   - question: "This repo is in an org, so WTF can classify issues with native GitHub issue types (Epic/Feature/Task/Bug) instead of labels — leaving labels free for your own segmentation like `phase-2`. Use native issue types?"
@@ -178,9 +196,13 @@ OWNER_TYPE=$(gh api "users/$OWNER" --jq '.type' 2>/dev/null)   # "User" or "Orga
     - **Native issue types (recommended)** → `CLASS_MODE=types`
     - **Labels** → `CLASS_MODE=labels`
 
-  If write/token perms are missing, do **not** offer types — provisioning needs org-owner rights. Set `CLASS_MODE=labels` and note it.
+  If write or token permissions are missing, do **not** offer types. Provisioning needs org-owner rights. Set `CLASS_MODE=labels` and note it.
 
-**Step C — provision native types** (only when `CLASS_MODE=types`). Run the **Provision native types** block from `../references/issue-classification.md` — it creates `Epic` (`Task`/`Bug`/`Feature` ship as org defaults). Then verify all four resolved; if any is missing (e.g. you are not an org owner), fall back to labels:
+**Step C — provision native types** (only when `CLASS_MODE=types`).
+
+Run the **Provision native types** block from `../references/issue-classification.md`. It creates `Epic` (`Task`/`Bug`/`Feature` ship as org defaults).
+
+Then verify all four resolved. If any is missing (for example you are not an org owner), fall back to labels:
 
 ```bash
 HAVE=$(gh api "orgs/$OWNER/issue-types" --jq '[.[].name]' 2>/dev/null)
@@ -189,9 +211,13 @@ for t in Epic Feature Task Bug; do
 done
 ```
 
-When this falls back, warn that native types need org-owner rights and WTF will use labels instead.
+When this falls back, warn that native types need org-owner rights. WTF will use labels instead.
 
-**Step D — create labels.** Always create the lifecycle labels. Create the kind labels (`epic`/`feature`/`task`/`bug`) **only in `labels` mode** — in `types` mode they are intentionally omitted so the label space stays free for your own segmentation. `--force` is idempotent (updates color/description if the label already exists, creates it otherwise):
+**Step D — create labels.** Always create the lifecycle labels.
+
+Create the kind labels (`epic`/`feature`/`task`/`bug`) **only in `labels` mode**. In `types` mode omit them on purpose so the label space stays free for your own segmentation.
+
+`--force` is idempotent. It updates color/description if the label already exists. Otherwise it creates the label:
 
 ```bash
 # Lifecycle labels — always, both modes:
@@ -208,9 +234,17 @@ if [ "$CLASS_MODE" = labels ]; then
 fi
 ```
 
-If any label creation fails (e.g. insufficient permissions), warn the user — the affected skills fall back to creating labels on first use.
+If any label creation fails (for example insufficient permissions), warn the user. The affected skills fall back to creating labels on first use.
 
-**Step D (cont.) — align the issue templates with the mode.** In `types` mode, rewrite each copied `.github/ISSUE_TEMPLATE/*.md` so its kind comes from the native type rather than a label — flip the `labels: <kind>` frontmatter line to `type: <Kind>` (`type` is a supported template frontmatter key alongside `title`/`labels`/`assignees`). This keeps issues opened manually from the GitHub UI typed, not labelled, so the label space stays free. In `labels` mode leave the templates as-is. The rewrite is conservative — it only touches an exact single `labels: <kind>` line, so customized multi-label templates are left alone:
+**Step D (cont.) — align the issue templates with the mode.**
+
+In `types` mode, rewrite each copied `.github/ISSUE_TEMPLATE/*.md`. Make its kind come from the native type rather than a label.
+
+Flip the `labels: <kind>` frontmatter line to `type: <Kind>`. (`type` is a supported template frontmatter key alongside `title`/`labels`/`assignees`.)
+
+This keeps issues opened manually from the GitHub UI typed, not labelled. The label space stays free.
+
+In `labels` mode leave the templates as they are. The rewrite is conservative. It only touches an exact single `labels: <kind>` line. Customized multi-label templates are left alone:
 
 ```bash
 if [ "$CLASS_MODE" = types ]; then
@@ -231,7 +265,7 @@ PY
 fi
 ```
 
-**Step E — record the mode** so every skill resolves it identically:
+**Step E — record the mode** so every skill resolves it the same way:
 
 ```bash
 mkdir -p .wtf
@@ -247,13 +281,13 @@ PY
 
 Commit `.wtf/config.json` so every teammate classifies issues the same way. Record `classification: types|labels` for the status report.
 
-> **Closing convention:** GitHub has no native setting to require PR-based closure, so this is enforced by skill behavior. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (won't implement) and `--reason "duplicate"` only. Surface this convention in the status report.
+> **Closing convention:** GitHub has no native setting to require PR-based closure. Skill behavior enforces this. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (will not implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
 ### 8. Install intervention-tracker hook
 
-The tracker hook counts user corrections and nudges toward `/wtf.reflect`. skills.sh copies the hook script into the skill dir, but the hook must be registered in Claude Code's `settings.json` manually.
+The tracker hook counts user corrections and nudges toward `/wtf.reflect`. skills.sh copies the hook script into the skill dir. You must register the hook in Claude Code's `settings.json` manually.
 
-**Step A — locate the installed hook script.** The hook is a Python script (`track-interventions.py`) so it runs identically on macOS, Linux, and Windows. Probe, in order, and keep the first that exists:
+**Step A — locate the installed hook script.** The hook is a Python script (`track-interventions.py`). It runs the same way on macOS, Linux, and Windows. Probe in order. Keep the first that exists:
 
 ```bash
 for cand in \
@@ -264,24 +298,32 @@ for cand in \
 done
 ```
 
-If none exist: warn the user that the hook script could not be found and skip hook registration.
+If none exist, warn the user that the hook script could not be found. Skip hook registration.
 
 **Step B — ask scope** (apply `../references/questioning-style.md`):
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
+
 - question: "Install the WTF intervention-tracker hook globally or only for this repo?"
 - header: "Hook scope"
 - options:
   - **Global (~/.claude/settings.json)** → runs in every repo that has `docs/steering/`
   - **This repo only (.claude/settings.json)** → scoped to this project
-  - **Skip** → don't install the hook
+  - **Skip** → do not install the hook
 
-Set `SETTINGS_FILE` accordingly:
+Set `SETTINGS_FILE` as follows:
+
 - Global → `$HOME/.claude/settings.json`
 - Per-repo → `.claude/settings.json`
 - Skip → jump to step 9.
 
-**Step C — patch settings.json idempotently.** Create the file if missing (`echo '{}' > "$SETTINGS_FILE"`). Then merge the two hook entries using `python3` (available on macOS/Linux; git-bash on Windows ships it via the installer or can be swapped for `py`). The registered command invokes the hook via `python3` so it works without a POSIX shell on Windows:
+**Step C — patch settings.json idempotently.**
+
+If the file is missing, create it (`echo '{}' > "$SETTINGS_FILE"`). Then merge the two hook entries with `python3`.
+
+`python3` is available on macOS/Linux. git-bash on Windows ships it via the installer or can use `py`.
+
+The registered command invokes the hook via `python3`. It works without a POSIX shell on Windows:
 
 ```bash
 PY_BIN=$(command -v python3 || command -v py || echo python)
@@ -311,15 +353,17 @@ p.write_text(json.dumps(data, indent=2))
 PY
 ```
 
-Re-running is safe — existing entries are detected by exact `command` string and not duplicated.
+Re-running is safe. Existing entries are detected by exact `command` string and are not duplicated.
 
-**Windows note:** if the user is on Windows without `python3`, skip the patch and print the JSON snippet for manual paste. Detect via `command -v python3 >/dev/null || echo 'manual'`.
+**Windows note:** If the user is on Windows without `python3`, skip the patch. Print the JSON snippet for manual paste. Detect via `command -v python3 >/dev/null || echo 'manual'`.
 
 Record `hook-installed: true|false|skipped` for the status report.
 
 ### 8b. Install the gh body helper
 
-`gh-body.py` is a cross-platform utility that makes every GitHub issue/PR body read and write UTF-8-safe — it prevents the CP850 mojibake, newline collapse, and inline-`--body` corruption that `gh` suffers under PowerShell on Windows. Skills invoke it at `.wtf/gh-body.py`; installing it here means the guard is committed to the repo and shared with every teammate. See `../references/gh-body-helper.md`.
+`gh-body.py` is a cross-platform utility that makes every GitHub issue/PR body read and write UTF-8-safe. It prevents the CP850 mojibake, newline collapse, and inline-`--body` corruption that `gh` suffers under PowerShell on Windows.
+
+Skills invoke it at `.wtf/gh-body.py`. Install it here so the guard is committed to the repo and shared with every teammate. See `../references/gh-body-helper.md`.
 
 **Step A — locate the bundled helper** (same install-location probe as the tracker):
 
@@ -341,9 +385,11 @@ if [ -n "$GHBODY_SRC" ]; then
 fi
 ```
 
-Commit `.wtf/gh-body.py` so the guard travels with the repo for every contributor. If `GHBODY_SRC` is empty (helper not found) or `cp` is unavailable (Windows without git-bash), tell the user to copy `gh-body.py` into `.wtf/` manually and note it — skills fall back to raw `gh` until then, which is unguarded on Windows.
+Commit `.wtf/gh-body.py` so the guard travels with the repo for every contributor.
 
-**Step C — verify it actually runs.** Skills invoke the helper as `python3 .wtf/gh-body.py`, so test that *exact* form — it validates the interpreter name, that Python is present, and that the copy is valid, all in one shot:
+If `GHBODY_SRC` is empty (helper not found) or `cp` is unavailable (Windows without git-bash), tell the user to copy `gh-body.py` into `.wtf/` manually. Note it. Skills fall back to raw `gh` until then. That path is unguarded on Windows.
+
+**Step C — verify it actually runs.** Skills invoke the helper as `python3 .wtf/gh-body.py`. Test that *exact* form. It validates the interpreter name, that Python is present, and that the copy is valid, all in one shot:
 
 ```bash
 if python3 .wtf/gh-body.py --help >/dev/null 2>&1; then
@@ -356,15 +402,20 @@ fi
 ```
 
 Interpret the result for the user:
+
 - `verified` → the guard is live.
-- `wrong-name` → Python exists but not as `python3` (common on Windows: the python.org installer provides `python`/`py`, not `python3`). The skill commands call `python3`, so the guard will fail until the user adds a `python3` alias/shim. Show the working interpreter you found (e.g. `py -3`) and tell them to alias it.
-- `no-python` → no Python 3 on PATH. The guard is inert; every body/comment op falls back to raw `gh`, which corrupts UTF-8 on Windows. Point the user to https://www.python.org/downloads/ and have them re-run setup.
+- `wrong-name` → Python exists but not as `python3`. On Windows the python.org installer often provides `python`/`py`, not `python3`. The skill commands call `python3`. The guard will fail until the user adds a `python3` alias/shim. Show the working interpreter you found (for example `py -3`). Tell them to alias it.
+- `no-python` → no Python 3 on PATH. The guard is inert. Every body/comment op falls back to raw `gh`. That corrupts UTF-8 on Windows. Point the user to https://www.python.org/downloads/. Have them re-run setup.
 
 Record `gh-body-helper: verified|wrong-name|no-python|not-installed` for the status report (`not-installed` if Step B could not copy the file).
 
 ### 8c. Install the shared skill references
 
-Every execution skill loads cross-skill docs via `../references/<name>.md` — i.e. a `references/` folder **next to the installed skills**, at the skills root. `npx skills add` installs each `wtf.*` skill directory individually; the repo's `skills/references/` folder has no `SKILL.md`, so it is never shipped, and `<skills-root>/references/` would be empty. To fix that, `wtf.setup` carries a vendored copy at `$SETUP_DIR/shared-references/` and writes it to the skills root here. Without this step, every other skill fails to resolve its references.
+Every execution skill loads cross-skill docs via `../references/<name>.md`. That is a `references/` folder **next to the installed skills**, at the skills root.
+
+`npx skills add` installs each `wtf.*` skill directory one by one. The repo's `skills/references/` folder has no `SKILL.md`, so it is never shipped. `<skills-root>/references/` would be empty.
+
+To fix that, `wtf.setup` carries a vendored copy at `$SETUP_DIR/shared-references/` and writes it to the skills root here. Without this step, every other skill fails to resolve its references.
 
 **Step A — derive the skills root** (the parent of `$SETUP_DIR`, resolved in step 5):
 
@@ -381,9 +432,13 @@ if [ -d "$SETUP_DIR/shared-references" ]; then
 fi
 ```
 
-This overwrites prior copies so updates propagate on every `npx skills update` + re-run. When setup runs from the wtf repo itself (`$PWD/skills/wtf.setup`), `$SKILLS_ROOT` is `skills/` and the copy is a harmless no-op refresh. If `$SETUP_DIR/shared-references` is absent (older payload, or `cp` unavailable on Windows without git-bash), tell the user to copy the repo's `skills/references/*.md` into `<skills-root>/references/` manually and note it — other skills cannot resolve `../references/...` until then.
+This overwrites prior copies so updates propagate on every `npx skills update` + re-run.
 
-**Step C — verify** at least one known reference landed:
+When setup runs from the wtf repo itself (`$PWD/skills/wtf.setup`), `$SKILLS_ROOT` is `skills/`. The copy is a harmless no-op refresh.
+
+If `$SETUP_DIR/shared-references` is absent (older payload, or `cp` unavailable on Windows without git-bash), tell the user to copy the repo's `skills/references/*.md` into `<skills-root>/references/` manually. Note it. Other skills cannot resolve `../references/...` until then.
+
+**Step C — verify** that at least one known reference landed:
 
 ```bash
 [ -f "$SKILLS_ROOT/references/questioning-style.md" ] && echo "shared-references: installed" || echo "shared-references: MISSING"
@@ -393,7 +448,7 @@ Record `shared-references: installed|missing` for the status report.
 
 ### 9. Report status
 
-Print a clear status summary covering every check:
+Print a clear status summary that covers every check:
 
 ```
 WTF Setup — Status Report
@@ -420,13 +475,14 @@ Shared skill references   ✅  installed (<skills-root>/references)  (or  ⚠️
 Ready to use WTF. Start with `wtf.write-epic` to plan your first initiative.
 ```
 
-If any item failed (gh not installed, not authenticated), replace the closing line with a clear "Fix the issues above before proceeding." and do not suggest next steps.
+If any item failed (`gh` not installed, not authenticated), replace the closing line with a clear "Fix the issues above before proceeding." Do not suggest next steps.
 
 ### 10. Offer to set up steering docs
 
 If setup completed without fatal errors, call `AskUserQuestion` (per `../references/questioning-style.md`):
+
 - question: "Setup complete. The steering docs (VISION.md, TECH.md, DESIGN.md, QA.md) capture your project's principles and standards — every skill reads them automatically. Would you like to create them now?"
 - header: "Steering docs"
 - options:
   - **Yes — set them up now** → run `wtf.steer-vision` (it will offer to chain to TECH, DESIGN, and QA at the end)
-  - **Not now** → skip; skills will prompt you to create them on first use
+  - **Not now** → skip. Skills will prompt you to create them on first use
