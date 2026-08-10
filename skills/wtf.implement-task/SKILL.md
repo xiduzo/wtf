@@ -62,6 +62,8 @@ Also fetch any relevant wiki pages or in-repo glossary docs for this task's Boun
 
 ### 6. Draft the Technical Approach
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body (Technical Approach prose and later issue updates). Commit subject/body prose follows STE via `../references/commit-conventions.md`.
+
 Produce a concrete Technical Approach with actual file paths (not generic layer names):
 
 - Architecture decisions: which layer owns what, which patterns to follow

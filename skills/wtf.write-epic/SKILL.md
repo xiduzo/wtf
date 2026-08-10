@@ -88,6 +88,8 @@ Evaluate:
 
 Produce a complete draft. Success Metrics must be specific and measurable. Feature Breakdown stays as empty placeholders.
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Load the EPIC template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context.
 
 **DDD writing rules for this draft:**
@@ -156,6 +158,7 @@ If this Epic introduced or refined any **Bounded Context** definitions or **Ubiq
 - Check whether a wiki page or in-repo glossary doc exists for this Bounded Context (e.g. `docs/glossary.md`, GitHub wiki page matching the context name).
 - If a page exists: add or update the relevant term definitions, linking back to the Epic issue number.
 - If no page exists: create one (prefer the GitHub wiki if available, otherwise `docs/glossary.md`), seeding it with the terms defined in this Epic.
+- Always keep (or add) the greppable **STE allowlist** table in `docs/glossary.md` per the **Glossary shape** in `../references/ste-writing.md` — one row per term with Kind `actor` | `verb` | `object` | `context` | `event` and a Source pointing at this Epic.
 
 Skip without comment if no terms were introduced. Report only the page name and terms added if an update was made.
 

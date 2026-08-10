@@ -94,6 +94,8 @@ Collect available frame URLs, run Path A validation on covered states. For uncov
 
 ### 7. Draft the Design Reference
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Produce the content for the Design Reference section of the Task:
 
 - Frame URLs mapped to Gherkin scenarios (Path A/B), or scaffolded component spec (Path C)

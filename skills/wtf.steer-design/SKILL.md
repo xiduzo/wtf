@@ -40,6 +40,7 @@ Ask only about items research could not determine. For each unanswered item, cal
 
 ## Step 4 — Writing rules
 
+- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
 - Tokens must reflect what is actually defined in the codebase — not aspirational values.
 - Component patterns reference real component paths where they exist.
 - Accessibility section always includes the baseline rules from the project's `CLAUDE.md` (if present) plus any additions.

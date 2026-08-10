@@ -68,6 +68,7 @@ Cross-skill references live in `skills/references/`:
 | `questioning-style.md` | How skills should prompt the user |
 | `scope-gates.md` | Definition-of-Ready / Definition-of-Done gates |
 | `spec-hierarchy.md` | Task → Feature → Epic traversal (extension + body-scrape) |
+| `ste-writing.md` | Strict ASD-STE100 for durable artifacts; DDD glossary as TN/TV allowlist |
 | `steering-doc-process.md` | How steering docs are created, refined, and consumed |
 | `subagent-protocol.md` | Contract for subagent delegation |
 

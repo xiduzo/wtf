@@ -154,6 +154,8 @@ Apply any edits, then proceed.
 
 ### 8. Post the review
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Write the review body to a temp file (`$BODY`) with the Write tool, then post it through the gh body helper (`../references/gh-body-helper.md`) so it survives UTF-8 on Windows:
 
 ```bash

@@ -141,6 +141,8 @@ Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
 
 ### 8. Draft the Task
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Load the TASK template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
 
 Section-specific guidance:

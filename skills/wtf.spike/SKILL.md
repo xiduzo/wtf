@@ -90,6 +90,8 @@ Apply any adjustments, then proceed.
 
 ### 7. Write the findings doc
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Write to `docs/spikes/<YYYY-MM-DD>-<slug>.md` where `<slug>` is a 2–4 word kebab-case summary of the question (e.g. `session-store-strategy`).
 
 Structure:

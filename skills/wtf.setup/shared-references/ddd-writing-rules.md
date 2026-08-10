@@ -7,6 +7,10 @@ description: Shared DDD vocabulary and anti-pattern rules for writing Epics, Fea
 
 Apply these rules whenever writing or reviewing Epic, Feature, or Task content.
 
+## Prose mechanics (STE)
+
+Sentence shape, tense, voice, and non-domain vocabulary follow strict STE in `ste-writing.md`. DDD chooses *which* domain term (actor, verb, object, event). Those terms feed the STE DDD allowlist as technical nouns and technical verbs. Apply both references before writing durable bodies.
+
 ## Domain Actor Naming
 
 Use named domain roles — never generic terms:

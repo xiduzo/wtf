@@ -127,6 +127,8 @@ This component map reduces duplication when `wtf.design-task` runs per-task.
 
 ### 8. Draft the Design Handoff
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Produce content for the **Design Handoff** section of the Feature issue. Use the structure in `references/design-handoff-template.md`.
 
 ### 9. Review with user

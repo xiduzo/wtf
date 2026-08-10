@@ -131,9 +131,11 @@ git add docs/steering/
 git commit -m "docs(steering): lessons from Epic #<epic_number>"
 ```
 
-If any domain model insights were gathered (Q3), also update the glossary via the same pattern as `wtf.write-epic` step 10.
+If any domain model insights were gathered (Q3), also update the glossary via the same pattern as `wtf.write-epic` step 10 (including the greppable **STE allowlist** table in `docs/glossary.md` per `../references/ste-writing.md`).
 
 ### 6. Write the retro summary
+
+Apply strict STE per `../references/ste-writing.md` before writing any durable body (retro comment and any Hard-Won Lessons prose).
 
 Post a structured retro comment on the Epic issue:
 

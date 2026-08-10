@@ -103,6 +103,8 @@ Bug: #<bug_number>"
 
 ### 8. Open the PR
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body (PR body and commit subject/body prose).
+
 Write the body to a temp file (`$BODY`) with the Write tool, then create the PR targeting `main` via the gh body helper (`../references/gh-body-helper.md`):
 
 ```bash

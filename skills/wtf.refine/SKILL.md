@@ -154,6 +154,8 @@ If a split signal fires on the **refined** issue, present it as a refinement con
 
 Re-run the checks from `../references/ddd-writing-rules.md` on any section whose text is being rewritten. Flag and correct violations silently; note corrections in the diff (step 5).
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body (rewritten sections and the audit trail comment).
+
 **ACs changed (Feature or Task) → Gherkin re-derivation**
 
 If Feature ACs changed, mark the Proposed Tasks section as potentially stale — note which tasks may need re-scoping. Do not automatically update child Tasks here; that is handled in step 9 (cascade).

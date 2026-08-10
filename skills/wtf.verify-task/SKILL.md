@@ -165,6 +165,8 @@ For each item in the Observability section (logs, metrics, alerts), one at a tim
 
 ### 7. Finalize results and post QA summary
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body (QA summary comment and free-text issue updates).
+
 The Test Mapping table has been updated after each scenario (step 4). Now do a final update: check off DoD items that passed; leave failing ones unchecked.
 
 ```bash

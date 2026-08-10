@@ -11,6 +11,7 @@ Shared behavior:
 
 - User-question style → `../references/questioning-style.md`
 - Commit / tag / release syntax → `../references/commit-conventions.md`
+- Durable prose (changelog / release notes) → `../references/ste-writing.md`
 
 ## Process
 
@@ -51,6 +52,8 @@ For every closed Feature or Task in scope, do two things in one pass:
 - Drop internal-only work (test infra, CI config, internal refactors with no user-facing effect) unless the release contains nothing else.
 
 ### 3. Draft the changelog entry
+
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
 Follow [Keep a Changelog](https://keepachangelog.com) conventions. Omit any section with no entries. For Epic-level changelogs, group entries under Feature headings if there are more than 5 entries.
 

@@ -45,6 +45,7 @@ Ask only about items research could not determine, in priority order. For each u
 
 ## Step 4 — Writing rules
 
+- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
 - Every sentence uses domain language — the words domain experts and stakeholders use.
 - Target users are named domain actors, never "users" or "admins".
 - Strategic goals are business outcomes, not features or technical tasks.

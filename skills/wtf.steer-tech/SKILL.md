@@ -38,6 +38,7 @@ Ask only about items research could not determine. For each unanswered item, cal
 
 ## Step 4 — Writing rules
 
+- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
 - Commands must be exact and tested — stale commands are worse than no commands.
 - Architecture description reflects what the codebase actually does, not aspirations.
 - Constraints are written as imperatives ("No synchronous I/O on the request path").

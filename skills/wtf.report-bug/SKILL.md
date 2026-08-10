@@ -90,6 +90,8 @@ List each file found with a one-line description of what it covers. These become
 
 ### 6. Draft the Bug report
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Load the BUG template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections:
 
 **Related**

@@ -13,11 +13,13 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
 - Description: lowercase, imperative mood, no trailing period
 - Breaking change: append `!` after type/scope (e.g. `feat!:` or `feat(auth)!:`)
 - Total subject under 72 characters
+- Free-text description and body prose follow strict STE per `ste-writing.md` (keep the `type` / `(scope)` / `!` prefix as-is)
 
 **Body** (optional — include when the "why" is not obvious from the subject):
 
 - Wrap at 72 columns
 - Explain motivation and trade-offs, not what the diff already shows
+- Apply `ste-writing.md` to the body prose
 
 **Trailers:**
 

@@ -84,6 +84,8 @@ This avoids including unrelated merged commits when the branch has a long histor
 
 ### 6. Draft the PR
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model — apply `../references/subagent-protocol.md` for the spawn — to generate a PR title per `../references/commit-conventions.md`. Pass in the task title (if available), the commit log, and whether this is a breaking change. If the subagent returns nothing usable, generate the title directly following the same rules. Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
 
 **Body:** Load the PR template per `../references/issue-template-loading.md` (verify `.github/pull_request_template.md` exists, halt-or-setup if missing). Fill in all sections:

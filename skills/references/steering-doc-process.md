@@ -55,7 +55,7 @@ Each `steer-*` skill defines its own gap-topic list and applies `./questioning-s
 
 ## Step 4. Draft the document
 
-Using the skill's reference template as the shape, fill in all sections with gathered context. Replace every `[PLACEHOLDER]` with real content. Apply the skill's own writing rules.
+Using the skill's reference template as the shape, fill in all sections with gathered context. Replace every `[PLACEHOLDER]` with real content. Apply the skill's own writing rules. Apply strict STE per `./ste-writing.md` before writing the durable file (build the DDD allowlist, grep the STE dictionary, run the self-lint).
 
 ## Step 5. Review with user
 

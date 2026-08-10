@@ -43,6 +43,7 @@ Ask only about items research could not determine. For each unanswered item, cal
 
 ## Step 4 — Writing rules
 
+- Apply strict STE per `../references/ste-writing.md` before writing any durable body (shared process Step 4 also requires this).
 - Coverage thresholds are stated as enforced minimums, not targets.
 - Test commands must be exact and match what CI actually runs.
 - Definition of Done items are written as checkboxes — concrete and binary.

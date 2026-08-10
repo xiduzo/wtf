@@ -98,6 +98,8 @@ Evaluate:
 
 Acceptance Criteria must map 1:1 to user stories. Edge Cases must name at least 2 explicit failure or boundary scenarios.
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body.
+
 Load the FEATURE template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill in all sections with the gathered context.
 
 **DDD writing rules for this draft** (see `../references/ddd-writing-rules.md` for full rules):

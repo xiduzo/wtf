@@ -104,6 +104,8 @@ For each target doc, follow the writer-side procedure in `../references/steering
 - **[Short label]** — [Concrete rule or observation]. *Learned [YYYY-MM-DD].*
 ```
 
+Apply strict STE per `../references/ste-writing.md` before writing any durable body (Hard-Won Lessons bullets). Keep the label short; write the observation in STE.
+
 Example:
 
 ```
