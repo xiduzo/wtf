@@ -1,4 +1,4 @@
-# WTF — Workflow Task Framework
+# WTF — Workflow Trace Framework
 
 Drop-in support for the full product development lifecycle — from user insights to validated production code — run agentically alongside humans, with humans always in the loop.
 
