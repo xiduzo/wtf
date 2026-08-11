@@ -8,7 +8,7 @@
 - `skills/wtf.setup/hooks/` — scripts that ride along in the `wtf.setup` payload: `track-interventions.py` (registered into `settings.json`) and `gh-body.py` (a UTF-8-safe gh body utility copied into the repo at `.wtf/gh-body.py`, not a settings hook).
 - `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN) and `docs/spikes/`.
 - `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
-- `.wtf/` — per-repo artifacts `wtf.setup` writes into the consuming repo: `gh-body.py` (the body helper) and `config.json` (`{"classification": "types"|"labels"}` — the issue-classification mode every skill resolves via `skills/references/issue-classification.md`).
+- `.wtf/` — per-repo artifacts `wtf.setup` writes into the consuming repo: `gh-body.py` (the body helper) and `config.json` (`{"classification": "types"|"labels", "planning": "guided"|"flow"}` — the issue-classification mode resolved via `skills/references/issue-classification.md` and the planning mode resolved via `skills/references/planning-mode.md`).
 
 ## Canonical skill location
 
@@ -66,6 +66,7 @@ Cross-skill references live in `skills/references/`:
 | `issue-classification.md` | Native issue types vs. labels — mode resolve, classify, query, detect |
 | `issue-template-loading.md` | Template verify + halt-or-setup + body-file create pattern |
 | `lifecycle-labels.md` | Label semantics + absent/overwrite gate templates |
+| `planning-mode.md` | `guided` vs `flow` planning — mode resolve, flow deltas, escalation |
 | `questioning-style.md` | How skills should prompt the user |
 | `scope-gates.md` | Definition-of-Ready / Definition-of-Done gates |
 | `spec-hierarchy.md` | Task → Feature → Epic traversal (extension + body-scrape) |

@@ -283,6 +283,32 @@ Commit `.wtf/config.json` so every teammate classifies issues the same way. Reco
 
 > **Closing convention:** GitHub has no native setting to require PR-based closure. Skill behavior enforces this. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (will not implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
+### 7b. Choose the planning mode
+
+WTF planning skills work in one of two modes. See `../references/planning-mode.md`. `guided` asks at each step. `flow` derives everything it can and presents one consolidated review. Both modes run the same quality gates.
+
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How should WTF planning skills work by default? You can override per invocation with a `guided` or `flow` argument."
+- header: "Planning"
+- options:
+  - **Guided (recommended to start)** → `PLAN_MODE=guided` — the skill asks step by step; best while the team still shapes its specs
+  - **Flow** → `PLAN_MODE=flow` — the skill drafts the full batch and asks once; best when Epics and steering docs already answer most questions
+
+Record the mode next to the classification key. The write preserves other keys:
+
+```bash
+python3 - ".wtf/config.json" "$PLAN_MODE" <<'PY'
+import json, sys, pathlib
+path, mode = sys.argv[1], sys.argv[2]
+p = pathlib.Path(path)
+data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
+data["planning"] = mode
+p.write_text(json.dumps(data, indent=2) + "\n")
+PY
+```
+
+Record `planning: guided|flow` for the status report.
+
 ### 8. Install intervention-tracker hook
 
 The tracker hook counts user corrections and nudges toward `/wtf.reflect`. skills.sh copies the hook script into the skill dir. You must register the hook in Claude Code's `settings.json` manually.

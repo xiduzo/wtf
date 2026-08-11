@@ -1,6 +1,7 @@
 ---
 name: wtf.write-feature
-description: This skill should be used when a user wants to create a GitHub Feature issue, break down an Epic into user-facing capabilities, write user stories in domain language, or capture what a domain actor can do — for example "create a feature", "write a feature for this epic", "add a feature to an epic", "break this epic into features", "write user stories for this feature", or "describe what this actor can do". Use this skill to write a single Feature. Use `wtf.epic-to-features` to generate the full set of Features for an Epic at once. Not applicable to Tasks, Epics, or bug reports.
+description: This skill should be used when a user wants to create a GitHub Feature issue, break down an Epic into user-facing capabilities, write user stories in domain language, or capture what a domain actor can do — for example "create a feature", "write a feature for this epic", "add a feature to an epic", "break this epic into features", "write user stories for this feature", or "describe what this actor can do". Use this skill to write a single Feature. Use `wtf.epic-to-features` to generate the full set of Features for an Epic at once. Supports two planning modes — `guided` (step-by-step questions) and `flow` (derive, one consolidated review) — passed as an argument or read from `.wtf/config.json`. Not applicable to Tasks, Epics, or bug reports.
+argument-hint: "[capability] [guided|flow]"
 ---
 
 # Write Feature
@@ -14,6 +15,12 @@ Create a GitHub Feature issue that defines a user-facing capability. Fetch the p
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. That result controls whether native sub-issue and dependency links are created in step 10.
 
 If invoked from `wtf.epic-to-features` or `wtf.write-epic`, skip this step. The orchestrator already ran it. Also skip on re-invocations in the same session (e.g. "Write next Feature" loop in step 11).
+
+### 0b. Resolve the planning mode
+
+Run the **Resolve the mode** block from `../references/planning-mode.md`. An explicit `guided` or `flow` argument in the invocation wins over config. `$WTF_PLAN` shapes steps 3 and 8 below. Every quality gate runs in both modes.
+
+If invoked from `wtf.epic-to-features`, use the mode the orchestrator passed in. Do not re-resolve.
 
 ### 1. Identify the parent Epic
 
@@ -67,6 +74,8 @@ Clarification questions are split into two tiers. Work through all Required ques
 8. Are there known edge cases or failure modes?
 
 For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough for a complete draft.
+
+**In `flow` mode:** answer these questions yourself first — from the Epic, the codebase, the glossary, and the steering docs. Only the genuinely unanswerable items survive. Batch those into **one** `AskUserQuestion` call instead of asking one by one. If every item resolves, ask nothing.
 
 ### 4. Derive user stories
 
@@ -152,6 +161,8 @@ If "Design handoff complete" is flagged as a blocker, also call `AskUserQuestion
 
 If the user provides a link via the free-text escape hatch, add it to the Design Reference section of the issue body.
 
+**In `flow` mode:** do not interrogate DoR items one by one. Auto-waive the human-process items ("User stories agreed by PO", "Design handoff complete") with the note `Waived (flow mode)` in the issue body. Evaluate the derivable items ("Acceptance criteria written and reviewed", "Edge cases identified") against the draft yourself. The user objects at the step 10 review if a waiver is wrong.
+
 ### 9. Scope gate
 
 Run Stage 2 of `../references/scope-gates.md` on the written draft. Even if step 6 passed, drafting sometimes exposes scope that was invisible in the abstract.
@@ -169,6 +180,8 @@ If no signals fire, proceed to user review. If one or more fire, follow the Stag
 On **Split it** → return to step 3 with the chosen focused capability as the seed, carrying forward the already-fetched Epic context. Only re-ask clarification questions that the narrowed scope makes ambiguous.
 
 ### 10. Review with user
+
+This review runs in **both** planning modes. In standalone `flow` mode it is the one consolidated review — everything before it asked nothing it could derive. When `wtf.epic-to-features` orchestrates in `flow` mode, its batch review replaces this step; skip it there.
 
 Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Any changes before I create the issue?"
