@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- Why does this change exist? Reference the Task intent and the Feature goal it serves. -->
+<!-- Why does this change exist? Reference the Trace's story and the Feature goal it serves. -->
 
 ## Changes
 
@@ -8,10 +8,10 @@
 
 ## Test plan
 
-<!-- Checklist derived from Gherkin scenario names. At minimum one item per observable behavior changed. -->
+<!-- Checklist derived from the claimed scenario names. At minimum one item per observable behavior changed. -->
 
 - [ ] 
 
 ## Related
 
-<!-- Closes #<task_number> -->
+<!-- Closes #<trace_number> -->

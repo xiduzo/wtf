@@ -14,9 +14,33 @@ assignees: ""
 
 ## User Stories
 
-<!-- Written by Product Owner -->
+<!-- 👤 PO — 1..n co-related stories that share one Spine. This body is canonical for all scenarios: PMs and designers edit them here, not in Trace issues. Repeat the story block for each story. -->
+
+### Story 1: [name]
 
 - As a **_, I want _** so that \_\_\_
+
+#### Acceptance Criteria
+
+<!-- Each AC maps to one or more scenarios below. -->
+
+- [ ]
+
+#### Scenarios
+
+<!-- Canonical Gherkin for this story. Traces claim subsets of these by name. -->
+
+```gherkin
+Scenario: Happy path
+  Given
+  When
+  Then
+
+Scenario: Edge case
+  Given
+  When
+  Then
+```
 
 ## Design Handoff
 
@@ -28,15 +52,9 @@ assignees: ""
 
 ---
 
-## Acceptance Criteria
-
-<!-- These directly feed into Gherkin scenarios in child Tasks. One AC → one or more scenarios. -->
-
-- [ ]
-
 ## Edge Cases
 
-## <!-- Explicitly name them here so Tasks can cover them in Gherkin. Use domain language. -->
+## <!-- Explicitly name them here so Deepening Traces can claim scenarios that cover them. Use domain language. -->
 
 ## Domain Events
 
@@ -49,7 +67,7 @@ assignees: ""
 
 ## Definition of Ready
 
-<!-- This feature is ready to be broken into Tasks when: -->
+<!-- This feature is ready for a Trace Plan when: -->
 
 - [ ] User stories agreed by PO
 - [ ] Design handoff complete
@@ -58,8 +76,18 @@ assignees: ""
 
 ---
 
-## Proposed Tasks
+## Trace Plan
 
-<!-- Link task issues as they are created -->
+<!-- Ordered checklist — the current aim, not a contract. Item 1 is the Skeleton. Each item names its story, its Scenario Claim, and what it adds to the Spine. Link Trace issues as they are created. -->
 
-- [ ]
+1. [ ] ☄️ Skeleton — [story]: [what it proves of the Spine] (claims: "[scenario name]")
+2. [ ] ☄️ [story]: [what it adds to the Spine] (claims: "[scenario names]")
+
+---
+
+## Delivery Override
+
+<!-- Optional. Set only when this Feature must not use the `delivery` mode in `.wtf/config.json`. State the reason. Leave blank to use the config. -->
+
+- Mode: <!-- staged | trunk -->
+- Reason:
