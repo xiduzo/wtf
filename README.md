@@ -25,6 +25,7 @@ A single framework spanning the full lifecycle:
 
 - **Agentic, not autopilot** — skills propose, structure, and execute; humans approve, redirect, and decide
 - **Human-in-the-loop by default** — every skill pauses for judgment calls rather than guessing
+- **Two planning modes** — `guided` asks step by step; `flow` derives everything it can and presents one consolidated review before anything is created. Set the default once in `.wtf/config.json`, override per invocation (e.g. `/wtf.epic-to-features 42 flow`). Both modes run the same quality gates.
 - **Single source of truth** — the GitHub issue holds design, implementation, and verification side-by-side
 - **Drop-in** — works in the Issues and repo you already have; no parallel system to maintain
 
@@ -171,6 +172,14 @@ CROSS-CUTTING  (run any time, any scope):
 
 The Task issue is the single source of truth: Designer, Developer, and QA each append their own section to it in sequence. Each skill offers to chain to the next step automatically. When requirements evolve after creation, use `wtf.refine` to keep hierarchy specs aligned without rewriting unchanged sections.
 
+## Where WTF is heading: the Trace model
+
+> **Status: decided, not yet implemented.** The skills below still work on Tasks.
+
+The Task layer is being replaced by **Traces** — tracer-bullet work units inspired by [The Pragmatic Programmer](https://fullstackhub.substack.com/p/the-pragmatic-programmer-12-tracer) and [AI Hero](https://www.aihero.dev/tracer-bullets). A Trace claims one user story and a declared subset of its Gherkin scenarios, implemented end-to-end through every layer in one pass — the first Trace of a Feature is a walking skeleton, each next Trace extends the spine. Fewer, bigger, always-releasable changes instead of layer-sliced tasks; a living Trace Plan that re-aims after every landed Trace.
+
+The decision record is [`docs/adr/0001-traces-replace-tasks.md`](docs/adr/0001-traces-replace-tasks.md), the implementation plan is [`docs/future-work/trace-model.md`](docs/future-work/trace-model.md), and the vocabulary (Trace, Skeleton, Spine, Scenario Claim, Re-aim) is pinned in [`CONTEXT.md`](CONTEXT.md).
+
 ## Installation
 
 ### One-command setup
@@ -226,7 +235,7 @@ npx skills update
 | -------------- | ---------------- | -------------------------------------------------------------- |
 | `wtf.setup`   | "set up wtf"     | Pre-flight check and installer — run once per repo on onboard  |
 
-Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, creates all lifecycle labels (`epic`, `feature`, `task`, `bug`, `implemented`, `designed`, `verified`), registers the intervention-tracker hook (asks global vs per-repo), and prints a status report. Offers to kick off steering doc creation at the end.
+Validates `gh` CLI is installed and authenticated, installs the `gh-sub-issue` and `gh-issue-dependency` extensions, scaffolds `.github/ISSUE_TEMPLATE/` with all four templates (Epic, Feature, Task, Bug), drops in the PR template, picks the issue-classification mode (native GitHub issue types in orgs, labels everywhere else), creates the lifecycle labels (`implemented`, `designed`, `verified`), asks the default planning mode (`guided` / `flow`), records both choices in `.wtf/config.json`, registers the intervention-tracker hook (asks global vs per-repo), and prints a status report. Offers to kick off steering doc creation at the end.
 
 ### Pre-planning
 
@@ -255,7 +264,7 @@ Break down an entire level of the hierarchy at once, walking through each item w
 | `wtf.epic-to-features`  | "break down this epic"           | Propose and create all Features for an Epic           |
 | `wtf.feature-to-tasks`  | "plan all tasks for feature #12" | Propose and create all Tasks for a Feature            |
 
-Both skills propose the full list upfront, then walk through creating each item one by one with pause/skip/add controls.
+Both skills propose the full list upfront. In `guided` mode they walk through creating each item one by one with pause/skip/add controls. In `flow` mode, `wtf.epic-to-features` drafts all Features in parallel via sub-agents and presents one consolidated review before batch-creating — two user gates total: confirm the list, approve the tree.
 
 ### Autonomous execution (the main event)
 
