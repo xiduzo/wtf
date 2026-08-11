@@ -182,7 +182,7 @@ The Feature body stays canonical for all stories and their Gherkin — Traces cl
 
 Legacy Task issues in existing repos stay readable — read paths treat them as legacy Traces. Write paths never create Tasks again.
 
-The decision record is [`docs/adr/0001-traces-replace-tasks.md`](docs/adr/0001-traces-replace-tasks.md), the implementation plan is [`docs/future-work/trace-model.md`](docs/future-work/trace-model.md), and the vocabulary (Trace, Skeleton, Spine, Scenario Claim, Re-aim) is pinned in [`CONTEXT.md`](CONTEXT.md).
+The decision record is [`docs/adr/0001-traces-replace-tasks.md`](docs/adr/0001-traces-replace-tasks.md), and the vocabulary (Trace, Skeleton, Spine, Scenario Claim, Re-aim) is pinned in [`CONTEXT.md`](CONTEXT.md).
 
 ## Installation
 

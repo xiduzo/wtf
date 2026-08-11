@@ -2,7 +2,7 @@
 
 **Status:** accepted (2026-08-11)
 
-The Task layer claimed to hold vertical slices but invited horizontal layering: decomposition pressure produced layer tasks (model → API → UI → email) that defer integration feedback, and an agent does not need layer decomposition — it drives one story end-to-end in one pass. Following the tracer-bullet sources ([aihero.dev/tracer-bullets](https://www.aihero.dev/tracer-bullets), *The Pragmatic Programmer*), we replace Tasks with **Traces**: a Trace is one pass over the Feature's Spine that claims exactly one story plus a Scenario Claim, Traces run spine-first within a Feature, the Trace Plan is re-aimed grow-only through `wtf.refine`, scenarios stay canonical in the Feature issue, and delivery is `staged` or `trunk` per config. The full model is specified in [`docs/future-work/trace-model.md`](../future-work/trace-model.md).
+The Task layer claimed to hold vertical slices but invited horizontal layering: decomposition pressure produced layer tasks (model → API → UI → email) that defer integration feedback, and an agent does not need layer decomposition — it drives one story end-to-end in one pass. Following the tracer-bullet sources ([aihero.dev/tracer-bullets](https://www.aihero.dev/tracer-bullets), *The Pragmatic Programmer*), we replace Tasks with **Traces**: a Trace is one pass over the Feature's Spine that claims exactly one story plus a Scenario Claim, Traces run spine-first within a Feature, the Trace Plan is re-aimed grow-only through `wtf.refine`, scenarios stay canonical in the Feature issue, and delivery is `staged` or `trunk` per config. The model is implemented across the skills and shared references; the vocabulary is pinned in [`CONTEXT.md`](../../CONTEXT.md).
 
 ## Considered Options
 
