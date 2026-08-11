@@ -9,47 +9,62 @@
 | ⚠️     | Conditional pass — scenario passed with a caveat or deviation noted   |
 | 🚫     | Blocked — could not be tested (missing dependency, environment issue) |
 
+## Method Values
+
+Every claimed scenario is verified by one of two methods. The verdict names the method per scenario.
+
+| Method        | Meaning                                                                          |
+| ------------- | -------------------------------------------------------------------------------- |
+| `executed`    | A Gherkin runner ran the scenario from the ephemeral projection (primary)        |
+| `interpreted` | QA walked the scenario manually against the running software (fallback)          |
+
+The fallback applies when no runner exists, or when a scenario has unbound steps.
+
 ## Final Verdict Options
 
-| Verdict             | Meaning                                                      |
-| ------------------- | ------------------------------------------------------------ |
-| ✅ Ready for merge  | All scenarios passed, all DoD items checked                  |
-| ❌ Needs fixes      | One or more scenarios failed; bug reports filed              |
-| ⚠️ Conditional pass | Passed with noted caveats; PO or Tech Lead sign-off required |
+| Verdict             | Meaning                                                                     |
+| ------------------- | --------------------------------------------------------------------------- |
+| ✅ Ready for merge  | All claimed scenarios passed, DoD items checked, and the system is releasable |
+| ❌ Needs fixes      | A claimed scenario failed, or the releasability check failed; bug reports filed |
+| ⚠️ Conditional pass | Passed with noted caveats; PO or Tech Lead sign-off required                |
 
 ## Sample Completed Test Mapping Table
 
-The running table format used during verification (columns: Scenario, Result, Bug Filed):
+The running table format used during verification (columns: Claimed scenario, Method, Result, Bug Filed):
 
-| Scenario                                                      | Result | Bug Filed |
-| ------------------------------------------------------------- | ------ | --------- |
-| Fulfilment Manager views open Purchase Orders                 | ✅     | —         |
-| Order list is empty when no open orders exist                 | ✅     | —         |
-| Order list shows error when fulfilment service is unavailable | ❌     | yes       |
-| Paginated order list loads next page on scroll                | ⚠️     | —         |
+| Claimed scenario                             | Method      | Result | Bug Filed |
+| -------------------------------------------- | ----------- | ------ | --------- |
+| Status shown for a settled payment           | executed    | ✅     | —         |
+| Status for a failed settlement               | executed    | ❌     | yes       |
+| Status while settlement is pending           | interpreted | ⚠️     | —         |
 
-## Sample QA Summary Comment
+## Sample QA Verdict Comment
 
 ```
-## QA Summary — Task #42
+## QA Verdict — Trace #42
 
-**Scenarios tested:** 4
-**Passed:** 2 ✅
-**Failed:** 1 ❌
-**Conditional:** 1 ⚠️
+**Scenario Claim:** 3 scenarios of story "Merchant sees settlement status"
+**Executed:** 2 via cucumber-js (ephemeral projection from Feature #17) — 1 ✅ / 1 ❌
+**Interpreted:** 1 — 1 ⚠️ (no step definition for "the settlement is pending")
 
 ### Findings
 
-**❌ Scenario: Order list shows error when fulfilment service is unavailable**
-- Expected: An error message "Fulfilment service unavailable — try again shortly" appears
-- Actual: Page shows blank white screen with no user feedback
-- Repro: Stop the fulfilment service, load /orders
+**❌ Scenario: Status for a failed settlement** (executed)
+- Expected: The status "Failed" shows with the failure reason
+- Actual: Runner reports a timeout — the status stays "Processing"
+- Repro: Run the projected scenario, or fail a settlement and load /settlements
 - Bug filed: #87
 
-**⚠️ Scenario: Paginated order list loads next page on scroll**
-- Passed functionally but scroll performance is sluggish on mobile (< 30fps)
-- Not a blocker for merge; filed as improvement in #88
+**⚠️ Scenario: Status while settlement is pending** (interpreted)
+- The status shows, but only after a manual page refresh
+- Not a merge blocker — filed as improvement in #88
+
+### Releasability
+Releasable: yes. Build and type check pass on `trace/42-settlement-status`. The Skeleton happy path still works.
+
+### Roll-up
+Story "Merchant sees settlement status" — 2 of 3 scenarios verified. Trace #43 claims the remainder.
 
 ### Verdict: ❌ Needs fixes
-Bug #87 must be resolved before merge.
+Bug #87 blocks the merge.
 ```

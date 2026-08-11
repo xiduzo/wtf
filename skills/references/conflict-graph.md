@@ -15,7 +15,7 @@ The graph still applies to legacy Task children (see `./issue-classification.md`
 Use this any time multiple sub-agents will each modify files:
 
 - `wtf.loop` — parallel Feature execution (plus legacy Task children within a phase)
-- `wtf.verify-trace` Full Feature mode — parallel QA across a Feature's Traces
+- `wtf.verify-trace` Full Feature mode — sequential QA in spine order within a Feature; the graph schedules only its legacy Task children
 - `wtf.refine` cascade — parallel refinement across affected children
 
 Without this step, parallel worktrees can race on the same file. That produces dirty merges.

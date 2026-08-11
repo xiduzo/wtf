@@ -22,6 +22,6 @@ Use this pattern whenever you need to update a section of a GitHub issue body wi
 
 - Always read before writing — never assume the current body matches the original draft.
 - **Never capture a body into a shell variable** (`BODY=$(gh issue view …)`) — PowerShell joins multi-line output with spaces and destroys the body. Always go through `read` → temp file → Read tool.
-- The second write in a run (e.g. step 9 updating Test Mapping after step 6 updated Technical Approach) must re-`read` the body rather than reusing the temp file from the earlier step, since other sections may have been updated in between.
+- The second write in a run (e.g. updating the Test Mapping table after an earlier step updated the Technical Approach section of the Trace body) must re-`read` the body rather than reusing the temp file from the earlier step, since other sections may have been updated in between.
 - `read` uses `mkstemp`, so every call yields a unique path — parallel runs never collide; no need to hand-roll names with the issue number or `$(date +%s)`.
 - If `.wtf/gh-body.py` is absent, use the raw-`gh` fallback in `../../references/gh-body-helper.md` (unguarded on Windows).

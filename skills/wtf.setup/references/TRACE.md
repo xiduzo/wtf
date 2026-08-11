@@ -96,6 +96,10 @@ Scenario:
 
 ---
 
+## Design Reference
+
+<!-- Optional. Filled by design-trace: Figma frames / component specs for the claimed scenarios. -->
+
 ## Definition of Done
 
 - [ ] All claimed scenarios covered by tests

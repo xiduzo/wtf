@@ -1,6 +1,6 @@
 # Component Spec Template
 
-Use this structure when no Figma frames are available. Fill in each section from the Gherkin scenarios and Feature ACs identified in the design-task skill.
+Use this structure when no Figma frames are available. Fill in each section from the claimed Gherkin scenarios and Feature ACs identified in the design-trace skill.
 
 ---
 

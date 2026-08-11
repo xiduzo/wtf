@@ -1,13 +1,13 @@
 ---
 name: wtf.create-pr
-description: This skill should be used when a developer wants to open a pull request for a completed task branch — for example "create a PR", "open a pull request", "submit this for review", "make a PR for task #42", "push this up for review", or "create PR from current branch". Reads the Task + Feature + Epic hierarchy to write a meaningful PR description. Handles branches with or without a linked WTF task issue.
+description: This skill should be used when a developer wants to open a pull request for a completed trace branch — for example "create a PR", "open a pull request", "submit this for review", "make a PR for trace #42", "push this up for review", or "create PR from current branch". Reads the Trace + Feature + Epic hierarchy to write a meaningful PR description. Handles branches with or without a linked WTF trace issue.
 ---
 
 # Create PR
 
-Open a pull request for a completed task branch.
+Open a pull request for a completed trace branch.
 
-This skill reads the full spec hierarchy (Task + Feature + Epic) and the branch diff.
+This skill reads the full spec hierarchy (Trace + Feature + Epic) and the branch diff.
 It writes a PR description that explains why the change exists, not only what it does.
 
 ## Process
@@ -18,7 +18,7 @@ Run steps 1–2 of `../references/gh-setup.md` (install check and auth check).
 Stop if `gh` is not installed or not authenticated.
 Extensions are not required for this skill.
 
-Skip this step if invoked from `wtf.verify-task` or another skill that already ran gh-setup this session.
+Skip this step if invoked from `wtf.verify-trace` or another skill that already ran gh-setup this session.
 
 ### 1. Confirm the branch
 
@@ -47,46 +47,48 @@ If an open PR already exists, print its URL and call `AskUserQuestion` (per `../
   - **Update description** → skip to step 5, targeting the existing PR for update via `gh pr edit <pr_number>`
   - **Open a new one** → create a new PR anyway
 
-### 2. Identify the Task (if any)
+### 2. Identify the Trace (if any)
 
-Try to extract a task number from the branch name (e.g. `task/42-date-range-filter` → `#42`).
+Try to extract a trace number from the branch name (e.g. `trace/42-date-range-filter` → `#42`).
+A legacy `task/42-<slug>` branch also matches — treat that issue as a legacy Trace per `../references/issue-classification.md`.
 
 If found, call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "I found Task #<n> linked to this branch. Is that the right task?"
-- header: "Linked task"
+- question: "I found Trace #<n> linked to this branch. Is that the right trace?"
+- header: "Linked trace"
 - options:
-  - **Yes, that's correct** → use Task #<n>
-  - **No, use a different task** → I'll provide the correct issue number
+  - **Yes, that's correct** → use Trace #<n>
+  - **No, use a different trace** → I'll provide the correct issue number
 
 If not found or the user says no, call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "Is there a Task issue linked to this work?"
-- header: "Linked task"
+- question: "Is there a Trace issue linked to this work?"
+- header: "Linked trace"
 - options:
-  - **No linked task** → proceed without a task link
-  - **Yes — I'll provide the number** → enter the task issue number
+  - **No linked trace** → proceed without a trace link
+  - **Yes — I'll provide the number** → enter the trace issue number
 
-### 3. Lifecycle check (if Task linked)
+### 3. Lifecycle check (if Trace linked)
 
-If no Task is linked, skip this step.
+If no Trace is linked, skip this step.
 
-Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `verified` label on the Task — recommended skill `wtf.verify-task`, header `Verify first?`.
-On **Verify first** → follow `wtf.verify-task` passing the Task number as context.
+Apply the **absent-label gate** from `../references/lifecycle-labels.md` for the `verified` label on the Trace — recommended skill `wtf.verify-trace`, header `Verify first?`.
+On **Verify first** → follow `wtf.verify-trace` passing the Trace number as context.
 On **Open PR anyway** → proceed.
 
 ### 4. Fetch the spec hierarchy
 
-**If a Task issue is known**, walk Task → Feature → Epic per `../references/spec-hierarchy.md`.
-Extract Gherkin, Contracts, DoD, and Test Mapping from the Task.
-Extract ACs, Goal, and constraints from the Feature and Epic.
+**If a Trace issue is known**, walk Trace → Feature → Epic per `../references/spec-hierarchy.md`.
+Extract the story, the Scenario Claim, the Spine position, the Technical Approach, and the DoD from the Trace.
+Extract ACs, the Trace Plan, any delivery override, and constraints from the Feature. Extract the Goal from the Epic.
+For a legacy Task, extract the old sections instead (Functional Description, Gherkin, Contracts, DoD, Test Mapping).
 
-**If no Task issue**, skip hierarchy fetch.
+Resolve the delivery mode per `../references/branch-setup.md` ("Resolve the delivery mode") — the Feature's override wins.
+
+**If no Trace issue**, skip hierarchy fetch.
 The PR will be written from diff context alone (step 5).
 
 ### 5. Inspect the diff
 
-Determine the base branch using the same logic as step 8.
-For `task/*`, use the parent feature branch.
-For `feature/*`, use `main`.
+Determine the base branch per the Base-branch policy in `../references/branch-setup.md` (same as step 8).
 Then collect the branch diff against that base:
 
 ```bash
@@ -102,17 +104,17 @@ Use `--stat` output only unless a specific commit message is ambiguous and canno
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
 **Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model — apply `../references/subagent-protocol.md` for the spawn — to generate a PR title per `../references/commit-conventions.md`.
-Pass in the task title (if available), the commit log, and whether this is a breaking change.
+Pass in the trace title (if available), the commit log, and whether this is a breaking change.
 If the subagent returns nothing usable, generate the title directly following the same rules.
 Examples: `feat(search): add date range filter`, `fix(payments): prevent double settlement`, `refactor(orders): extract fulfilment service`.
 
 **Body:** Load the PR template per `../references/issue-template-loading.md` (verify `.github/pull_request_template.md` exists, halt-or-setup if missing).
 Complete all sections:
 
-- **Summary**: derived from the Task's Intent + Functional Description (or commit messages if no Task). Explain the why.
+- **Summary**: derived from the Trace's story and its Spine position — what this pass adds to the Spine (Skeleton | extension | deepening, and which Traces it builds on). Explain the why. If no Trace, derive from commit messages.
 - **Changes**: grouped logical summary of `git diff --stat` output — not a file list.
-- **Test plan**: if a Task exists, derive checklist items from the Gherkin scenario names. If no Task, derive from changed files and commit messages. At minimum one item per observable behavior changed.
-- **Related**: closure keywords per `../references/commit-conventions.md`. If a Task exists, include `Closes #<task_number>`. If the PR also closes the parent Feature (all sibling tasks already merged), add `Closes #<feature_number>` on its own line.
+- **Test plan**: if a Trace exists, one checklist item per claimed scenario name from the Scenario Claim. If no Trace, derive from changed files and commit messages. At minimum one item per observable behavior changed.
+- **Related**: closure keywords per `../references/commit-conventions.md`, one per line. If a Trace exists, include `Closes #<trace_number>`. In `trunk` delivery, when this Trace exhausts the Feature's Trace Plan, add `Closes #<feature_number>` on its own line. For a feature-branch PR (`staged`), include `Closes #<feature_number>` plus one `Closes #<trace_number>` line per completed Trace.
 
 ### 7. Review with user
 
@@ -128,10 +130,13 @@ Apply edits, then proceed.
 
 ### 8. Create the PR
 
-Determine the base branch from the current branch name:
+Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`:
 
-- `task/*` branch → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
+- `trace/*` branch, `staged` delivery → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
+- `trace/*` branch, `trunk` delivery → target `main`
 - `feature/*` branch → target `main`
+- `hotfix/*` branch → target `main`
+- `task/*` branch (legacy) → target the parent feature branch
 - Other → call `AskUserQuestion` (per `../references/questioning-style.md`):
   - question: "What branch should this PR target?"
   - header: "Base branch"
@@ -143,13 +148,13 @@ Then create the PR via the gh body helper (`../references/gh-body-helper.md`) so
 ```bash
 # $BODY is the temp file you wrote the PR body to with the Write tool.
 
-# task branch:
+# trace branch — staged delivery:
 python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
   --body-file "$BODY" \
   --base feature/<feature-number>-<feature-slug>
 
-# feature branch:
+# trace branch — trunk delivery, or feature branch:
 python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
   --body-file "$BODY" \
@@ -158,13 +163,13 @@ python3 .wtf/gh-body.py create --pr \
 
 Print the PR URL.
 
-### 9. Update the Task issue (if linked)
+### 9. Update the Trace issue (if linked)
 
-If a Task issue is linked, post a comment linking the PR:
+If a Trace issue is linked, post a comment linking the PR:
 
 ```bash
 # Write "PR opened: <pr_url>" to a temp file with the Write tool ($COMMENT), then:
-python3 .wtf/gh-body.py comment <task_number> --body-file "$COMMENT"
+python3 .wtf/gh-body.py comment <trace_number> --body-file "$COMMENT"
 ```
 
 ### 10. Offer next steps

@@ -3,33 +3,35 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Run wtf.refine for Feature #24 — Settlement date range filter. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/scope-narrowed-feature.json`, field `issue`). The insight is already provided: 'Scope narrowed — exclude mobile clients from this feature. Mobile support is deferred to v2.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Output only the change map from step 3.",
-      "expected_output": "A change map showing scope changed, ACs affected (mobile AC removed), Edge Cases affected (mobile fallback removed), and Proposed Tasks as potentially stale.",
+      "prompt": "Run wtf.refine for Feature #24 — Settlement date range filter. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/scope-narrowed-feature.json`, field `issue`; it is a Feature). The insight is already provided: 'Scope narrowed — exclude mobile clients from this feature. Mobile support is deferred to v2.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Output only the change map from step 3.",
+      "expected_output": "A change map showing scope changed, ACs affected (mobile AC removed), canonical Scenarios affected (mobile scenario removed — scenarios live on the Feature), Edge Cases affected (mobile fallback removed), and the Trace Plan as potentially stale (the mobile Trace entry). Claiming Traces are noted as cascade items (synced-copy refresh), not as sections rewritten directly.",
       "files": ["evals/fixtures/scope-narrowed-feature.json"],
       "expectations": [
         "The change map shows scope changed: yes",
         "The change map identifies Acceptance Criteria as a section to rewrite",
+        "The change map identifies the canonical Scenarios on the Feature as affected (the mobile scenario)",
         "The change map identifies Edge Cases as an affected section",
-        "The change map notes Proposed Tasks as potentially stale or needing review",
-        "The change map does not mark Gherkin as directly affected (Gherkin is Task-level and would cascade)"
+        "The change map notes the Trace Plan as potentially stale or needing re-partition",
+        "The change map treats Traces that claim the changed scenarios as cascade items (synced-copy refresh), not as sections it rewrites directly"
       ]
     },
     {
       "id": 2,
-      "prompt": "Run wtf.refine for Task #31 — Send settlement confirmation to customer. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/domain-language-correction.json`, field `issue`). The insight is already provided: 'Domain language correction: use Merchant instead of Customer throughout — our bounded context uses Merchant for B2B clients, not Customer.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Output only the change map from step 3.",
-      "expected_output": "A change map showing DDD language changed, with Gherkin steps and Contracts identified as sections to rewrite because they contain the incorrect 'Customer' term.",
+      "prompt": "Run wtf.refine for issue #31 — Send settlement confirmation to customer. Test mode: skip step 0 (gh setup already confirmed). For step 1, do not call gh — the issue is already identified: use the issue from `evals/fixtures/domain-language-correction.json`, field `issue`. Still run step 1's kind detection on the fixture's labels. The insight is already provided: 'Domain language correction: use Merchant instead of Customer throughout — our bounded context uses Merchant for B2B clients, not Customer.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Output the detected kind and the change map from step 3.",
+      "expected_output": "The issue carries the `task` label, so it is detected as a legacy Task and treated as a legacy Trace, routed through the Trace validation path. The change map shows DDD language changed, with the in-body Gherkin steps and Contracts identified as sections to rewrite because they contain the incorrect 'Customer' term. The Gherkin is edited in place (legacy bodies are canonical for their own scenarios — no redirect to a Feature).",
       "files": ["evals/fixtures/domain-language-correction.json"],
       "expectations": [
+        "The output detects the issue as a legacy Task and says it treats it as a legacy Trace",
         "The change map shows DDD language changed: yes",
-        "The change map identifies Gherkin or Gherkin steps as an affected section",
+        "The change map identifies the in-body Gherkin or Gherkin steps as an affected section, edited in place (no redirect to a parent Feature)",
         "The change map identifies Contracts as an affected section",
         "The change map notes that 'Customer' should be replaced with 'Merchant'"
       ]
     },
     {
       "id": 3,
-      "prompt": "Run wtf.refine for Feature #38 — Settlement CSV export. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/technical-constraint-added.json`, field `issue`). The insight is already provided: 'New constraint: must support multi-currency settlement. All amounts must be stored and displayed in ISO 4217 format (e.g. currency code alongside amount). Single-currency assumption is no longer valid.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Output only the change map from step 3.",
-      "expected_output": "A change map showing a new constraint, with Acceptance Criteria and Edge Cases identified as sections to rewrite to reflect multi-currency requirements.",
+      "prompt": "Run wtf.refine for Feature #38 — Settlement CSV export. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/technical-constraint-added.json`, field `issue`; it is a Feature). The insight is already provided: 'New constraint: must support multi-currency settlement. All amounts must be stored and displayed in ISO 4217 format (e.g. currency code alongside amount). Single-currency assumption is no longer valid.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Output only the change map from step 3.",
+      "expected_output": "A change map showing a new constraint, with Acceptance Criteria, canonical Scenarios (amount-format Then steps), and Edge Cases identified as sections to rewrite to reflect multi-currency requirements.",
       "files": ["evals/fixtures/technical-constraint-added.json"],
       "expectations": [
         "The change map identifies a new constraint or scope change",
@@ -40,7 +42,7 @@
     },
     {
       "id": 4,
-      "prompt": "Run wtf.refine for Feature #24 — Settlement date range filter. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/conflicting-insights.json`, field `issue`). Two insights are provided simultaneously: (1) 'Scope narrowed — exclude mobile clients. Mobile is deferred to v2.' and (2) 'Mobile is now the priority — exclude desktop support. Desktop will be addressed in v2.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Run step 3 only. Output the change map, showing specifically how it handles the conflict between the two insights.",
+      "prompt": "Run wtf.refine for Feature #24 — Settlement date range filter. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (issue already identified — use the issue from `evals/fixtures/conflicting-insights.json`, field `issue`; it is a Feature). Two insights are provided simultaneously: (1) 'Scope narrowed — exclude mobile clients. Mobile is deferred to v2.' and (2) 'Mobile is now the priority — exclude desktop support. Desktop will be addressed in v2.' Skip steps 2b–2c (no GitHub comments or referenced URLs). Skip steps 4–9 (validations, apply, audit, cascade). Run step 3 only. Output the change map, showing specifically how it handles the conflict between the two insights.",
       "expected_output": "The change map explicitly flags a conflict between the two insights (insight 1 says exclude mobile; insight 2 says exclude desktop — these are mutually exclusive). It does not silently apply one insight while ignoring the other. It identifies Acceptance Criteria as the directly affected section and prompts the user to resolve the contradiction before proceeding.",
       "files": ["evals/fixtures/conflicting-insights.json"],
       "expectations": [
