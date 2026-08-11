@@ -42,4 +42,4 @@ Section structure that `wtf.design-feature` writes back into the Feature issue. 
 - **Design path** must match the path actually run in step 6 — do not over-claim Path B if frames were scaffolded.
 - **Screen inventory** must list every screen identified in the journey map (step 5), even ones marked `pending`.
 - **Validation** checkboxes are filled by the skill, not the user.
-- **Shared components** is the inheritance contract for `wtf.design-task` — entries here are the per-feature reuse decisions that downstream Tasks must respect.
+- **Shared components** is the inheritance contract for `wtf.design-trace` — entries here are the per-feature reuse decisions that downstream Traces must respect.

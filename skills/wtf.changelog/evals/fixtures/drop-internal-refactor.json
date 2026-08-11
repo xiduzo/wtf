@@ -1,25 +1,25 @@
 {
-  "_note": "Feature scope with one user-facing task and one pure internal refactor — task #33 (refactor) must be dropped; only task #34 appears in the changelog",
+  "_note": "Feature scope with one user-facing trace and one pure internal change — #33 (a legacy Task with in-body Gherkin, kept to exercise the legacy read path) must be dropped; only trace #34 appears in the changelog. Scenario text for #34 is canonical in the feature body.",
   "feature": {
     "number": 30,
-    "title": "Settlement status display",
-    "body": "## Goal\nMerchants need to see the current processing status of each settlement so they can track payouts without contacting support.\n\n## Acceptance Criteria\n- Each settlement in the list shows a status badge (Pending, Processing, Paid, Failed)\n- The status is updated in real time when it changes\n- Merchants can filter the list by status",
+    "title": "🚀 Settlement status display",
+    "body": "## Goal\nMerchants need to see the current processing status of each settlement so they can track payouts without contacting support.\n\n## Acceptance Criteria\n- Each settlement in the list shows a status badge (Pending, Processing, Paid, Failed)\n- The status is updated in real time when it changes\n- Merchants can filter the list by status\n\n## User Stories\n\n### Story: Merchant sees settlement status\nAs a Merchant, I want to see the processing status of each settlement, so that I can track payouts at a glance.\n\n```gherkin\nScenario: Merchant sees status badge on settlement row\n  Given a merchant is viewing the settlement list\n  When the list loads\n  Then each settlement row shows a status badge indicating its current processing state\n  And the badge colour reflects the status: grey for Pending, blue for Processing, green for Paid, red for Failed\n\nScenario: Merchant filters settlements by status\n  Given a merchant is viewing the settlement list\n  When they select 'Failed' from the status filter\n  Then only settlements with a Failed status badge are shown in the list\n```\n\n## Trace Plan\n\n1. [x] ☄️ Skeleton — Merchant sees settlement status (claims: \"Merchant sees status badge on settlement row\", \"Merchant filters settlements by status\")",
     "state": "CLOSED"
   },
-  "tasks": [
+  "traces": [
     {
       "number": 33,
-      "title": "Migrate settlement storage from flat table to normalised schema",
+      "title": "🛠 Migrate settlement storage from flat table to normalised schema",
       "labels": [{"name": "task"}, {"name": "verified"}],
       "state": "CLOSED",
       "body": "## Functional Description\nRefactor the internal database schema to split the settlements table into a normalised structure with a separate status_events table. This is an internal engineering change with no direct user-facing behaviour change.\n\n## Gherkin\n```gherkin\nScenario: Internal schema migration completes without data loss\n  Given the settlements table contains 10,000 existing records\n  When the database migration runs\n  Then all 10,000 records are present in the new normalised schema\n  And no existing settlement data is lost or corrupted\n```"
     },
     {
       "number": 34,
-      "title": "Show status badge on each settlement row",
-      "labels": [{"name": "task"}, {"name": "verified"}],
+      "title": "☄️ Skeleton — Merchant sees settlement status",
+      "labels": [{"name": "trace"}, {"name": "verified"}],
       "state": "CLOSED",
-      "body": "## Functional Description\nDisplay a colour-coded status badge (Pending, Processing, Paid, Failed) on each row of the settlement list so merchants can see payout progress at a glance.\n\n## Gherkin\n```gherkin\nScenario: Merchant sees status badge on settlement row\n  Given a merchant is viewing the settlement list\n  When the list loads\n  Then each settlement row shows a status badge indicating its current processing state\n  And the badge colour reflects the status: grey for Pending, blue for Processing, green for Paid, red for Failed\n\nScenario: Merchant filters settlements by status\n  Given a merchant is viewing the settlement list\n  When they select 'Failed' from the status filter\n  Then only settlements with a Failed status badge are shown in the list\n```"
+      "body": "## Story\nAs a Merchant, I want to see the processing status of each settlement, so that I can track payouts at a glance.\n\n## Scenario Claim\n- Merchant sees status badge on settlement row\n- Merchant filters settlements by status\n\n## Spine Position\nSkeleton — proves the status path from settlement record to badge display.\n\n<details><summary>Synced from Feature #30 — edit there, not here</summary>\n\n```gherkin\nScenario: Merchant sees status badge on settlement row\n  Given a merchant is viewing the settlement list\n  When the list loads\n  Then each settlement row shows a status badge indicating its current processing state\n  And the badge colour reflects the status: grey for Pending, blue for Processing, green for Paid, red for Failed\n\nScenario: Merchant filters settlements by status\n  Given a merchant is viewing the settlement list\n  When they select 'Failed' from the status filter\n  Then only settlements with a Failed status badge are shown in the list\n```\n\n</details>"
     }
   ]
 }

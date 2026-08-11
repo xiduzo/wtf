@@ -24,17 +24,17 @@ Best → worst for simple (single-turn) evals:
 | `wtf.create-pr` (no-Task path) | Good ✅ | Diff + branch → PR title + body. Title assertable via Conventional Commits regex; body sections by substring. |
 | `wtf.refine` classify step | Good ✅ | Issue body + insight text → change map. Assert which sections got marked dirty. |
 | `wtf.changelog` | Good ✅ | Closed issues (fixtures) → Keep-a-Changelog markdown. Assert structure and absence of implementation vocabulary. |
-| `wtf.write-task` | Good ✅ | Checkpoint evals: step 7 (Gherkin generation), step 9 (scope gate), step 3 (ambiguity clarification). Each is a deterministic sub-function isolated from the interactive steps. |
+| `wtf.write-trace` | Good ✅ | Checkpoint evals: claim selection, depth split, ambiguity clarification. Each is a deterministic sub-function isolated from the interactive steps. |
 | `wtf.pr-review` | Good ✅ | Step 5 (review checklist) checkpoint: diff + task spec → PASS/FAIL/WARN per dimension. Missing test coverage, schema drift, and scope creep are all assertable. |
 | `wtf.report-bug` | Good ✅ | Step 6 (bug report draft) checkpoint: failing scenario + task context → structured bug report. Assert all template sections present, Gherkin evidence included, domain language enforced. |
 | `wtf.epic-to-features` | Good ✅ | Step 2 (feature list proposal) checkpoint: epic fixture → feature list. Assert Actor-verb-object pattern, domain language only, no re-proposal of already-created features. |
-| `wtf.feature-to-tasks` | Good ✅ | Step 2 (task list proposal) checkpoint: feature fixture → task list. Assert vertical slices, migration tasks separated from behavior tasks, each task maps to at least one AC. |
+| `wtf.feature-to-traces` | Good ✅ | Trace Plan checkpoint: feature fixture → Trace Plan. Assert spine order, Scenario Claims partition the stories, each Trace maps to claimed scenarios. |
 | `wtf.write-epic`, `wtf.write-feature` | Poor (simple) | Heavy `AskUserQuestion` flow with no sub-step as deterministic as write-task's Gherkin generator or scope gate. Needs trajectory evals for meaningful coverage. |
 | `wtf.reflect` | Fair ✅ | Step 4 routing (learning → TECH/QA/DESIGN/VISION) is deterministic. 5 evals cover all four targets plus the ambiguous-defaults-to-TECH case. |
 | `wtf.hotfix` | Fair ✅ | Step 4 (branch naming), step 6 (scope gate), and step 8 (PR body structure) are all deterministic checkpoints. Implementation step is codebase-dependent and untested. |
 | `wtf.retro` | Poor | Needs live GitHub issue/PR history to compare planned vs shipped. Cannot be fixture-mocked without enormous complexity. |
-| `wtf.implement-task` | Poor | Codebase-dependent; every output is unique to the actual files changed. |
-| `wtf.verify-task` | Poor | Needs running software and real test execution. |
+| `wtf.implement-trace` | Poor | Codebase-dependent; every output is unique to the actual files changed. |
+| `wtf.verify-trace` | Poor | Needs running software and real test execution. |
 | `wtf.setup` | Poor | Environment-dependent; output varies by installed tools and repo state. |
 | `wtf.design-*` | Poor | Figma MCP coupling; non-deterministic outputs. |
 | `wtf.steer-*` | Poor | Research-heavy; output depends on live codebase state. |
@@ -60,7 +60,7 @@ The skill-creator plugin is separate from this repo. To eval a wtf skill:
 
 ## Evaluating multi-step and interactive skills
 
-The skills above ("Excellent/Good") are mostly single-turn: one input → one output. The interactive skills (`wtf.write-epic/feature/task`, `wtf.loop` end-to-end) involve multi-step reasoning, stateful decisions, and `AskUserQuestion` gates. These need a different approach.
+The skills above ("Excellent/Good") are mostly single-turn: one input → one output. The interactive skills (`wtf.write-epic/feature/trace`, `wtf.loop` end-to-end) involve multi-step reasoning, stateful decisions, and `AskUserQuestion` gates. These need a different approach.
 
 ### Trajectory evals (not single-turn)
 
@@ -142,5 +142,5 @@ Skill-creator's benchmark output already captures `total_tokens` and `duration_m
 - [x] Fixture convention is documented in `skills/references/eval-fixture-convention.md`.
 - [x] `CLAUDE.md` has a section explaining how to run evals locally.
 - [x] `wtf.loop`, `wtf.create-pr`, `wtf.refine`, `wtf.changelog` have simple evals authored.
-- [x] At least one interactive skill (`wtf.write-task`) has checkpoint evals (Gherkin generation, scope gate, ambiguity clarification).
+- [x] At least one interactive skill (`wtf.write-trace`) has checkpoint evals (claim selection, depth split, ambiguity clarification).
 - [x] Common failure patterns covered: `wtf.loop` has contradiction-spec (spec contradiction) and external-blocker (external dep gate) perturbation evals; `wtf.refine` has conflicting-insights perturbation eval.

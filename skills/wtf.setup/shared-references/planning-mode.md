@@ -2,7 +2,7 @@
 
 Every WTF planning skill uses this file to decide how much it asks and how much it derives. The mode controls interaction density. It never controls quality.
 
-Read this from any skill that authors Epics, Features, or Tasks. The current consumers are `wtf.write-feature` and `wtf.epic-to-features`. Other planning skills adopt it the same way.
+Read this from any skill that authors Epics, Features, or Traces. The current consumers are `wtf.write-feature`, `wtf.epic-to-features`, and `wtf.feature-to-traces`. Other planning skills adopt it the same way.
 
 There are two modes:
 

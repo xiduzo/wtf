@@ -1,9 +1,9 @@
 {
-  "_note": "Fixture for eval 2 — one task (implemented) waiting for QA verification. Arrays match gh issue list --json number,title,labels,updatedAt output.",
+  "_note": "Fixture for eval 2 — one trace (implemented) waiting for QA verification. Arrays match gh issue list --json number,title,labels,updatedAt output; features also carry body (User Stories + Trace Plan). The Trace Plan claims all scenarios, so no Skeleton or partition-gap finding fires.",
   "epics": [
     {
       "number": 5,
-      "title": "Settlement Visibility",
+      "title": "🎯 Settlement Visibility",
       "labels": [{"name": "epic"}],
       "updatedAt": "2026-05-01T09:00:00Z"
     }
@@ -11,16 +11,17 @@
   "features": [
     {
       "number": 10,
-      "title": "Merchant can view settlement status for a completed payment",
-      "labels": [{"name": "feature"}],
-      "updatedAt": "2026-05-01T10:00:00Z"
+      "title": "🚀 Merchant can view settlement status for a completed payment",
+      "labels": [{"name": "feature"}, {"name": "designed"}],
+      "updatedAt": "2026-05-01T10:00:00Z",
+      "body": "## User Stories\n\n### Story: Merchant sees settlement status\nAs a Merchant, I want to see the settlement status of a completed payment, so that I can track my payout.\n\n```gherkin\nScenario: Status shown for a settled payment\n  Given a Merchant has a completed payment that is settled\n  When the Merchant opens the payment detail page\n  Then the settlement status 'Settled' is shown\n```\n\n## Trace Plan\n\n1. [ ] ☄️ Skeleton — Merchant sees settlement status for one completed payment (claims: \"Status shown for a settled payment\")"
     }
   ],
-  "tasks": [
+  "traces": [
     {
       "number": 42,
-      "title": "Add settlement status field to Payment Aggregate",
-      "labels": [{"name": "task"}, {"name": "designed"}, {"name": "implemented"}],
+      "title": "☄️ Skeleton — Merchant sees settlement status for one completed payment",
+      "labels": [{"name": "trace"}, {"name": "designed"}, {"name": "implemented"}],
       "updatedAt": "2026-05-02T14:30:00Z"
     }
   ],
