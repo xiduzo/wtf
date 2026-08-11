@@ -1,5 +1,5 @@
 {
-  "_note": "Fixture for eval 3 — Feature with no Proposed Tasks checklist where one AC (chunked ZIP export for large datasets) is significantly more complex than the others and must become its own separate Task.",
+  "_note": "Fixture for eval 3 — legacy-shape Feature (no Trace Plan) with two stories, where one AC (chunked ZIP export for large datasets) is far more complex than the rest. Expected: a derived Trace Plan with exactly one Skeleton first claiming the primary story's happy path (basic CSV download), the chunked ZIP export as its own Deepening entry citing its story, and the filtered-export story delivered by its own entry. Split by depth — never a separate backend/frontend or migration entry.",
   "feature": {
     "number": 50,
     "title": "Feature: Settlement CSV export",

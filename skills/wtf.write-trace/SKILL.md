@@ -1,11 +1,11 @@
 ---
-name: wtf.write-task
-description: This skill should be used when a user wants to create a task, write a ticket, decompose a feature into implementable work, break down a story, define a vertical slice for development, or write Gherkin scenarios — for example "create a task", "write a task for this feature", "break this feature into tasks", "define implementation work", or "add a sub-issue to this feature". Guides creation of a GitHub Task issue linked to a parent Feature and Epic, derives Gherkin acceptance scenarios from the Feature's ACs, enforces DDD ubiquitous language in scenarios, and checks for vertical-slice integrity and task dependencies.
+name: wtf.write-trace
+description: This skill should be used when a user wants to create a single Trace issue under a Feature — for example "create a trace", "write a trace for this feature", "add a trace to feature #42", "claim these scenarios", "start the Skeleton", or "add a Deepening Trace". A Trace claims one story and a declared subset of that story's Gherkin scenarios from the Feature body. Scenarios are canonical in the Feature and are never re-derived here. Use `wtf.feature-to-traces` to plan and create the full Trace set for a Feature. Not applicable to Epics, Features, or bug reports.
 ---
 
-# Write Task
+# Write Trace
 
-Create a GitHub Task issue — the implementable unit of work. Derive Gherkin scenarios from the parent Feature's Acceptance Criteria so nothing is lost in translation.
+Create a GitHub Trace issue — one pass over the Feature's Spine. The story and its scenarios already live in the Feature body. This skill selects a claim. It does not invent a spec.
 
 ## Process
 
@@ -13,101 +13,78 @@ Create a GitHub Task issue — the implementable unit of work. Derive Gherkin sc
 
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. That result controls whether native sub-issue and dependency links are created in step 10.
 
-If invoked from `wtf.feature-to-tasks` or `wtf.write-feature`, skip this step. The orchestrator already ran it. Also skip on re-invocations in the same session (e.g. "Write next Task" loop in step 11).
+If invoked from `wtf.feature-to-traces` or `wtf.write-feature`, skip this step. The orchestrator already ran it. Also skip on re-invocations in the same session (e.g. "Next Trace in plan" loop in step 12).
 
-### 1. Identify the parent Feature
+### 1. Identify the parent Feature and read its Trace state
 
-Call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "Which Feature does this Task belong to?"
+If the orchestrator passed a Feature number, use it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which Feature does this Trace belong to?"
 - header: "Feature"
-- options: from recent open issues labeled `feature`
+- options: from recent open Feature issues (list per `../references/issue-classification.md`)
 
-Walk Task → Feature → Epic per `../references/spec-hierarchy.md` to extract ACs, edge cases, user stories, Goal, and Context. If the Epic number was passed in as context (e.g. from an orchestrator), skip the parent walk and use it directly.
+Walk Feature → Epic per `../references/spec-hierarchy.md`. From the Feature body, extract:
 
-### 2. Name the task
+- The **User Stories**, each with its ACs and its canonical Gherkin scenarios.
+- The **Trace Plan** — the ordered checklist, when present.
+- The **delivery override**, when present.
 
-**If a task description was passed in from the orchestrator** (e.g. from `wtf.feature-to-tasks` step 3 or `wtf.write-feature` step 11), present it directly as the proposal without offering source options:
+Then list existing child Traces with `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. Read each child's Scenario Claim. Also recognize legacy Task children per the legacy reads in `../references/issue-classification.md`. Treat a legacy Task's Gherkin scenario names as claims already taken.
 
-> "Here's the task I'll write: _[task description]_. Does this look right, or would you like to adjust it?"
+You now hold the **claim state**: which scenarios of each story are claimed, and by which Trace. This state drives step 2.
 
-**If invoked from `wtf.write-feature` or `wtf.feature-to-tasks` context but no description was pre-filled**, call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "How would you like to define this task?"
-- header: "Task source"
+### 2. Select the story and the Scenario Claim
+
+The story is given, not asked. Do not run independent intent questioning. Show the user:
+
+1. The Feature's stories with their scenario names.
+2. The Trace Plan entries, with issue numbers where created.
+3. Which scenarios are already claimed, and by which Trace.
+
+If the orchestrator passed a plan entry, present its story and claim as the proposal. Otherwise, if the Trace Plan has a next unclaimed entry, propose that entry as the default. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Which scenarios does this Trace claim?"
+- header: "Claim"
 - options:
-  - **Propose from ACs** → based on Feature ACs, existing tasks, and Proposed Tasks checklist. Propose the next unimplemented task and confirm (default)
-  - **Describe myself** → I'll provide a one-sentence description
+  - **Next plan entry** — the proposed entry's story and scenario names (default, when a plan entry exists)
+  - **Select a different subset** → the user names a story and its scenarios
 
-**If invoked standalone** (no Feature context), call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "What is this task implementing?" (one sentence — e.g. "Add date range filter to search API")
-- header: "Task"
-- options: infer 1–2 candidates from Feature ACs if available
+Validate the confirmed claim:
 
-### 3. Clarify ambiguity before proceeding
+- The claim covers exactly **one** story. A claim that spans two stories fails step 4.
+- The claim must not overlap any existing Trace's claim, including legacy Task claims. If it overlaps, show the conflict and re-ask.
+- Compare the union of all claims — existing Traces, remaining plan entries, and this claim — against the story's full scenario list. If scenarios stay unclaimed and no remaining plan entry names them, warn the user. The story's partition is then incomplete. Suggest a later Deepening Trace or a plan update via `wtf.refine`. Do not block creation.
 
-Assess whether you have enough information to define a single, focused, implementable task. Cross-check the user's input against the Feature's Acceptance Criteria, Edge Cases, and the Epic's Goal.
+### 3. Set the Spine Position
 
-Topics that may require clarification (in priority order):
+Decide the position from the claim state:
 
-- Exact scope, entry/exit points
-- Data contracts and error handling
-- User roles and permissions
-- Performance requirements
-- Which **Aggregate(s)** does this Task modify or query?
-- What **invariants** must hold after the change?
-- What **domain Events** does this Task emit?
-- If this Task touches an integration boundary, which Bounded Contexts are involved?
+- **Skeleton** — only when the Feature has no child Trace and no legacy Task child. The Skeleton is the first Trace. It claims the primary story's happy-path scenario, minimally, through every layer. Lean but complete — never a prototype.
+- **Extension** — the first Trace of a further story on an existing Spine.
+- **Deepening** — further scenarios of a story already started. Always cite the story it deepens. A Deepening Trace is never storyless.
 
-For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough to write a complete draft. Do not invent answers or assume away ambiguity.
+Record **Builds on**: the issue numbers of the previous Trace in the plan order. The Skeleton builds on nothing. This replaces free-form dependency questioning — Traces within a Feature are sequential by design. The previous Trace becomes the blocked-by link in step 10.
 
-### 4. Explore the codebase and wiki
+### 4. Claim assessment
+
+Run Stage 1 of `../references/scope-gates.md` on the selected claim. Trace bar: one story, one Scenario Claim, end-to-end through every layer, releasable on merge.
+
+Trace-level split signals (heuristics — use judgment, not rigid thresholds):
+
+- The claim spans more than one story.
+- The claim is too large for one agent pass — many scenarios with distinct setup, or scenarios that touch unrelated failure domains.
+
+If a signal fires, split by **depth**: re-partition the claim into a smaller first claim plus Deepening Traces. Never split by layer (model → API → UI). Present the re-partition and confirm with the user.
+
+### 5. Explore the codebase and glossary
 
 Use the Agent tool to search the codebase for:
 
-- Files and modules this task will touch (Impacted Areas)
-- Existing patterns that inform Technical Approach
-- Current interfaces at the integration point
-- Existing tests covering adjacent behavior
-- Dependencies (other tasks or systems that must exist first)
-- The Aggregate classes or modules relevant to this task — note their invariant-enforcement logic
-- Any existing domain Event definitions to reuse rather than invent
+- Current interfaces at the integration points the claim touches (for Contracts & Interfaces).
+- Existing domain Event definitions to reuse rather than invent.
+- Observability patterns (logs, metrics, alerts) near the touched code paths.
 
-Also fetch any relevant wiki pages or in-repo glossary docs for this task's Bounded Context. Check `docs/glossary.md`, GitHub wiki pages matching the context name, or any ADR files. Use these to verify Ubiquitous Language terms before writing Gherkin scenarios. If no wiki or glossary exists, proceed without comment.
+Also fetch `docs/glossary.md`, wiki pages for the Bounded Context, or ADR files when they exist. Use these to verify Ubiquitous Language terms. If none exist, proceed without comment.
 
-**Cross-feature dependency scan:** Fetch sibling Features from the Epic's Feature Breakdown (extracted above) and the Proposed Tasks checklist from each. For sibling Feature bodies, use the per-level fetch in `../references/spec-hierarchy.md`. Then list already-created sibling tasks:
-
-```bash
-# Resolve $WTF_CLASS once — see ../references/issue-classification.md.
-if [ "$WTF_CLASS" = types ]; then
-  gh issue list --search 'type:"Task" state:open' --json number,title,body
-else
-  gh issue list --label task --state open --json number,title,body
-fi
-```
-
-Filter client-side to tasks whose body references a sibling Feature number. Note any whose scope overlaps with or must precede this task. Keep these candidate dependencies in mind for step 5.
-
-### 5. Vertical slice assessment
-
-Run Stage 1 of `../references/scope-gates.md` on the codebase findings from step 4. Task bar: touches every layer needed for one observable, user-facing behavior end-to-end (e.g. DB schema → service logic → API → UI). It must be independently shippable without another unmerged task.
-
-Evaluate:
-
-- **Passes** → proceed.
-- **Too broad** → propose smaller slices and confirm with the user.
-- **Has dependencies** → identify them explicitly, including tasks from **sibling Features** in the same Epic (surfaced in step 4):
-  - Tasks this task **depends on** (must be merged first — check if the code path exists yet. These may belong to the same Feature or a different Feature in the Epic)
-  - Tasks that **depend on this task** (will be blocked until this merges)
-
-For each cross-feature dependency found, state explicitly: "Task #X (in Feature #Y) must be completed first because [reason]." Make the inter-feature ordering visible before you commit to it.
-
-Document all dependencies in the draft with GitHub issue references. For cross-feature deps, annotate the reason inline:
-
-```markdown
-## Dependencies
-
-- Depends on #42 (Feature #12 — payment aggregate must exist before settlement status can be read)
-- Blocks #51 (Feature #15 — notification email requires this task's event to be emitted)
-```
+Do not design the implementation here. The Technical Approach is filled by `wtf.implement-trace` at implementation time.
 
 ### 6. Ask about contracts
 
@@ -115,123 +92,104 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Are there specific API contracts, events, or data schemas I should know about?"
 - header: "Contracts"
 - options:
-  - Candidates from contract names or event names inferred from the codebase (e.g. existing API routes or domain events found in step 4)
+  - Candidates from contract or event names found in step 5, plus the Feature's Domain Events
   - **None — proceed without** — skip this section (include only if nothing was found)
 
-Use the answer to fill Contracts & Interfaces. Apply domain event naming rules from `../references/ddd-writing-rules.md` — past-tense domain names, named from the domain's perspective. If "none", stub events with the domain Event names derived in step 3 rather than leaving them blank.
+Use the answer to fill Contracts & Interfaces. Apply domain event naming rules from `../references/ddd-writing-rules.md`. If "none", stub events with the Feature's Domain Event names rather than leaving them blank.
 
-### 7. Generate Gherkin from Feature ACs
-
-For each Acceptance Criterion in the parent Feature:
-
-- Write at least one Scenario (happy path)
-- Write a failure or edge case Scenario if the Feature listed one
-
-Reference the contracts gathered in step 6 when writing scenarios. Use the exact domain Event names, API operation names, and field names from those contracts in Given/When/Then steps. Keep the scenarios aligned with the implementation contracts.
-
-Gherkin rules (vocabulary rules from `../references/ddd-writing-rules.md`):
-
-- Scenarios describe observable outcomes — not internal state
-- Given/When/Then must be concrete and specific, not abstract
-- Each scenario must survive internal refactors — it tests behavior, not implementation
-- **Use only Ubiquitous Language** in steps — never reference implementation details (no "database row", "REST call", "HTTP 200", "mock", "table", "JSON field")
-- **Domain actors** appear in Given steps ("Given a Fulfilment Manager has an open Purchase Order")
-- **Domain Events** appear in When steps where they trigger behavior ("When the `PaymentSettled` event is received")
-- **Business outcomes** appear in Then steps ("Then the Order is marked as Fulfilled") — not system states ("Then the orders table has status = 'fulfilled'")
-
-### 8. Draft the Task
+### 7. Draft the Trace
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
-Load the TASK template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill all sections with the gathered context. Replace the placeholder Gherkin scenarios with the ones generated in step 7.
+Load the TRACE template per `../references/issue-template-loading.md` (verify existence, halt-or-setup if missing, read body below the second `---` delimiter). Fill the sections:
 
-Section-specific guidance:
+- **Story** — copy it verbatim from the Feature. Do not re-derive it. Do not reword it.
+- **Scenario Claim** — list the claimed scenario names. Below them, fill the collapsed `<details>` block with the claimed scenarios copied verbatim from the Feature body. Set the summary line to "Claimed scenarios — synced from Feature #<feature_number> — edit there, not here".
+- **Spine Position** — the position from step 3 and the Builds-on Trace numbers. A Deepening Trace names the story it deepens.
+- **Contracts & Interfaces** — from step 6.
+- **Technical Approach** — leave the placeholders. `wtf.implement-trace` fills this section.
+- **Observability** — fill from the patterns found in step 5. If the Trace has no production observability need, state "None required for this trace".
+- **Definition of Done** — keep the template checklist unchanged.
+- **Test Mapping** — one row per claimed scenario, with the scenario name filled and the test file blank.
 
-- **Design Reference**: Link the Figma frame if one exists. Otherwise write "N/A — no design for this task."
-- **Observability**: Fill Logs, Metrics, and Alerts from the codebase patterns found in step 4. If the task has no production observability requirements, state "None required for this task" rather than leaving blank.
-- **Rollout**: Fill Feature flag, Backward compatibility, and Data migration only if applicable. Otherwise write "N/A" for each.
+Run the DDD Language Guard from `../references/ddd-writing-rules.md` on any new prose you wrote. Copied scenarios and the copied story are canonical — leave them untouched even when they would fail the guard. Flag such a failure to the user as a Feature-body concern for `wtf.refine`.
 
-### 9. Scope gate
+### 8. Scope gate
 
-Run Stage 2 of `../references/scope-gates.md` on the written draft. Step 5 catches tasks that cannot ship alone. This step catches tasks that are simply too large.
+Run Stage 2 of `../references/scope-gates.md` on the written draft. Drafting sometimes reveals a claim that is larger than it looked.
 
-**Task-level split signals** (heuristics — use judgement, not rigid thresholds):
+If a split signal fires, follow the Stage 2 procedure. State the signals. Propose a **depth** split: a re-partitioned Scenario Claim — a smaller claim now, Deepening Traces for the rest. Never propose layer slices. Use the keep/split/stop ask from `../references/scope-gates.md`.
 
-- More than 4 Gherkin scenarios covering distinct, independently shippable user journeys — not multiple failure modes for the same behavior (four ways a payment validation can fail is one behavior, not four tasks).
-- The Impacted Areas list spans more than 3–4 unrelated modules (e.g. API layer, database schema, frontend component, and a background job all bundled together).
-- The Technical Approach describes more than 5 distinct implementation steps that could each be merged separately without breaking anything.
-- The task contains both a schema/data migration and user-facing behavior — migrations are typically safer as a separate prior task.
+On **Split it** → return to step 2 with the narrowed claim as the proposal. Carry forward the codebase findings from step 5.
 
-**Split strategy by signal:**
+### 9. Review with user
 
-- Migration + behavior → propose the migration as task A and the behavior as task B. Task B depends on task A.
-- Broad modules → split along deployment boundaries (backend task + frontend task, or data-layer + service-layer).
-- Too many Gherkin scenarios → split by user journey, keeping each task's scenarios tightly grouped around one observable outcome.
-
-If no signals fire, proceed to user review. If one or more fire, follow the Stage 2 procedure. State the signals. Explain the risk (large tasks increase review friction, merge conflict surface, and rollback complexity). Propose a concrete split using the matching strategy. Use the keep/split/stop ask from `../references/scope-gates.md`.
-
-On **Split it** → return to step 2 with the chosen focused task description as the seed, reusing the same parent Feature. Carry forward codebase findings from step 4.
-
-### 10. Review with user
-
-Show the draft. Pay specific attention to Gherkin. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "Do the scenarios cover everything from the Feature ACs?"
+Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Does the claim and the draft look right?"
 - header: "Review"
 - options:
-  - **Yes — looks complete** → proceed with issue creation
-  - **Missing edge cases** → add more scenarios
+  - **Looks good — create the issue** → proceed with issue creation
+  - **Change the claim** → return to step 2
   - **Other changes** → adjust something else
 
 Apply edits. Then proceed.
 
-### 11. Create the issue and link to Feature
+### 10. Create the issue and link it
 
 > Note: Write the body to a temp file (`$BODY`) with the Write tool. Then create it through the gh body helper so multi-line UTF-8 content survives on Windows. See `../references/gh-body-helper.md`.
 
-**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise title from the task description. Pass in the task description and ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title directly from the one-sentence task description provided in step 2.
+**Title generation:** Spawn a subagent using the `claude-haiku-4-5-20251001` model to generate a concise, domain-language title from the story and the claim. Pass in the story and the claimed scenario names. Ask for a short title (no prefix emoji/label needed — that is added below). If the subagent returns nothing usable, derive the title from the story and position (e.g. "Skeleton — <story summary>").
 
-Create the Task issue:
+Create the Trace issue:
 
 ```bash
 # $BODY is the temp file you wrote the filled body to with the Write tool.
 # Create the issue WITHOUT a kind label — the classify step below sets the kind.
-python3 .wtf/gh-body.py create --title "🛠 Task: <title>" --body-file "$BODY"
-```
-Print the Task issue URL and number.
-
-**Classify the issue as `Task`.** Set `TYPE="Task"` and `ISSUE_NUMBER=<number from the URL>`. Then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation. In `labels` mode it applies the `task` label. Either way the Task is classified. Nothing downstream depends on which mechanism was used.
-
-**Native relationships:** If `gh-sub-issue-available` (from step 0), link this Task as a child of its Feature:
-
-```bash
-gh sub-issue add <feature_number> <task_number>
+python3 .wtf/gh-body.py create --title "☄️ Trace: <title>" --body-file "$BODY"
 ```
 
-If `gh-issue-dependency-available`, create a blocking link for each dependency identified in step 5:
+Print the Trace issue URL and number.
+
+**Classify the issue as `Trace`.** Set `TYPE="Trace"` and `ISSUE_NUMBER=<number from the URL>`. Then run the **Classify a new issue** block from `../references/issue-classification.md` (resolve `$WTF_CLASS` once first). In `types` mode it sets the native GitHub issue type and leaves labels free for your own segmentation. In `labels` mode it applies the `trace` label. Either way the Trace is classified.
+
+**Native relationships:** If `gh-sub-issue-available` (from step 0), link this Trace as a child of its Feature:
 
 ```bash
-# For each issue this Task depends on (same Feature or sibling Feature):
-gh issue-dependency add <task_number> --blocked-by <blocker_number>
+gh sub-issue add <feature_number> <trace_number>
+```
+
+If `gh-issue-dependency-available` and this Trace builds on a previous Trace (step 3), create the sequential blocking link:
+
+```bash
+gh issue-dependency add <trace_number> --blocked-by <previous_trace_number>
 ```
 
 If either extension is unavailable, warn the user. Do not write relationship references into the issue body.
 
+### 11. Update the Trace Plan in the Feature
+
+Record the created issue number in the Feature's Trace Plan. Use the read → modify → write flow from `../references/gh-body-helper.md`:
+
+1. `python3 .wtf/gh-body.py read <feature_number>` — fetch the current body to a temp file.
+2. With the Edit tool, append ` #<trace_number>` to the matching Trace Plan entry. Change nothing else.
+3. `python3 .wtf/gh-body.py edit <feature_number> --body-file "<path>"` — push it back.
+
+If the Feature has no Trace Plan, or no entry matches this claim, add an entry in plan order instead. Name the story, the Scenario Claim, and what it adds to the Spine. Tell the user the plan was extended.
+
 ### 12. Offer to continue
 
-Count remaining tasks by fetching the Feature's Proposed Tasks checklist (named items without issue numbers) and comparing against already-created child tasks. Use `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. Subtract created task count from total named items in the Proposed Tasks list to get remaining. Mention how many remain.
+Count the Trace Plan entries that have no issue number yet. Mention how many remain.
 
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:
-  - **Design this Task** → add design coverage for this Task now (default)
-  - **Write next Task** → write the next Task for this Feature (N remaining — replace N with actual count)
-  - **Write a Feature** → write a new Feature for the same Epic
+  - **Next Trace in plan** → write the next unclaimed plan entry (N remaining — replace N with the actual count) (default when entries remain)
+  - **Implement now** → follow `wtf.implement-trace` with this Trace number
   - **Stop here** → exit, no further action
 
-- **Design this Task** → follow the `wtf.design-task` process, opening with: "Continue with task #<task_number>".
-- **Write next Task** → restart from step 2, reusing the same Feature. If the Feature's Proposed Tasks list has named-but-uncreated items, propose the next one as the default.
-- **Write a Feature** → proceed with `wtf.write-feature`, passing the Epic number in as context.
+- **Next Trace in plan** → restart from step 2, reusing the same Feature. Propose the next unclaimed plan entry as the default.
+- **Implement now** → proceed with the `wtf.implement-trace` skill, passing the Trace number in as context.
 - **Stop here** → exit.
 
 > Suggest clearing context before continuing if the conversation has grown long.

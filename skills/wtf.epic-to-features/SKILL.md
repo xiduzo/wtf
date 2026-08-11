@@ -12,13 +12,15 @@ Break an Epic down into its full set of Features. Propose the complete feature l
 
 ### 0. GitHub CLI setup
 
-Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. This determines whether native sub-issue and dependency links are created downstream (via `wtf.write-feature` and `wtf.write-task`).
+Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. This determines whether native sub-issue and dependency links are created downstream (via `wtf.write-feature` and `wtf.write-trace`).
 
 Skip this step if gh-setup was already confirmed this session (e.g. when chained from `wtf.write-epic`).
 
-### 0b. Resolve the planning mode
+### 0b. Resolve the planning mode and the feature scope
 
 Run the **Resolve the mode** block from `../references/planning-mode.md`. An explicit `guided` or `flow` argument in the invocation wins over config. `$WTF_PLAN` selects step 3 (guided) or step 3F (flow). Steps 0–2 and 4 run in both modes.
+
+Then resolve `$WTF_SCOPE` with the read from `wtf.write-feature` step 0b: the `feature_scope` key in `.wtf/config.json` (`single-story` | `grouped`). If the key is missing, ask once per that step. `$WTF_SCOPE` shapes the proposed Feature list in step 2. Pass both `$WTF_PLAN` and `$WTF_SCOPE` down to every `wtf.write-feature` invocation, so it does not re-resolve them.
 
 ### 1. Identify the Epic
 
@@ -34,6 +36,11 @@ List Features already created under this Epic via `gh sub-issue list <epic_numbe
 ### 2. Propose the full Feature list
 
 From the Epic's Goal, Context, and Success Metrics, derive a proposed list of Features that together deliver the Epic's outcome. Each Feature must follow the pattern: **[Domain Actor] can [domain verb] [domain object]**.
+
+`$WTF_SCOPE` shapes the list:
+
+- **`single-story`** — more, smaller Features. Each Feature carries exactly one user story.
+- **`grouped`** — fewer Features. Each carries co-related stories that share one Spine.
 
 If the Epic already has partially-created Features (found via `gh sub-issue list`), open the list with a note. Use this form: "Epic #N already has [X] Features created: [list with issue numbers]. Here are the remaining Features I'd propose:"
 
@@ -66,6 +73,7 @@ For each Feature in the confirmed list, in order:
 1. Announce: "Creating Feature [N/total]: _[capability name]_"
 2. Follow the `wtf.write-feature` process, passing:
    - The Epic number (skip step 1 of write-feature — Epic is already fetched)
+   - The resolved `$WTF_PLAN` and `$WTF_SCOPE` (skip step 0b of write-feature)
    - The capability name as the pre-filled answer to step 2 of write-feature
    - **Abbreviated clarification**: the capability name already follows the `[Actor] can [verb] [object]` pattern and the Epic context is already in hand. Skip write-feature step 3 (clarification questions) unless something is genuinely ambiguous from the Epic. Write-feature step 4 (user story derivation) and step 5 (DDD Language Guard) should still run. Resume from write-feature step 6 (vertical slice assessment).
 3. Before you move to the next Feature, call `AskUserQuestion` (per `../references/questioning-style.md`):
@@ -87,8 +95,8 @@ Read `skills/wtf.write-feature/SKILL.md` at runtime. Extract steps 3–9 (clarif
 
 - The inline write-feature step range under a heading "# Inline instructions — execute the steps below".
 - An override section per the sub-agent protocol: no `AskUserQuestion`; unresolvable ambiguities and firing scope-gate signals return a `NEEDS_INPUT` block instead; skip step 8's per-item DoR interrogation and apply the `flow` waiver rule from write-feature step 8.
-- The pre-known context: Epic number, Epic Goal / Context / Success Metrics, the capability name, the full confirmed feature list (for dependency detection in step 6), and any glossary terms found in step 1.
-- The required return shape: the filled Feature body (template-complete, including the **Proposed Tasks** checklist from step 7b), the capability name, the dependency list (names of sibling Features this one depends on), and any `NEEDS_INPUT` block.
+- The pre-known context: Epic number, Epic Goal / Context / Success Metrics, the capability name, the resolved `$WTF_SCOPE`, the full confirmed feature list (for dependency detection in step 6), and any glossary terms found in step 1.
+- The required return shape: the filled Feature body (template-complete, including the per-story canonical Gherkin scenarios and the **Trace Plan** checklist from step 7b), the capability name, the dependency list (names of sibling Features this one depends on), and any `NEEDS_INPUT` block.
 
 Sub-agents draft text only. They never create issues, never write files, and never touch `gh` beyond read-only queries.
 
@@ -101,8 +109,8 @@ Collect all `NEEDS_INPUT` blocks. If any exist, group them and present them in a
 Present the whole tree compactly — one block per Feature:
 
 > **N. [capability name]**
-> Stories: [one line per story, compressed] · ACs: [count] · Edge cases: [count]
-> Proposed Tasks: [the checklist items, inline]
+> Stories: [one line per story, compressed, with its scenario count] · ACs: [count] · Edge cases: [count]
+> Trace Plan: [the ordered items inline, Skeleton first]
 > Depends on: [sibling names, or —]
 
 Note anything auto-waived or corrected (DoR waivers, DDD guard fixes). Offer any full body on request. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
@@ -133,8 +141,8 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:
-  - **Break down first Feature** → follow `wtf.feature-to-tasks` with the first created Feature number (default)
-  - **Break down next Feature** → follow `wtf.feature-to-tasks` with a different Feature number
+  - **Plan first Feature's Traces** → follow `wtf.feature-to-traces` with the first created Feature number (default)
+  - **Plan another Feature's Traces** → follow `wtf.feature-to-traces` with a different Feature number
   - **Stop here** → exit. No further action
 
 > Suggest `/clear` before continuing if the conversation has grown long.

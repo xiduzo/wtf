@@ -1,5 +1,5 @@
 {
-  "_note": "Fixture for eval 2 — Feature with a Proposed Tasks checklist spanning distinct backend and frontend layers. The skill must use the checklist as its starting point and keep backend/frontend tasks separate.",
+  "_note": "Fixture for eval 2 — legacy-shape Feature carrying a Proposed Tasks checklist sliced by LAYER (API filter, query optimisation, picker UI, URL persistence). The Trace model must refuse this slicing: a legacy Proposed Tasks list is not a Trace Plan. Expected: a derived spine-first plan — one Skeleton claiming the story's happy path through API and UI in one Trace, then Deepening entries for the edge cases — with the layer checklist explicitly not adopted.",
   "feature": {
     "number": 45,
     "title": "Feature: Settlement date range filter",

@@ -1,5 +1,5 @@
 {
-  "_note": "Fixture for eval 1 — Feature with no Proposed Tasks checklist whose ACs clearly imply a database schema migration. The skill must derive the task list from ACs and place the migration task first.",
+  "_note": "Fixture for eval 1 — legacy-shape Feature (no Trace Plan, no canonical scenarios) whose ACs imply a database schema migration. The old task model made the migration a separate first task. The Trace model must NOT: the schema change rides inside the Skeleton, which claims the story's happy path end-to-end through every layer. Expected: a derived Trace Plan with exactly one Skeleton first and Deepening entries for the edge cases — no standalone migration entry, no layer entries.",
   "feature": {
     "number": 42,
     "title": "Feature: Track settlement processing fees",

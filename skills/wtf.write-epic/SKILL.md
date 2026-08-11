@@ -1,6 +1,6 @@
 ---
 name: wtf.write-epic
-description: This skill should be used when a user wants to create, draft, or plan a GitHub Epic issue — for example "write an epic", "I want to define a new initiative", "scope out this strategic project", "turn this idea into an epic", "plan work that spans multiple features", or "start from a bounded context". Also use when the user asks to define domain outcomes, capture a large initiative before breaking it into features, or describe work in terms of business goals rather than technical tasks.
+description: This skill should be used when a user wants to create, draft, or plan a GitHub Epic issue — for example "write an epic", "I want to define a new initiative", "scope out this strategic project", "turn this idea into an epic", "plan work that spans multiple features", or "start from a bounded context". Also use when the user asks to define domain outcomes, capture a large initiative before breaking it into features, or describe work in terms of business goals rather than implementation details.
 ---
 
 # Write Epic
@@ -71,7 +71,7 @@ Before drafting, review the seed idea and all gathered context against the rules
 
 - Does the Epic title describe a **business outcome**, not a technology action?
 - Does the Goal use domain vocabulary — not engineering jargon?
-- Reframe any tech terms as business outcomes. Implementation detail belongs in Tasks.
+- Reframe any tech terms as business outcomes. Implementation detail belongs in Traces.
 - Flag any ambiguous or undefined term. Propose the domain-correct alternative.
 
 ### 5. Vertical slice assessment

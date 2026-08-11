@@ -1,41 +1,42 @@
 {
-  "skill_name": "wtf.write-task",
+  "skill_name": "wtf.write-trace",
   "evals": [
     {
       "id": 1,
-      "prompt": "Run wtf.write-task in test mode. Skip steps 0–6 (gh setup, parent feature selection, task naming, ambiguity clarification, codebase exploration, scope pre-check, contracts). The parent Feature is provided in `evals/fixtures/gherkin-generation.json`, field `feature`. Run step 7 only: generate Gherkin scenarios from the Feature's Acceptance Criteria and edge cases. Do not proceed to step 8. Output only the Gherkin block.",
-      "expected_output": "Four or more Gherkin scenarios: one for each Acceptance Criterion (download trigger, PDF header, empty state, permission gate) plus at least one for an edge case. All steps use Merchant as the domain actor, no implementation vocabulary, Then steps describe business outcomes not system state.",
-      "files": ["evals/fixtures/gherkin-generation.json"],
+      "prompt": "Run wtf.write-trace in test mode. Skip steps 0–1 (gh setup confirmed; instead of gh commands, read `evals/fixtures/claim-selection.json` and use its `feature` and `traces` objects as the live data). The confirmed claim is Trace Plan entry 2 of Feature #55. Produce the Story and Scenario Claim sections of the Trace body as step 7 would draft them. Do not produce other sections. Do not create an issue.",
+      "expected_output": "The Story section copies the Merchant PDF-export story verbatim from the Feature. The Scenario Claim lists exactly the three scenario names from plan entry 2, plus a collapsed <details> block whose summary reads 'synced from Feature #55 — edit there, not here' and whose Gherkin is copied verbatim from the Feature body. The Skeleton's claimed scenario ('Merchant downloads a settlement PDF') is not claimed again, and no new scenarios are invented.",
+      "files": ["evals/fixtures/claim-selection.json"],
       "expectations": [
-        "At least four Gherkin scenarios are produced",
-        "The domain actor used in Given steps is 'Merchant' (not 'user', 'admin', or 'customer')",
-        "Then steps describe business outcomes without implementation vocabulary (no 'HTTP', 'database', 'JSON field', 'REST', 'table', 'mock')",
-        "At least one scenario covers the empty result edge case ('No settlements found')",
-        "At least one scenario covers the permission gate (Merchant without settlement.export permission)"
+        "The Story section reproduces the Feature's story text verbatim (Merchant, export settlement history as a PDF, accounting and audit needs) without rewording",
+        "The Scenario Claim names exactly the three scenarios from plan entry 2: 'PDF header shows Merchant name and date range', 'Empty settlement range produces a placeholder PDF', and 'Merchant without export permission sees no export action'",
+        "The claim does not include 'Merchant downloads a settlement PDF' (already claimed by existing Trace #56)",
+        "A <details> block is present whose summary contains 'synced from Feature #55' and 'edit there, not here'",
+        "The Gherkin inside the <details> block matches the Feature body's scenarios verbatim — no re-derived or newly invented steps or scenarios"
       ]
     },
     {
       "id": 2,
-      "prompt": "Run wtf.write-task in test mode. Skip steps 0–8 (all steps before the scope gate). The task draft is provided in `evals/fixtures/scope-gate-draft.json`, field `task.draft_body`. Run step 9 only: scope gate. Evaluate the draft for split signals and output whether a split is needed, which signals fire, and what concrete split is proposed.",
-      "expected_output": "Step 9 fires at least one split signal — either too many distinct Gherkin journeys (schema migration, background worker, UI, API, and permission scenarios are independent journeys) or too many impacted modules (DB, service, API, UI, worker). It proposes a concrete split such as 'migration as Task A, application behaviour as Task B' and uses the keep/split/stop gate.",
-      "files": ["evals/fixtures/scope-gate-draft.json"],
+      "prompt": "Run wtf.write-trace in test mode. Skip steps 0–7 (all steps before the scope gate). The Trace draft is provided in `evals/fixtures/depth-split-draft.json`, field `trace.draft_body`, with the parent Feature in field `feature`. Run step 8 only: the scope gate. Output whether a split is needed, which signals fire, and what concrete split is proposed.",
+      "expected_output": "Step 8 fires the claim-too-large signal: six scenarios spanning distinct failure domains is too much for one agent pass, and a Skeleton must claim the happy path minimally. It proposes a depth split — a re-partitioned Scenario Claim, e.g. Skeleton claims 'Merchant downloads a settlement PDF' and Deepening Traces claim the header, empty-range, permission, and slow-export scenarios. It never proposes a layer split, and it presents the keep/split/stop choice.",
+      "files": ["evals/fixtures/depth-split-draft.json"],
       "expectations": [
-        "At least one split signal is identified (too many distinct journeys or too many unrelated modules)",
-        "A concrete split strategy is proposed (e.g. migration vs behaviour, or backend vs frontend)",
+        "At least one split signal is identified (the Scenario Claim is too large for one agent pass, or the Skeleton claims more than the happy path)",
+        "The proposed split re-partitions the Scenario Claim by depth: a smaller first claim (the happy-path scenario) plus one or more Deepening Traces claiming the remaining scenarios",
+        "No layer split is proposed — the output does not split the work into model/schema, API/backend, and UI/frontend units",
         "The keep/split/stop choice is presented to the user",
         "The draft is not silently approved without raising the split question"
       ]
     },
     {
       "id": 3,
-      "prompt": "Run wtf.write-task in test mode. Skip steps 0–2 (gh setup, parent feature selection, task naming). The task description is 'Handle settlement errors'. The parent Feature is from `evals/fixtures/ambiguous-task.json`, field `feature`. Run step 3 only: clarify ambiguity. List the questions you would ask the user before proceeding. Do not answer the questions or proceed to step 4.",
-      "expected_output": "Step 3 produces a set of clarifying questions covering at minimum: which error types or failure modes are in scope, what the expected handling strategy is (retry, surface to user, log only), and the entry/exit points of this task. It does not invent answers or proceed with assumptions.",
-      "files": ["evals/fixtures/ambiguous-task.json"],
+      "prompt": "Run wtf.write-trace in test mode. Skip steps 0–1 (gh setup confirmed; instead of gh commands, read `evals/fixtures/ambiguous-claim.json` and use its `feature` and `traces` objects as the live data). The user request is in field `trace_request`: 'Add a trace for settlement error handling'. Run step 2 only: select the story and the Scenario Claim. Show what you would present and what you would ask. Do not answer for the user and do not proceed to step 3.",
+      "expected_output": "Step 2 shows the claim state — 'Failed settlement is retried' is claimed by Trace #61, four scenarios remain unclaimed, and the Trace Plan has no remaining entries — then asks the user which of the unclaimed scenarios this Trace claims. It does not invent a claim, does not re-claim the Skeleton's scenario, and does not draft a body.",
+      "files": ["evals/fixtures/ambiguous-claim.json"],
       "expectations": [
-        "Questions are asked rather than assumptions being made",
-        "At least one question targets scope or entry/exit points (which errors, what triggers this task)",
-        "At least one question targets error handling strategy (retry logic, notification, logging)",
-        "The skill does not proceed to step 4 or produce a task draft in this output"
+        "The user is asked which scenarios to claim rather than a claim being assumed from the vague request",
+        "The four unclaimed scenarios (permanent failure, Merchant notification, operator retry, idempotent duplicate retry) are surfaced as the selectable claim space",
+        "The already-claimed scenario 'Failed settlement is retried' is shown as taken by Trace #61 and is not offered for claiming",
+        "The output does not proceed to later steps or produce a Trace body draft"
       ]
     }
   ]
