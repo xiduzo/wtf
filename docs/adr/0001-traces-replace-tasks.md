@@ -2,7 +2,7 @@
 
 **Status:** accepted (2026-08-11)
 
-The Task layer claimed to hold vertical slices but invited horizontal layering: decomposition pressure produced layer tasks (model → API → UI → email) that defer integration feedback, and an agent does not need layer decomposition — it drives one story end-to-end in one pass. Following the tracer-bullet sources ([aihero.dev/tracer-bullets](https://www.aihero.dev/tracer-bullets), *The Pragmatic Programmer*), we replace Tasks with **Traces**: a Trace is one pass over the Feature's Spine that claims exactly one story plus a Scenario Claim, Traces run spine-first within a Feature, the Trace Plan is re-aimed grow-only through `wtf.refine`, scenarios stay canonical in the Feature issue, and delivery is `staged` or `trunk` per config. The model is implemented across the skills and shared references; the vocabulary is pinned in [`CONTEXT.md`](../../CONTEXT.md).
+The Task layer claimed to hold vertical slices but invited horizontal layering: decomposition pressure produced layer tasks (model → API → UI → email) that defer integration feedback, and an agent does not need layer decomposition — it drives one story end-to-end in one pass. Following the tracer-bullet sources ([aihero.dev/tracer-bullets](https://www.aihero.dev/tracer-bullets), *The Pragmatic Programmer*), we replace Tasks with **Traces**: a Trace is one pass over the Feature's Spine that claims exactly one story plus a Scenario Claim, Traces run spine-first within a Feature, the Trace Plan is re-aimed through `wtf.refine` — autonomously for order, human-gated for every change to its scenario set — scenarios stay canonical in the Feature issue, and delivery is `staged` or `trunk` per config. The model is implemented across the skills and shared references; the vocabulary is pinned in [`CONTEXT.md`](../../CONTEXT.md).
 
 ## Considered Options
 
@@ -14,6 +14,7 @@ The Task layer claimed to hold vertical slices but invited horizontal layering: 
 ## Consequences
 
 - Fewer, bigger PRs: one per Trace instead of one per layer task. Every Trace must leave the system releasable.
+- Concurrency moves rather than disappears. Layer tasks of one Feature could run in parallel; Traces build on each other's Spine and cannot. Two things recover most of it. **Trace branches stack** — a Trace forks from the branch of the Trace it builds on as soon as that code is pushed and green, never waiting for a merge, and GitHub retargets each stacked PR when the one below it merges with its head branch deleted (so `wtf.setup` enables `delete_branch_on_merge`). **The Skeleton is the only true serialization point** — after it lands, the Feature's remaining Traces are colored by the same file-conflict graph that schedules Features, so Traces sharing no files run at once. The residual cost is a restack when review changes a Trace others sit on, and it is paid only for the Traces above it.
 - A phased 4-stage migration touches ~22 skills and 13+ references (foundations → authoring → execution → periphery).
 - Read paths treat legacy Task issues as legacy-Traces indefinitely. Write paths never create Tasks again.
 - Five skills rename without deprecation aliases: write-task → write-trace, feature-to-tasks → feature-to-traces, implement-task → implement-trace, verify-task → verify-trace, design-task → design-trace. A changelog rename table covers the migration.

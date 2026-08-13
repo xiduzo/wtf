@@ -1,6 +1,6 @@
 ---
 name: wtf.loop
-description: This skill should be used when a developer wants to autonomously execute all Traces under a fully-specified Epic or Feature — for example "go", "start building", "implement everything", "run the loop", "execute the feature", "build it all", "kick it off". Requires that the Epic/Feature/Trace tree is fully written before starting. Chains implement → verify → PR → re-aim for every Trace — spine-first within each Feature, parallel across Features — with targeted human-in-the-loop gates for contradictions, ambiguities, and plan shrinkage.
+description: This skill should be used when a developer wants to autonomously execute all Traces under a fully-specified Epic or Feature — for example "go", "start building", "implement everything", "run the loop", "execute the feature", "build it all", "kick it off". Requires that the Epic/Feature/Trace tree is fully written before starting. Chains implement → verify → PR → re-aim for every Trace — spine-first within each Feature, parallel across Features — with targeted human-in-the-loop gates for contradictions, ambiguities, and every change to a Trace Plan's scenario set.
 ---
 
 # Loop
@@ -9,12 +9,13 @@ Autonomously execute a fully-specified Epic or Feature.
 
 Once the spec tree is complete (Epic → Features → Traces), the developer says "go".
 
-The dispatch unit is the **Trace**. For every Trace the system chains `wtf.implement-trace → wtf.verify-trace → wtf.create-pr`, waits for the PR to merge, then re-aims the parent Feature's Trace Plan through headless `wtf.refine`. Traces within a Feature run strictly sequentially, in Trace Plan order. Features run in parallel where the cross-feature conflict graph allows. Surface only the decisions a human must make.
+The dispatch unit is the **Trace**. For every Trace the system chains `wtf.implement-trace → wtf.verify-trace → wtf.create-pr`, then re-aims the parent Feature's Trace Plan through headless `wtf.refine` when the PR merges. A Feature's Skeleton runs first and alone; its remaining Traces are then scheduled by the same file-conflict graph that schedules Features, so Traces that share no files run at the same time. A Trace branches off the branch of the Trace it builds on and never waits for a merge — PRs stack, and GitHub unwinds them. Features run in parallel where the cross-feature conflict graph allows. Surface only the decisions a human must make.
 
 Shared behavior used throughout this skill:
 
 - Sub-agent spawning rules → `../references/subagent-protocol.md`
-- Conflict scheduling (Features parallel, Traces sequential) → `../references/conflict-graph.md`
+- Conflict scheduling (Features parallel; Traces parallel after the Skeleton) → `../references/conflict-graph.md`
+- Stacked Trace branches, PR bases, and restacking → `../references/branch-setup.md`
 - Commit and PR conventions → `../references/commit-conventions.md`
 - Branch, worktree, and delivery-mode setup → `../references/branch-setup.md`
 - Pre-flight checks (step 2) → `references/pre-flight-validation.md`
@@ -127,7 +128,7 @@ To prevent this, add a `rolls_up` edge from every parent to each of its children
 
 **Collapse Traces into Feature units:**
 
-Fold each Feature and its Traces into one **Feature unit** that carries the ordered Trace sequence from the Trace Plan. Traces of one Feature never enter the conflict graph — they run spine-first, one after another, per `../references/conflict-graph.md`. Legacy Task children stay individual units and keep conflict-graph scheduling. In a mixed Feature, both are child work items. Only the sequencing differs: the Trace sequence serializes by plan order, and the legacy Tasks schedule by the graph.
+Fold each Feature and its Traces into one **Feature unit** that carries the ordered Trace set from the Trace Plan. A Feature unit is scheduled against other units by its whole conflict surface; inside the unit its Traces are scheduled by a graph of their own, per `../references/conflict-graph.md`: the Skeleton first and alone, then the remaining Traces colored by their `## Impacted Areas`. Legacy Task children stay individual units and keep conflict-graph scheduling. In a mixed Feature, both are child work items.
 
 **Classify each dependency edge (`blocks` / `blocked_by`) as internal or external** (`rolls_up` edges are internal by construction):
 
@@ -156,11 +157,13 @@ External blockers: ✅ #<x> merged  ✅ #<y> merged
 Phase 1  (no blockers)
   Sub-phase 1.1  [features in parallel]
     Feature #5 — Payment settlement       impacted: src/settlements/
-      Trace sequence (spine-first):
+      Traces — Skeleton first, then by file conflict:
         1. ☄️ #10 Skeleton — status for one settled payment
-        2. ☄️ #11 Deepening — settlement failure modes
+        2. ☄️ #11 Extension — settlement export      ─┐ no shared files
+           ☄️ #12 Deepening — settlement failures    ─┘ run in parallel
+             (both stack on #10 · PR base trace/10-…)
     Feature #6 — Reporting                impacted: src/reports/
-      Trace sequence (spine-first):
+      Traces — Skeleton first, then by file conflict:
         1. ☄️ #20 Skeleton — monthly report happy path
   Sub-phase 1.2  [after 1.1 — file conflict with #5]
     Task #14 — Seed migrations (legacy)   impacted: src/settlements/db/
@@ -200,7 +203,7 @@ The reference also covers the parallelism rules: Feature units in one sub-phase 
 
 Apply `../references/subagent-protocol.md` for every Agent call. The conflict-free sub-phases from step 2d drive cross-feature parallelism.
 
-Collect every `NEEDS_INPUT` block and every re-aim shrinkage suggestion into one pending-gates list. Present them batched at the next gate round (per `../references/subagent-protocol.md` rule 3), grouped by Feature.
+Collect every `NEEDS_INPUT` block and every re-aim set-change proposal into one pending-gates list. Present them batched at the next gate round (per `../references/subagent-protocol.md` rule 3), grouped by Feature.
 
 ### 5. Feature completion (delivery-mode aware)
 
@@ -236,7 +239,7 @@ Loop complete — <target>: <title>
 ─────────────────────────────────────
 Traces completed:  [n]
 Traces skipped:    [n]
-Re-aims applied:   [n]  (drops suggested: [n], approved: [n])
+Re-aims applied:   [n]  (set changes proposed: [n], approved: [n])
 PRs merged:        [list of URLs]
 Feature PRs:       [urls] (staged) / Features closed: [list] (trunk)
 ```
@@ -257,7 +260,7 @@ The loop pauses and asks for human input only when:
 | Circular dependency (internal) | Hard stop — cannot resolve automatically |
 | External blocker not yet merged/closed | Loop cannot start until upstream work is done |
 | Internal blocker skipped or unmerged mid-run | Ordering constraint within the current run |
-| Re-aim suggests dropping a scenario or story | Grow-only rule — a human approves every shrinkage |
+| Re-aim proposes adding or dropping a scenario or story | Scenario-set gate — a human approves every change to the plan's scenario set |
 | Claimed scenario not covered by test suite | No automated signal — human must verify manually |
 | Covered test(s) fail | Implementation may need rework |
 | PR pipeline check(s) fail | CI signal is authoritative — human must decide whether to fix or skip |

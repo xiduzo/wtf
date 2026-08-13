@@ -1,6 +1,7 @@
-# Remove our skills
-.claude/skills/wtf.*
-.agents/skills/wtf.*
+# Runtime mirrors of skills/ — installed or symlinked copies of WTF into itself.
+# skills/ is the only source of truth; never commit a nested copy or link back to it.
+.claude/skills/
+.agents/
 skills-lock.json
 
 # Mac things

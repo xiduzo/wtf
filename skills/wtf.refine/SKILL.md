@@ -236,7 +236,8 @@ After the Trace Plan rewrite, verify:
 
 1. The remaining claims plus the landed Traces' claims cover each story's scenarios exactly once — full cover, no overlap.
 2. The plan has exactly one Skeleton.
-3. The spine order is sound — every entry builds on landed Traces or on earlier entries.
+3. Every story other than the Skeleton's story keeps exactly one Extension entry, before that story's Deepening entries.
+4. The spine order is sound — every entry builds on landed Traces or on earlier entries.
 
 ### 5. Draft the section updates and show a diff
 
@@ -347,13 +348,13 @@ The audit comment must include:
 
 **Sections updated:** [comma-separated list]
 
-**Trace Plan delta:** [reordered: …, re-batched: …, scenarios moved: …, added: … — or "no Trace Plan change"]
+**Trace Plan delta:** [reordered: …, re-batched: …, scenarios moved: …, set change applied (human-approved): … — or "no Trace Plan change"]
 
 **Validations re-run:** [scope gate / DDD guard / scenario re-derivation / claim re-check / partition re-check — or "none required"]
 
 **Labels affected:** [stripped: implemented, verified — or "none"]
 
-**Suggested shrinkage:** [the scenario or story the evidence says to drop, plus that evidence — omit this block when there is none]
+**Proposed set change:** [each scenario or story the evidence says to add or to drop, plus that evidence — omit this block when there is none]
 
 **Children that may need refinement:** [list with issue numbers and reason — or "none identified"]
 ```
@@ -419,25 +420,34 @@ A genuine blocker returns a `NEEDS_INPUT` block instead (protocol rule 3).
 | Step 1 — issue ask | Skip the ask. The Feature number is pre-loaded. Detection and hierarchy fetch still run. |
 | Step 2 — insight interview + 2d confirmation | Skip both. The pre-loaded learnings and verify results are the insight list. |
 | Step 3 — classify | Runs. The default change type is **Trace landed — re-aim**. Other change types may also fire from the learnings. |
-| Step 4 — validations | Runs. If a split signal fires, or the partition re-check fails and grow-only moves cannot fix it, return `NEEDS_INPUT`. |
+| Step 4 — validations | Runs. If a split signal fires, or the partition re-check fails and reordering alone cannot fix it, return `NEEDS_INPUT`. |
 | Step 5 — diff review question | Skip the question. Apply the diff directly. |
 | Step 6 — stale label question | Resolve by rule: auto-strip per the stale-label table. Record the strips in the audit comment. |
 | Step 8 — audit comment | ALWAYS post it. Heading: `## Re-aim (headless) — after Trace #<n> — <YYYY-MM-DD>`. |
 | Step 9 — cascade | Runs without asking, but only part (a), the mechanical sync. Never refine judgment children autonomously — list them in the audit comment. |
 
-**Grow-only rule (hard boundary).**
+**Scenario-set gate (hard boundary).**
+The plan's scenario set belongs to the human. The plan's order belongs to the skill.
+
 In headless mode the skill may reorder the remaining plan entries.
 It may re-batch them.
 It may move scenarios between remaining entries.
-It may add newly discovered scenarios and plan entries.
-It MUST NOT drop or weaken any scenario or story.
-"Weaken" includes: delete a scenario, loosen a Then step, delete a story, or remove a plan entry without moving its claimed scenarios.
+These moves change sequencing only. They never change which scenarios the plan delivers.
 
-When the evidence suggests a drop:
+It MUST NOT change the scenario set on its own, in either direction. A set change includes:
 
-1. Do not apply the drop.
-2. Record a **Suggested shrinkage** block in the audit comment: what to drop, and the evidence.
+- add a scenario, add a story, or add a plan entry that claims a scenario the plan did not already carry
+- delete a scenario or a story
+- loosen a Then step
+- remove a plan entry without moving its claimed scenarios to another entry
+
+When the evidence supports a set change — growth or shrinkage:
+
+1. Do not apply it.
+2. Record a **Proposed set change** block in the audit comment: each proposed addition, each proposed drop, and the evidence for each.
 3. Return a `NEEDS_INPUT`-style result (per `../references/subagent-protocol.md` rule 3) so the loop gates on a human.
+
+On approval, the loop re-runs headless refine with the approved change as the pre-loaded insight, marked human-approved. Refine applies it and posts the audit trail. On rejection, the plan keeps its current set.
 
 Interactive mode has no such restriction.
 The human is present and approves the diff.

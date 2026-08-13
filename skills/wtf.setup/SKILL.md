@@ -283,6 +283,31 @@ Commit `.wtf/config.json` so every teammate classifies issues the same way. Reco
 
 > **Closing convention:** GitHub has no native setting to require PR-based closure. Skill behavior enforces this. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (will not implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
+### 7a-bis. Enable automatic head-branch deletion
+
+Trace PRs stack: a Trace branches off the branch of the Trace it builds on rather than waiting for a merge (`../references/branch-setup.md`). GitHub retargets a stacked PR to its parent's base **only when the parent's head branch is deleted on merge**. Without this setting, a human merging through the web UI strands every PR above them.
+
+Check it, and turn it on when the token allows:
+
+```bash
+gh repo view --json deleteBranchOnMerge --jq '.deleteBranchOnMerge'
+```
+
+If `false`, ask the user (per `../references/questioning-style.md`):
+
+- question: "WTF stacks Trace pull requests. GitHub only re-points a stacked PR when the branch below it is deleted on merge. Turn on automatic head-branch deletion?"
+- header: "Branch cleanup"
+- options:
+  - **Enable it (recommended)** → run the API call below
+  - **Leave it off** → warn that stacked PRs will need their base re-pointed by hand, and record this in the status report
+
+```bash
+gh api -X PATCH "repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)" \
+  -F delete_branch_on_merge=true
+```
+
+If the call fails on permissions, say so plainly and tell the user to set **Settings → General → Automatically delete head branches** themselves. Record `delete_branch_on_merge: true|false` for the status report.
+
 ### 7b. Choose the planning mode
 
 WTF planning skills work in one of two modes. See `../references/planning-mode.md`. `guided` asks at each step. `flow` derives everything it can and presents one consolidated review. Both modes run the same quality gates.

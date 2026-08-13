@@ -49,7 +49,8 @@ If the Feature body has a Trace Plan, that plan **is** the list. Do not re-deriv
 1. **Story named** — every entry names exactly one story.
 2. **Partition** — for each story, the entries' claims plus existing issue claims cover all its scenarios, with no overlap.
 3. **One Skeleton, first** — exactly one Skeleton entry exists, and it is item 1. If a child Trace or legacy Task already laid the Spine, no Skeleton entry may remain open.
-4. **Numbers match** — checked entries carry issue numbers that exist as children. Unchecked entries with numbers point at open child Traces.
+4. **One Extension per further story** — every story other than the Skeleton's story has exactly one Extension entry. That entry precedes that story's Deepening entries.
+5. **Numbers match** — checked entries carry issue numbers that exist as children. Unchecked entries with numbers point at open child Traces.
 
 For each gap, propose a concrete fix — a re-partitioned claim, a reordered list, a named story, a corrected checkbox. In `guided` mode, confirm each fix with the user as you find it. In `flow` mode, collect all fixes and confirm them in the step 4 review. Write confirmed fixes into the Feature body in step 4.
 

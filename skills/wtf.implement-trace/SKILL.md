@@ -57,14 +57,24 @@ Load `docs/steering/TECH.md` per the **strict consumer-side load** in `../refere
 
 ### 5. Sequencing gate and branch setup
 
-Traces within a Feature are sequential by design. Before you branch, check the previous Trace:
+A Trace needs the **code** of the Trace it builds on, not its merge. Before you branch, resolve the stack base:
 
 1. Read the Builds-on Trace numbers from the Spine Position section. When they are absent, use the Trace Plan order in the Feature body.
-2. If this Trace builds on a previous Trace, find that Trace's PR and check its state (`gh pr view <pr_number> --json state`).
-3. If the previous Trace's PR is not merged, warn the user and stop. The base branch does not yet contain the Spine this Trace extends. Continue only when the user explicitly overrides.
-4. A Skeleton builds on nothing. It passes this gate without a check.
+2. A Skeleton builds on nothing. Its stack base is the feature branch (`staged`) or `main` (`trunk`). It passes this gate without a check.
+3. Otherwise find the Trace this one builds on and check whether its branch still exists:
 
-Then set up branches per `../references/branch-setup.md`: resolve the delivery mode (config plus per-feature override), generate the slug, and create or resume `trace/<trace-number>-<trace-slug>`. In `staged` delivery, first create or check out the feature branch — the trace branch bases on it. In `trunk` delivery, base on `main` and do not create a feature branch. Resolve any conflicts before you continue.
+   ```bash
+   git fetch origin
+   git rev-parse --verify origin/trace/<n>-<slug>   # exists → still open, stack on it
+   ```
+
+   - **Branch exists** → it is the stack base. Do not wait for its PR. Verify the branch is green (`gh pr checks <pr_number>`); if it is red, warn the user and ask before stacking on it.
+   - **Branch is gone** → that Trace merged and GitHub already retargeted anything stacked on it. The stack base is the feature branch (`staged`) or `main` (`trunk`).
+   - **Neither the branch nor a merged PR exists** → the Trace this one builds on has not been implemented. Warn the user and stop. Continue only when the user explicitly overrides.
+
+Then set up branches per `../references/branch-setup.md`: resolve the delivery mode (config plus per-feature override), generate the slug, and create or resume `trace/<trace-number>-<trace-slug>` off the stack base. In `staged` delivery, create or check out the feature branch first when the stack base is the feature branch. In `trunk` delivery, do not create a feature branch. Resolve any conflicts before you continue.
+
+Tell the user what this Trace stacked on, and that its PR will target that branch.
 
 ### 6. Explore the codebase
 

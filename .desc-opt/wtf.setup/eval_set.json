@@ -1,0 +1,22 @@
+[
+  { "query": "we're starting to use wtf on our backend repo github.com/acme/orders-api — can you get everything ready: gh extensions, issue templates, labels, all of it", "should_trigger": true },
+  { "query": "set up wtf in this repo", "should_trigger": true },
+  { "query": "a new engineer joined and just cloned the monorepo, walk them through getting wtf configured on their machine", "should_trigger": true },
+  { "query": "i'd rather our github issues use native issue types (Epic/Feature/Task/Bug) than labels — can you configure that for this repo?", "should_trigger": true },
+  { "query": "our repo just got transferred into the contoso org. now that we can, switch wtf over to github's native issue types", "should_trigger": true },
+  { "query": "is wtf actually ready here or do i still need to install something first?", "should_trigger": true },
+  { "query": "configure gh and the issue templates so i can start writing epics", "should_trigger": true },
+  { "query": "create the epic / feature / task / bug labels the wtf workflow needs", "should_trigger": true },
+  { "query": "first time using this — initialize wtf for the project", "should_trigger": true },
+  { "query": "verify my environment is good for wtf — gh auth, the extensions, and the issue-type setup", "should_trigger": true },
+  { "query": "create an epic for the payments onboarding initiative", "should_trigger": false },
+  { "query": "set the issue type of #142 to Bug in the github ui", "should_trigger": false },
+  { "query": "add the needs-design label to all the open task issues", "should_trigger": false },
+  { "query": "set up a github actions workflow to run our jest suite on every pull request", "should_trigger": false },
+  { "query": "give me a project health check — what's blocked, what's unverified", "should_trigger": false },
+  { "query": "we're on jira — set up issue types and a workflow for our board there", "should_trigger": false },
+  { "query": "install the gh-dash extension so i can triage PRs from the terminal", "should_trigger": false },
+  { "query": "configure my git user.email and gpg signing key for this repo", "should_trigger": false },
+  { "query": "report a bug: checkout throws a 500 when the cart is empty", "should_trigger": false },
+  { "query": "add a SECURITY issue template to .github/ISSUE_TEMPLATE/ for vulnerability disclosures", "should_trigger": false }
+]

@@ -10,6 +10,7 @@ For each Feature, verify:
 - Each user story carries its canonical Gherkin scenarios in the Feature body
 - A **Trace Plan** exists: an ordered checklist where each entry names its story, its Scenario Claim, and what it adds to the Spine
 - Entry 1 is the Skeleton, and no other entry is a Skeleton
+- Every story other than the Skeleton's story has exactly one Extension entry, before that story's Deepening entries
 - Each unchecked plan entry links an existing Trace issue
 
 For each Trace, verify:
@@ -66,17 +67,22 @@ Using the dependency graph and the Feature units built in step 1:
 
 3. **Topological sort** — sort **every** unit into an execution order that respects both edge kinds from step 1: `blocked_by` (dependency) and `rolls_up` (parent→child join). A unit inherits every ancestor's `blocked_by` edges — but **not** their `rolls_up` edges (inheriting roll-up would make a child depend on itself, a false cycle): it cannot start until every dependency of every ancestor is also satisfied. Because each parent rolls up its whole subtree, a dependency on a parent (e.g. Feature B `blocked_by` Feature A) is automatically deferred until **every** Trace under Feature A has merged — not just the Feature A node. A Feature unit already carries its own Traces, so it satisfies its `rolls_up` edges through its Trace sequence. Epic nodes appear in the order purely as join barriers; step 4 dispatches only Feature units and legacy Tasks, so a phase holding only barrier nodes is a no-op. Group units at the same effective depth into **execution phases** — units within a phase have no dependency between them, directly or through any ancestor.
 
-4. **Cross-feature conflict sub-phasing** — apply the algorithm in `../../references/conflict-graph.md` to each phase, using the *effective* impacted set (unit ∪ every ancestor's impacted set; a Feature unit also unions the areas its Traces declare). This partitions each phase into numbered sub-phases where units within a sub-phase share no overlapping impacted files — including cross-parent overlaps inherited from ancestors, and overlaps against loose bugs/issues mixed into the run. Traces of one Feature never enter this graph — they serialize spine-first inside their unit. Record the final execution structure as:
+4. **Cross-feature conflict sub-phasing** — apply the algorithm in `../../references/conflict-graph.md` to each phase, using the *effective* impacted set (unit ∪ every ancestor's impacted set; a Feature unit also unions the areas its Traces declare). This partitions each phase into numbered sub-phases where units within a sub-phase share no overlapping impacted files — including cross-parent overlaps inherited from ancestors, and overlaps against loose bugs/issues mixed into the run. Then apply the same algorithm a second time, **inside** each Feature unit, over its own Traces: the Skeleton alone in trace-sub-phase 1, the remaining Traces colored by their `## Impacted Areas`. Record the final execution structure as:
 
    ```
    phases: [
      { phase: 1, sub_phases: [
-       { sub: 1, units: [Feature #5 (traces #10 → #11), Feature #6 (trace #20)] },  # no file overlap — run in parallel
-       { sub: 2, units: [Task #14 (legacy)] }                                        # overlaps with #5 — run after
+       { sub: 1, units: [
+           Feature #5 (traces: [#10] → [#11, #12] → [#13]),   # #11 and #12 share no files — parallel
+           Feature #6 (traces: [#20])
+         ] },                                                  # no file overlap between #5 and #6 — parallel
+       { sub: 2, units: [Task #14 (legacy)] }                  # overlaps with #5 — run after
      ]},
      { phase: 2, sub_phases: [...] }
    ]
    ```
+
+   A Trace's branch stacks on the Trace it builds on rather than waiting for a merge (`../../references/branch-setup.md`), so a later trace-sub-phase gates on a pushed, green branch — not on a merged PR.
 
 ## Gate — surface all findings at once
 

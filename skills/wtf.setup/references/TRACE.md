@@ -40,7 +40,7 @@ Scenario:
 
 ## Spine Position
 
-<!-- Skeleton | Extension | Deepening. The Skeleton is Trace 1. It proves the Spine. Each later Trace extends it. Name the Traces this one builds on. -->
+<!-- Skeleton | Extension | Deepening. The Skeleton is Trace 1 and proves the Spine. An Extension adds a further story to the Spine. A Deepening claims further scenarios of a story already started. Name the Traces this one builds on. -->
 
 - Position:
 - Builds on: Trace #
@@ -65,7 +65,9 @@ Scenario:
 
 ### Events / Side Effects
 
-## <!-- Describe any events emitted, webhooks triggered, or state changes -->
+<!-- Describe any events emitted, webhooks triggered, or state changes. Write "None" when the Trace emits nothing. -->
+
+- None
 
 ---
 

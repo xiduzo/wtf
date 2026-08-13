@@ -176,13 +176,13 @@ The Trace issue is the single source of truth: Designer, Developer, and QA each 
 
 ## The Trace model
 
-WTF's implementation unit is the **Trace** — a tracer-bullet work unit inspired by [The Pragmatic Programmer](https://fullstackhub.substack.com/p/the-pragmatic-programmer-12-tracer) and [AI Hero](https://www.aihero.dev/tracer-bullets). A Trace claims one user story and a declared subset of its Gherkin scenarios — its **Scenario Claim** — implemented end-to-end through every layer in one pass. The first Trace of a Feature is the **Skeleton**: the primary story's happy path, minimal, through every layer, at production quality. Each later Trace extends the spine — the next story, or a Deepening Trace that claims further scenarios of a story already started. Scenario Claims partition a story's scenarios: full cover, no overlap. Every Trace leaves the system releasable.
+WTF's implementation unit is the **Trace** — a tracer-bullet work unit inspired by [The Pragmatic Programmer](https://fullstackhub.substack.com/p/the-pragmatic-programmer-12-tracer) and [AI Hero](https://www.aihero.dev/tracer-bullets). A Trace claims one user story and a declared subset of its Gherkin scenarios — its **Scenario Claim** — implemented end-to-end through every layer in one pass. The first Trace of a Feature is the **Skeleton**: the primary story's happy path, minimal, through every layer, at production quality. Each later Trace extends the Spine — an **Extension Trace** that adds the next story, or a **Deepening Trace** that claims further scenarios of a story already started. Scenario Claims partition a story's scenarios: full cover, no overlap. Every Trace leaves the system releasable.
 
-The Feature body stays canonical for all stories and their Gherkin — Traces claim scenarios, they never re-derive them. The Trace Plan is a living aim, not a contract: after each landed Trace, `wtf.refine` re-aims the plan. Autonomous re-aim is grow-only — it may reorder, re-batch, and add scenarios, but a human approves every drop. Delivery is `staged` (trace PRs merge into the feature branch, then feature → main) or `trunk` (trace PRs merge into `main` directly), set once in `.wtf/config.json`.
+The Feature body stays canonical for all stories and their Gherkin — Traces claim scenarios, they never re-derive them. The Trace Plan is a living aim, not a contract: after each landed Trace, `wtf.refine` re-aims the plan. Autonomous re-aim owns the order only — it may reorder, re-batch, and move scenarios between entries. A human approves every change to which scenarios the plan delivers, in both directions. Delivery is `staged` (trace PRs merge into the feature branch, then feature → main) or `trunk` (trace PRs merge into `main` directly), set once in `.wtf/config.json`.
 
 Legacy Task issues in existing repos stay readable — read paths treat them as legacy Traces. Write paths never create Tasks again.
 
-The decision record is [`docs/adr/0001-traces-replace-tasks.md`](docs/adr/0001-traces-replace-tasks.md), and the vocabulary (Trace, Skeleton, Spine, Scenario Claim, Re-aim) is pinned in [`CONTEXT.md`](CONTEXT.md).
+The decision record is [`docs/adr/0001-traces-replace-tasks.md`](docs/adr/0001-traces-replace-tasks.md), and the vocabulary (Trace, Skeleton, Extension Trace, Deepening Trace, Spine, Spine Position, Scenario Claim, Re-aim) is pinned in [`CONTEXT.md`](CONTEXT.md).
 
 ## Installation
 
@@ -276,7 +276,7 @@ Both skills propose the full plan upfront. `wtf.feature-to-traces` validates the
 | ------------- | ------------------------------- | -------------------------------------------------------- |
 | `wtf.loop`   | "go", "start building", "build it all" | Chain implement → verify → PR → re-aim for every Trace, spine-first |
 
-Requires a fully-specified Epic/Feature/Trace tree. Reads each Feature's ordered Trace Plan, runs pre-flight checks (spec completeness, contradictions, codebase mismatches, circular deps), and chains `wtf.implement-trace → wtf.verify-trace → wtf.create-pr` for each Trace — Traces of one Feature run sequentially in spine order, Features run in parallel. After each verified Trace it re-aims the Feature's Trace Plan via headless `wtf.refine`, pausing only when a human decision is actually needed (contradictions, ambiguities, plan shrinkage). Supports resuming a previous run (skips traces already labeled `implemented` or `verified`). In `staged` delivery it ends by opening a feature → main PR once all trace PRs are merged; in `trunk` delivery trace PRs merge into `main` directly.
+Requires a fully-specified Epic/Feature/Trace tree. Reads each Feature's ordered Trace Plan, runs pre-flight checks (spec completeness, contradictions, codebase mismatches, circular deps), and chains `wtf.implement-trace → wtf.verify-trace → wtf.create-pr` for each Trace — a Feature's Skeleton runs first and alone, its remaining Traces are then scheduled by the same file-conflict graph that schedules Features, and Features run in parallel. Trace branches stack: each one forks from the branch of the Trace it builds on instead of waiting for a merge, and GitHub retargets each stacked PR when the one below it merges. After each verified Trace it re-aims the Feature's Trace Plan via headless `wtf.refine`, pausing only when a human decision is actually needed (contradictions, ambiguities, any change to a Trace Plan's scenario set). Supports resuming a previous run (skips traces already labeled `implemented` or `verified`). In `staged` delivery it ends by opening a feature → main PR once all trace PRs are merged; in `trunk` delivery trace PRs merge into `main` directly.
 
 ### Feature design
 
@@ -371,7 +371,7 @@ Routes each learning into the right steering doc (TECH, QA, DESIGN, or VISION) u
 | --------------- | -------------------------- | ----------------------------------------------------------------------- |
 | `wtf.refine`   | "re-aim feature #12"       | Update an existing Epic/Feature/Trace from new insights — the single Re-aim mechanism |
 
-Merges insights from conversation, GitHub comments, and referenced docs; re-validates only affected sections; shows a section-by-section diff before applying updates; posts an audit-trail comment; and cascades scenario edits to the Traces that claim them. Runs headless as `wtf.loop`'s Re-aim step after each verified Trace — grow-only in that mode: it may reorder, re-batch, and add scenarios, but only suggests a drop for human approval.
+Merges insights from conversation, GitHub comments, and referenced docs; re-validates only affected sections; shows a section-by-section diff before applying updates; posts an audit-trail comment; and cascades scenario edits to the Traces that claim them. Runs headless as `wtf.loop`'s Re-aim step after each verified Trace — order-only in that mode: it may reorder, re-batch, and move scenarios between entries, and it proposes every addition and every drop for human approval.
 
 ### Project health
 

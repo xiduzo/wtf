@@ -57,7 +57,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 
 Fetch all sub-issues of the Feature using `gh sub-issue list <feature_number>` per the cookbook in `../references/gh-setup.md`. This returns the authoritative list of children. Do not search by label or title matching. Split the children by kind per `../references/issue-classification.md`: Trace children, and legacy Task children.
 
-**Verify Traces sequentially.** Traces of one Feature landed in spine order, one after another. Verify them in the same order: the Trace Plan order from the Feature body. If a Trace does not appear in the plan, fall back to issue-number order. Do not parallelize Traces of one Feature.
+**Verify Traces sequentially.** Traces of one Feature build on each other's Spine, and sibling Traces may have landed in either order. Verify in Trace Plan order regardless — it is the order the Spine was designed in. If a Trace does not appear in the plan, fall back to issue-number order. Do not parallelize Traces of one Feature: they share a checkout, and a later Trace's scenarios can depend on an earlier Trace's code.
 
 **Spawn one sub-agent per Trace, one at a time.** Apply the rules in `../references/subagent-protocol.md` for every Agent call. Specifically for Full Feature mode:
 

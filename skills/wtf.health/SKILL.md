@@ -74,11 +74,12 @@ For each issue, check its labels against the expected lifecycle:
 |--------|----------|
 | No `designed` label, no child Traces | ⚠️ Feature not designed, no traces |
 | No Skeleton entry — Trace Plan absent, or item 1 is not the Skeleton | ⚠️ No Skeleton — the Spine is unproven |
+| A story other than the primary has no Extension entry | ⚠️ Story not on the Spine — re-aim the Trace Plan |
 | Partition gap — a story scenario in the Feature body that no Trace Plan entry claims | ⚠️ Unclaimed scenarios — re-aim the Trace Plan |
 | Has child Traces, none `implemented` | 🔵 In progress |
 | All child Traces `verified`, Feature still open | ✅ Feature complete — needs Feature PR |
 
-Read each Feature body's User Stories and Trace Plan for the Skeleton and partition checks. Compare the scenario names per story against the Scenario Claims in the Trace Plan entries. Do not check the synced scenario copies in Trace bodies — `wtf.verify-trace` owns drift detection.
+Read each Feature body's User Stories and Trace Plan for the Skeleton, Extension, and partition checks. The primary story is the story named by the Skeleton entry. Compare the scenario names per story against the Scenario Claims in the Trace Plan entries. Do not check the synced scenario copies in Trace bodies — `wtf.verify-trace` owns drift detection.
 
 **Traces (legacy Task issues share this table — mark each such finding "legacy Task"):**
 | Signal | Category |

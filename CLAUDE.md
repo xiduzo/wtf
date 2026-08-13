@@ -7,8 +7,8 @@
 - `skills/wtf.setup/shared-references/` — **generated** vendored copy of `skills/references/` (minus dev-only `eval-fixture-convention.md`) that rides along in the `wtf.setup` payload. `npx skills add` installs each `wtf.*` skill dir individually, so `skills/references/` (no `SKILL.md`) never ships; `wtf.setup` carries this copy and writes it to `<skills-root>/references/` at setup time so installed skills can resolve `../references/...`. **Never edit by hand** — regenerate with `bash skills/wtf.setup/sync-shared-references.sh` after changing any reference doc.
 - `skills/wtf.setup/hooks/` — scripts that ride along in the `wtf.setup` payload: `track-interventions.py` (registered into `settings.json`) and `gh-body.py` (a UTF-8-safe gh body utility copied into the repo at `.wtf/gh-body.py`, not a settings hook).
 - `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN), `docs/spikes/`, and `docs/adr/` (decision records).
-- `CONTEXT.md` — the domain glossary: the DDD ubiquitous language for the WTF work model (Trace, Skeleton, Spine, Scenario Claim, Re-aim). Use its terms exactly.
-- `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
+- `CONTEXT.md` — the domain glossary: the DDD ubiquitous language for the WTF work model (Trace, Skeleton, Extension Trace, Deepening Trace, Spine, Spine Position, Scenario Claim, Re-aim). Use its terms exactly.
+- `.claude/skills/` and `.agents/` — git-ignored. If a runtime installs or links WTF into this repo, that copy is disposable and always stale. **Never edit it, never commit it, never read it to answer a question about a skill** — read `skills/` instead. Delete it when it drifts.
 - `.wtf/` — per-repo artifacts `wtf.setup` writes into the consuming repo: `gh-body.py` (the body helper) and `config.json` with four keys: `"classification": "types"|"labels"` (issue-kind mechanism, resolved via `skills/references/issue-classification.md`), `"planning": "guided"|"flow"` (interaction density, resolved via `skills/references/planning-mode.md`), `"feature_scope": "single-story"|"grouped"` (stories per Feature, resolved by `wtf.setup` / `wtf.write-feature` / `wtf.epic-to-features`), and `"delivery": "staged"|"trunk"` (where Trace PRs merge, resolved via `skills/references/branch-setup.md`).
 
 ## Canonical skill location
@@ -60,7 +60,7 @@ Cross-skill references live in `skills/references/`:
 |---|---|
 | `branch-setup.md` | Trunk-based branch hierarchy, slug rules, worktree policy, delivery-mode resolve (`staged`/`trunk`) |
 | `commit-conventions.md` | Commit message format used across skills |
-| `conflict-graph.md` | File-conflict graph for parallel scheduling — Features parallel, Traces sequential |
+| `conflict-graph.md` | File-conflict graph for parallel scheduling — across Features, and across a Feature's Traces once its Skeleton lands |
 | `ddd-writing-rules.md` | Ubiquitous-language rules for issue/Gherkin authoring |
 | `gh-body-helper.md` | Cross-platform UTF-8-safe issue/PR body read & write (`.wtf/gh-body.py`) |
 | `gh-setup.md` | `gh` CLI + extension install + sub-issue/dependency cookbook |

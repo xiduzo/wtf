@@ -149,7 +149,7 @@ Load the FEATURE template per `../references/issue-template-loading.md` (verify 
 
 ### 7b. Propose the Trace Plan
 
-From the stories and their scenarios, derive the **Trace Plan**: an ordered checklist. Item 1 is the Skeleton. It claims the primary story's happy-path scenario, minimally, through every layer. Each later item names its story, its Scenario Claim (the claimed scenario names), and what it adds to the Spine. The Scenario Claims of one story's Traces must partition that story's scenarios — full cover, no overlap.
+From the stories and their scenarios, derive the **Trace Plan**: an ordered checklist. Item 1 is the Skeleton. It claims the primary story's happy-path scenario, minimally, through every layer. Every story other than the primary one then gets exactly one **Extension** entry, placed before that story's Deepening entries. Each later item names its Spine Position, its story, its Scenario Claim (the claimed scenario names), and what it adds to the Spine. The Scenario Claims of one story's Traces must partition that story's scenarios — full cover, no overlap.
 
 Add the checklist to the **Trace Plan** section of the draft:
 
@@ -157,8 +157,8 @@ Add the checklist to the **Trace Plan** section of the draft:
 ## Trace Plan
 
 1. [ ] ☄️ Skeleton — Merchant sees settlement status for one completed payment (claims: "Status shown for a settled payment")
-2. [ ] ☄️ Deepening — settlement status failure modes (claims: "Status for a failed settlement", "Status while settlement is pending")
-3. [ ] ☄️ Merchant filters settlements by date range (claims: all scenarios)
+2. [ ] ☄️ Extension — Merchant filters settlements by date range (claims: all scenarios)
+3. [ ] ☄️ Deepening — settlement status failure modes (claims: "Status for a failed settlement", "Status while settlement is pending")
 ```
 
 Do not ask a separate question for this. It is shown as part of the draft in step 10. The user can adjust the plan during that review.

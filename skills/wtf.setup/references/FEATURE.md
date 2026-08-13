@@ -78,10 +78,11 @@ Scenario: Edge case
 
 ## Trace Plan
 
-<!-- Ordered checklist — the current aim, not a contract. Item 1 is the Skeleton. Each item names its story, its Scenario Claim, and what it adds to the Spine. Link Trace issues as they are created. -->
+<!-- Ordered checklist — the current aim, not a contract. Item 1 is the Skeleton. Every further story gets one Extension before its Deepenings. Each item names its Spine Position, its story, its Scenario Claim, and what it adds to the Spine. Link Trace issues as they are created. -->
 
-1. [ ] ☄️ Skeleton — [story]: [what it proves of the Spine] (claims: "[scenario name]")
-2. [ ] ☄️ [story]: [what it adds to the Spine] (claims: "[scenario names]")
+1. [ ] ☄️ Skeleton — [primary story]: [what it proves of the Spine] (claims: "[scenario name]")
+2. [ ] ☄️ Extension — [further story]: [what it adds to the Spine] (claims: "[scenario name]")
+3. [ ] ☄️ Deepening — [story already started]: [what it adds to the Spine] (claims: "[scenario names]")
 
 ---
 

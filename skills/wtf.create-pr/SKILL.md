@@ -111,7 +111,7 @@ Examples: `feat(search): add date range filter`, `fix(payments): prevent double 
 **Body:** Load the PR template per `../references/issue-template-loading.md` (verify `.github/pull_request_template.md` exists, halt-or-setup if missing).
 Complete all sections:
 
-- **Summary**: derived from the Trace's story and its Spine position — what this pass adds to the Spine (Skeleton | extension | deepening, and which Traces it builds on). Explain the why. If no Trace, derive from commit messages.
+- **Summary**: derived from the Trace's story and its Spine position — what this pass adds to the Spine (Skeleton | Extension | Deepening, and which Traces it builds on). Explain the why. If no Trace, derive from commit messages.
 - **Changes**: grouped logical summary of `git diff --stat` output — not a file list.
 - **Test plan**: if a Trace exists, one checklist item per claimed scenario name from the Scenario Claim. If no Trace, derive from changed files and commit messages. At minimum one item per observable behavior changed.
 - **Related**: closure keywords per `../references/commit-conventions.md`, one per line. If a Trace exists, include `Closes #<trace_number>`. In `trunk` delivery, when this Trace exhausts the Feature's Trace Plan, add `Closes #<feature_number>` on its own line. For a feature-branch PR (`staged`), include `Closes #<feature_number>` plus one `Closes #<trace_number>` line per completed Trace.
@@ -130,10 +130,17 @@ Apply edits, then proceed.
 
 ### 8. Create the PR
 
-Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`:
+Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`. The base is the **stack base** the branch was cut from:
 
-- `trace/*` branch, `staged` delivery → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
-- `trace/*` branch, `trunk` delivery → target `main`
+```bash
+# The stack base is the upstream this branch forked from:
+git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null
+```
+
+- `trace/*` branch stacked on a still-open Trace → target that `trace/*` branch
+- `trace/*` branch whose base Trace already merged (its branch is gone), `staged` delivery → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
+- `trace/*` branch whose base Trace already merged, `trunk` delivery → target `main`
+- Skeleton `trace/*` branch → the feature branch (`staged`) or `main` (`trunk`)
 - `feature/*` branch → target `main`
 - `hotfix/*` branch → target `main`
 - `task/*` branch (legacy) → target the parent feature branch
@@ -142,13 +149,21 @@ Determine the base branch from the current branch name and the delivery mode, pe
   - header: "Base branch"
   - options: from `git branch -r`
 
+Never target a branch this one did not fork from — the diff would carry the intervening Trace's commits. When the base is another `trace/*` branch, say so in the PR body: this is a stacked PR, it merges after its base, and GitHub retargets it automatically when the base merges with its head branch deleted.
+
 Write the body to a temp file (`$BODY`) with the Write tool.
 Then create the PR via the gh body helper (`../references/gh-body-helper.md`) so the description survives UTF-8 on Windows:
 
 ```bash
 # $BODY is the temp file you wrote the PR body to with the Write tool.
 
-# trace branch — staged delivery:
+# stacked trace branch — base is the Trace it builds on:
+python3 .wtf/gh-body.py create --pr \
+  --title "<title>" \
+  --body-file "$BODY" \
+  --base trace/<base-trace-number>-<base-trace-slug>
+
+# trace branch whose base Trace merged, or a Skeleton — staged delivery:
 python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
   --body-file "$BODY" \
