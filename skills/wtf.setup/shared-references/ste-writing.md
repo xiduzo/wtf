@@ -38,7 +38,7 @@ Durable artifacts that skills produce still use **strict** mode (dictionary + DD
 
 ## Copyright
 
-ASD-STE100 is free to read and copyrighted ([asd-ste100.org](https://asd-ste100.org)). Do not paste the standard in full. Do not copy or vendor the STE dictionary into this repo. Resolve the dictionary from the installed global `ste-writing` skill (see below).
+ASD-STE100 is free to read and copyrighted ([asd-ste100.org](https://asd-ste100.org)). Do not paste the standard in full. The dictionary ships with WTF as the `ste-writing` skill (`skills/ste-writing/references/dictionary.md`) — word lists and substitutions only, meanings and examples omitted.
 
 ## Mode
 
@@ -48,11 +48,12 @@ Always use **strict** mode. Apply structural rules **and** dictionary grep. Do n
 
 Grep — do not read whole — this file (first path that exists):
 
-1. `~/.claude/skills/ste-writing/references/dictionary.md`
-2. `~/.cursor/skills/ste-writing/references/dictionary.md`
-3. Any other installed `ste-writing` skill path the runtime exposes whose `references/dictionary.md` exists
+1. `../ste-writing/references/dictionary.md` — the sibling skill at the skills root. WTF ships it; `npx skills add` installs it next to the other `wtf.*` skills.
+2. `~/.claude/skills/ste-writing/references/dictionary.md`
+3. `~/.cursor/skills/ste-writing/references/dictionary.md`
+4. Any other installed `ste-writing` skill path the runtime exposes whose `references/dictionary.md` exists
 
-If **no** dictionary file is found: **halt** durable writing. Tell the user to install the `ste-writing` skill (so its `references/dictionary.md` is available), then retry. Do not draft the durable body without the dictionary.
+If **no** dictionary file is found: **halt** durable writing. Tell the user to re-run `npx skills add` (or `wtf.setup`) so the bundled `ste-writing` skill is installed, then retry. Do not draft the durable body without the dictionary.
 
 Header of that file says "Do not redistribute" — leave it in place. Only grep it.
 
@@ -173,7 +174,7 @@ Keep Conventional Commits structure (`commit-conventions.md`). Apply STE only to
 | Item | Value |
 |------|-------|
 | Standard | ASD-STE100 Issue 9 (2025-01-15) |
-| Global skill | `ste-writing` (dictionary + full rule index) |
+| Bundled skill | `ste-writing` at the skills root (dictionary + full rule index) |
 | Max instruction sentence | 20 words |
 | Max descriptive sentence | 25 words |
 | Max words in a multi-word noun | 3 |

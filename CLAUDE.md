@@ -18,6 +18,7 @@ Edit skill files in `skills/<skill-name>/SKILL.md`. Any other path is a runtime 
 
 | Skill | File |
 |---|---|
+| ste-writing | `skills/ste-writing/SKILL.md` (ships the STE dictionary) |
 | wtf.changelog | `skills/wtf.changelog/SKILL.md` |
 | wtf.create-pr | `skills/wtf.create-pr/SKILL.md` |
 | wtf.design-feature | `skills/wtf.design-feature/SKILL.md` |
