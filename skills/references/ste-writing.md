@@ -46,14 +46,11 @@ Always use **strict** mode. Apply structural rules **and** dictionary grep. Do n
 
 ## Resolve the STE dictionary
 
-Grep — do not read whole — this file (first path that exists):
+Grep — do not read whole — this file:
 
-1. `../ste-writing/references/dictionary.md` — the sibling skill at the skills root. WTF ships it; `npx skills add` installs it next to the other `wtf.*` skills.
-2. `~/.claude/skills/ste-writing/references/dictionary.md`
-3. `~/.cursor/skills/ste-writing/references/dictionary.md`
-4. Any other installed `ste-writing` skill path the runtime exposes whose `references/dictionary.md` exists
+`../ste-writing/references/dictionary.md` — the sibling `ste-writing` skill at the skills root. WTF ships it. `npx skills add` installs it next to the other `wtf.*` skills.
 
-If **no** dictionary file is found: **halt** durable writing. Tell the user to re-run `npx skills add` (or `wtf.setup`) so the bundled `ste-writing` skill is installed, then retry. Do not draft the durable body without the dictionary.
+If the dictionary file is not found: **halt** durable writing. Tell the user to re-run `npx skills add` (or `wtf.setup`) so the bundled `ste-writing` skill is installed, then retry. Do not draft the durable body without the dictionary.
 
 Header of that file says "Do not redistribute" — leave it in place. Only grep it.
 
