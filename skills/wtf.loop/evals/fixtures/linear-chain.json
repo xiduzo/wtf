@@ -1,13 +1,19 @@
 {
-  "_note": "Linear chain: A→B→C. Each task blocks the next. Expected: 3 phases, 1 task each, no parallelism.",
+  "_note": "Spine-first chain: one Feature with three Traces in Trace Plan order — Skeleton #10, then #11, then #12. No dependency edges exist. Expected: one Feature unit whose Traces run strictly sequentially in plan order, no parallelism.",
+  "feature": {
+    "number": 1,
+    "title": "Feature: Settlement status",
+    "labels": ["feature"],
+    "body": "## Goal\nMerchants can see the settlement status of a completed payment.\n\n## Acceptance Criteria\n- [ ] Merchants can see the status of a settled payment\n- [ ] Merchants can see why a settlement failed\n- [ ] Merchants can see that a settlement is pending\n\n## User Stories\n### Story: Merchant sees settlement status\nAs a Merchant, I want to see the settlement status of a payment, so that I know when funds arrive.\n\n```gherkin\nScenario: Status shown for a settled payment\n  Given a Merchant has a settled payment\n  When the Merchant opens the settlement list\n  Then the payment shows status 'settled'\n\nScenario: Status for a failed settlement\n  Given a Merchant has a failed settlement\n  When the Merchant opens the settlement list\n  Then the payment shows status 'failed' with a reason code\n\nScenario: Status while settlement is pending\n  Given a Merchant has a pending settlement\n  When the Merchant opens the settlement list\n  Then the payment shows status 'pending'\n```\n\n## Trace Plan\n1. [ ] ☄️ #10 Skeleton — status for one settled payment (claims: \"Status shown for a settled payment\")\n2. [ ] ☄️ #11 Deepening — failed settlement (claims: \"Status for a failed settlement\")\n3. [ ] ☄️ #12 Deepening — pending settlement (claims: \"Status while settlement is pending\")\n\n## Impacted Areas\n- src/settlements/"
+  },
   "nodes": [
-    { "number": 10, "title": "Task A — Define data model", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/db/"] },
-    { "number": 11, "title": "Task B — Implement service layer", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/services/"] },
-    { "number": 12, "title": "Task C — Expose API endpoint", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/api/"] }
+    { "number": 10, "title": "Trace: Skeleton — status for one settled payment", "type": "trace", "labels": ["trace", "designed"], "feature": 1 },
+    { "number": 11, "title": "Trace: Deepening — failed settlement", "type": "trace", "labels": ["trace", "designed"], "feature": 1 },
+    { "number": 12, "title": "Trace: Deepening — pending settlement", "type": "trace", "labels": ["trace", "designed"], "feature": 1 }
   ],
   "edges": {
-    "10": { "blocks": [11], "blocked_by": [] },
-    "11": { "blocks": [12], "blocked_by": [10] },
-    "12": { "blocks": [], "blocked_by": [11] }
+    "10": { "blocks": [], "blocked_by": [] },
+    "11": { "blocks": [], "blocked_by": [] },
+    "12": { "blocks": [], "blocked_by": [] }
   }
 }

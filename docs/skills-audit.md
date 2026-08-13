@@ -1,8 +1,12 @@
 # WTF Skill Suite Audit
 
+> **Historical snapshot — 01/05/2026. Do not read as current state.**
+>
+> Every recommendation in section 5 shipped. The suite has since moved from the Task model to the Trace model ([ADR 0001](adr/0001-traces-replace-tasks.md)), which renamed five skills and retired the `TASK.md` template. Names below are the names as they stood on the audit date. See [Status since the audit](#6-status-since-the-audit) for the translation table and what changed. For the live picture, read `CLAUDE.md` and `skills/`.
+
 01/05/2026
 
-Scope: 25 skills under `skills/wtf.*/SKILL.md`. Source of truth confirmed at `skills/`. References at `skills/references/` (8 files). Audit conducted by reading each `SKILL.md` plus targeted greps. No skill files modified.
+Scope: 25 skills under `skills/wtf.*/SKILL.md`. Source of truth confirmed at `skills/`. References at `skills/references/` (8 files at the time; 17 today). Audit conducted by reading each `SKILL.md` plus targeted greps. No skill files modified.
 
 ---
 
@@ -271,3 +275,29 @@ T:4 P:3 R:5. Strong: most parent-traversal logic (13 mentions), explicit blocked
 8. **Add `subagent-protocol.md` cite to `wtf.create-pr:100`** where it spawns a haiku subagent for title generation. One-line fix; closes drift gap.
 9. **Add `steering-doc-process.md` cite to `wtf.reflect`.** It is the primary writer of TECH/QA/DESIGN/VISION but does not invoke the shared process doc — 1-2 line fix.
 10. **Move `wtf.design-feature` Design Handoff template (lines 148-180)** into a local `skills/wtf.design-feature/references/design-handoff-template.md`. Drops SKILL.md from 1715w to ~1100w. Mirrors how `wtf.design-task` already uses `component-spec-template.md`.
+
+---
+
+## 6. Status since the audit
+
+All ten recommendations in section 5 are implemented. `skills/references/` grew from 8 files to 17.
+
+The Trace model ([ADR 0001](adr/0001-traces-replace-tasks.md)) then replaced Tasks with Traces as the implementation unit. Five skills renamed, with no deprecation aliases:
+
+| Audited as | Reads today |
+|---|---|
+| `wtf.write-task` | `wtf.write-trace` |
+| `wtf.feature-to-tasks` | `wtf.feature-to-traces` |
+| `wtf.implement-task` | `wtf.implement-trace` |
+| `wtf.verify-task` | `wtf.verify-trace` |
+| `wtf.design-task` | `wtf.design-trace` |
+
+Also changed, which invalidates parts of sections 1-4 above:
+
+- `.github/ISSUE_TEMPLATE/TASK.md` retired in favour of `TRACE.md`. No skill loads `TASK.md`. Old repos may still hold the file — see `skills/references/issue-template-loading.md`.
+- Gherkin scenarios are canonical on the **Feature**, not on the implementation issue. A Trace claims a named subset of them (its Scenario Claim).
+- References added since: `planning-mode.md`, `conflict-graph.md`, `issue-classification.md`, `ste-writing.md`, `gh-body-helper.md`, and the six the audit itself recommended.
+- `wtf.loop` split into `references/pre-flight-validation.md` and `references/trace-execution.md` (recommendation 7).
+- The skill inventory, reference inventory, and eval coverage tables in `CLAUDE.md` are the maintained versions of section 1. This file is not maintained.
+
+A fresh audit is a separate exercise. Nothing here should be cited as the current shape of the suite.

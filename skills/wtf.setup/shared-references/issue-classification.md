@@ -1,13 +1,13 @@
 # Issue Classification — native types vs. labels
 
-Every WTF skill uses this file to mark an issue as an **Epic**, **Feature**, **Task**, or **Bug**. Skills also use it to find issues of a given kind later.
+Every WTF skill uses this file to mark an issue as an **Epic**, **Feature**, **Trace**, or **Bug**. Skills also use it to find issues of a given kind later.
 
 Read this from any skill that *sets* the kind of a new issue. Also read it when a skill *lists* issues of a kind. Also read it when a skill *detects* the kind of an existing issue.
 
 GitHub offers two mechanisms. GitHub gates the better one.
 
 - **`types`** — native [GitHub issue types](https://docs.github.com/en/issues/tracking-your-work-with-issues/configuring-issues/managing-issue-types-in-an-organization). These work in **organizations only**. Org owners define them. Personal and user accounts cannot use them. When available, the issue *type* carries the classification. **Labels stay free for your own segmentation** (for example `phase-2`, `frontend`).
-- **`labels`** — the `epic` / `feature` / `task` / `bug` labels carry the classification. This fallback works on **any** repo, including personal accounts.
+- **`labels`** — the `epic` / `feature` / `trace` / `bug` labels carry the classification. This fallback works on **any** repo, including personal accounts.
 
 `wtf.setup` picks the mode once. It records the mode in `.wtf/config.json`. The two mechanisms are interchangeable for classification. They are **not** the same as lifecycle labels. `designed` / `implemented` / `verified` are always labels in **both** modes — see `./lifecycle-labels.md`. Issue types replace only the *kind* label. They never replace lifecycle labels.
 
@@ -18,6 +18,7 @@ GitHub offers two mechanisms. GitHub gates the better one.
 - [Classify a new issue](#classify-a-new-issue) — write side (`write-*`, `report-bug`)
 - [List issues of a kind](#list-issues-of-a-kind) — read side (`health`, `retro`, …)
 - [Detect the kind of an existing issue](#detect-the-kind-of-an-existing-issue) — `refine`
+- [Legacy Task reads](#legacy-task-reads) — old repos, read side only
 - [Provision native types](#provision-native-types) — used by `wtf.setup` only
 - [`gh` limitations to know](#gh-limitations-to-know)
 
@@ -27,10 +28,10 @@ GitHub offers two mechanisms. GitHub gates the better one.
 |---|---|---|---|---|---|
 | Epic | `Epic` | `epic` | `5319e7` | `purple` | 🎯 |
 | Feature | `Feature` | `feature` | `0075ca` | `blue` | 🚀 |
-| Task | `Task` | `task` | `e4e669` | `yellow` | 🛠 |
+| Trace | `Trace` | `trace` | `e4e669` | `yellow` | ☄️ |
 | Bug | `Bug` | `bug` | `d73a4a` | `red` | 🐞 |
 
-Type names are **capitalized** (`Epic`). Labels are **lowercase** (`epic`). In `types` mode, search and `select` match the capitalized type name. In `labels` mode, everything is lowercase. Every organization ships `Task`/`Bug`/`Feature` as defaults. Only `Epic` must be created (see [Provision native types](#provision-native-types)).
+Type names are **capitalized** (`Epic`). Labels are **lowercase** (`epic`). In `types` mode, search and `select` match the capitalized type name. In `labels` mode, everything is lowercase. Every organization ships `Task`/`Bug`/`Feature` as defaults. The shipped `Task` default is simply unused — WTF write paths never create Tasks. `Epic` and `Trace` must be created (see [Provision native types](#provision-native-types)).
 
 ## Resolve the mode
 
@@ -58,16 +59,16 @@ fi
 
 ## Classify a new issue
 
-Used by `write-epic` / `write-feature` / `write-task` / `report-bug` **after** the issue is created. Create the issue *without* a kind label. That keeps labels free in `types` mode. Capture its number. Then set `TYPE` and run this block. It sets the native type when the mode and the type allow. Otherwise it falls back to the kind label. So it is always safe:
+Used by `write-epic` / `write-feature` / `write-trace` / `report-bug` **after** the issue is created. Create the issue *without* a kind label. That keeps labels free in `types` mode. Capture its number. Then set `TYPE` and run this block. It sets the native type when the mode and the type allow. Otherwise it falls back to the kind label. So it is always safe:
 
 ```bash
-TYPE="Task"            # Epic | Feature | Task | Bug
+TYPE="Trace"           # Epic | Feature | Trace | Bug
 ISSUE_NUMBER=<number from the created issue URL>
 
 case "$TYPE" in
   Epic)    LABEL=epic;    COLOR=5319e7; DESC="Strategic initiative spanning multiple features" ;;
   Feature) LABEL=feature; COLOR=0075ca; DESC="User-facing capability delivered as a vertical slice" ;;
-  Task)    LABEL=task;    COLOR=e4e669; DESC="Implementable vertical slice of a Feature" ;;
+  Trace)   LABEL=trace;   COLOR=e4e669; DESC="One pass over a Feature's spine — one story, one Scenario Claim, end-to-end" ;;
   Bug)     LABEL=bug;     COLOR=d73a4a; DESC="Something is broken" ;;
 esac
 
@@ -94,7 +95,7 @@ The `gh label create … || true` keeps `labels` mode self-healing. It still wor
 
 ## List issues of a kind
 
-Used by `health`, `retro`, `epic-to-features`, `write-task`, `spike`, `refine`, and similar skills. The fields you request stay the same across modes. Only the filter changes.
+Used by `health`, `retro`, `epic-to-features`, `write-trace`, `spike`, `refine`, and similar skills. The fields you request stay the same across modes. Only the filter changes.
 
 **Single kind** (`TYPE` capitalized, `LABEL` lowercase from the table):
 
@@ -106,17 +107,19 @@ else
 fi
 ```
 
-**Several kinds at once** (logical OR — for example the Epic/Feature/Task candidate list `refine` and `spike` show):
+**Several kinds at once** (logical OR — for example the Epic/Feature/Trace candidate list `refine` and `spike` show):
 
 ```bash
 if [ "$WTF_CLASS" = types ]; then
-  gh issue list --search 'state:open (type:"Epic" OR type:"Feature" OR type:"Task")' --json number,title --limit 10
+  gh issue list --search 'state:open (type:"Epic" OR type:"Feature" OR type:"Trace")' --json number,title --limit 10
 else
-  gh issue list --label "epic,feature,task" --state open --json number,title --limit 10
+  gh issue list --label "epic,feature,trace" --state open --json number,title --limit 10
 fi
 ```
 
 (`--label "a,b,c"` is OR for labels. `type:"A" OR type:"B"` is OR for types.)
+
+When the repo may hold legacy Task issues, extend the filter — see [Legacy Task reads](#legacy-task-reads).
 
 ## Detect the kind of an existing issue
 
@@ -129,15 +132,24 @@ if [ "$WTF_CLASS" = types ]; then
   KIND=$(gh api graphql -f query="{ repository(owner:\"${REPO%%/*}\", name:\"${REPO##*/}\"){ issue(number:$ISSUE_NUMBER){ issueType{ name } } } }" \
            --jq '.data.repository.issue.issueType.name' 2>/dev/null)
 else
-  KIND=$(gh issue view "$ISSUE_NUMBER" --json labels --jq '.labels[].name' | grep -iE '^(epic|feature|task|bug)$' | head -1)
+  KIND=$(gh issue view "$ISSUE_NUMBER" --json labels --jq '.labels[].name' | grep -iE '^(epic|feature|trace|bug|task)$' | head -1)
 fi
 ```
 
-If `$KIND` is empty (no type set and no kind label), ask the user. See `wtf.refine`.
+If `$KIND` is `Task` or `task`, treat the issue as a legacy Trace (see [Legacy Task reads](#legacy-task-reads)). If `$KIND` is empty (no type set and no kind label), ask the user. See `wtf.refine`.
+
+## Legacy Task reads
+
+Repos that predate the Trace model hold `Task` issues (type `Task`, label `task`, prefix 🛠). Read paths treat them as legacy Traces. `wtf.health`, `wtf.refine`, and `wtf.retro` then stay complete in migrated repos.
+
+- **List** — when the repo may hold legacy Tasks, add the legacy filter. In `types` mode: `(type:"Trace" OR type:"Task")`. In `labels` mode: `--label "trace,task"`.
+- **Detect** — the detect block above already matches `task`. Map `Task`/`task` to the Trace kind before you route.
+
+Write paths never create Tasks. Do not set the `Task` type on a new issue. Do not add the `task` label. No relabel migration runs — legacy Task issues stay as they are.
 
 ## Provision native types
 
-**`wtf.setup` only.** Native types live at the **organization** level. They need an **org owner**. Orgs ship `Task`/`Bug`/`Feature` by default. Create whatever is missing (in practice just `Epic`) with the REST API. `color` must be one of `gray, blue, green, yellow, orange, red, pink, purple, null`:
+**`wtf.setup` only.** Native types live at the **organization** level. They need an **org owner**. Orgs ship `Task`/`Bug`/`Feature` by default. No org ships a `Trace` type. Create whatever is missing — in practice `Epic` **and** `Trace` — with the REST API. Never create a `Task` type. The shipped `Task` default stays unused. `color` must be one of `gray, blue, green, yellow, orange, red, pink, purple, null`:
 
 ```bash
 # $OWNER is the org login. Create a type only if a same-named one doesn't already exist.
@@ -150,7 +162,7 @@ create_type() {  # $1=name $2=color $3=description
 }
 create_type Epic    purple "Strategic initiative spanning multiple features"
 create_type Feature blue   "User-facing capability delivered as a vertical slice"
-create_type Task    yellow "Implementable vertical slice of a Feature"
+create_type Trace   yellow "One pass over a Feature's spine — one story, one Scenario Claim, end-to-end"
 create_type Bug     red    "Something is broken"
 ```
 
@@ -159,5 +171,5 @@ Creation needs the **"Issue Types" org write** permission (org owner). If the PO
 ## `gh` limitations to know
 
 - **`gh issue list --json issueType` does not exist** (verified on gh 2.92.0). You can *filter* by type server-side with `--search "type:\"X\""`. To *read* one issue's type you must use the GraphQL `issue.issueType.name` query above. That is why the read snippets above never request an `issueType` JSON field.
-- `--search 'type:"Task"'` returns nothing when no native types exist. That is why `labels` mode is the safe default. That is why the mode is resolved before any query.
-- Type names in `--search` are quoted and case-insensitive (`type:"task"` works). The GraphQL `select(.name=="Task")` match is **exact**. Keep the capitalized names from the table.
+- `--search 'type:"Trace"'` returns nothing when no native types exist. That is why `labels` mode is the safe default. That is why the mode is resolved before any query.
+- Type names in `--search` are quoted and case-insensitive (`type:"trace"` works). The GraphQL `select(.name=="Trace")` match is **exact**. Keep the capitalized names from the table.

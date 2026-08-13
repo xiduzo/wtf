@@ -1,6 +1,6 @@
 # Issue Template Loading
 
-Shared procedure for any wtf skill that creates a GitHub issue from a template (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-task`, `wtf.report-bug`) or a PR from a template (`wtf.create-pr`).
+Shared procedure for any wtf skill that creates a GitHub issue from a template (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-trace`, `wtf.report-bug`) or a PR from a template (`wtf.create-pr`).
 
 ## Templates by skill
 
@@ -8,9 +8,11 @@ Shared procedure for any wtf skill that creates a GitHub issue from a template (
 |---|---|
 | `wtf.write-epic` | `.github/ISSUE_TEMPLATE/EPIC.md` |
 | `wtf.write-feature` | `.github/ISSUE_TEMPLATE/FEATURE.md` |
-| `wtf.write-task` | `.github/ISSUE_TEMPLATE/TASK.md` |
+| `wtf.write-trace` | `.github/ISSUE_TEMPLATE/TRACE.md` |
 | `wtf.report-bug` | `.github/ISSUE_TEMPLATE/BUG.md` |
 | `wtf.create-pr` | `.github/pull_request_template.md` |
+
+Old repos may still hold `.github/ISSUE_TEMPLATE/TASK.md`. Leave it alone. No skill loads it.
 
 ## 1. Verify the template exists
 
@@ -50,4 +52,4 @@ Multi-line bodies must go through a temp file (never an inline `--body`). Every 
 
 If `.wtf/gh-body.py` is absent, use the raw-`gh` fallback in `./gh-body-helper.md`. That means the repo has not run `wtf.setup` since the guard shipped. That fallback works on macOS/Linux. It is unguarded on Windows.
 
-The exact title prefix (`🎯 Epic:`, `🚀 Feature:`, `🛠 Task:`, `🐞 Bug:`) and label name are skill-specific. See each skill's create step. The Read → Write-temp → helper pattern is universal.
+The exact title prefix (`🎯 Epic:`, `🚀 Feature:`, `☄️ Trace:`, `🐞 Bug:`) and label name are skill-specific. See each skill's create step. The Read → Write-temp → helper pattern is universal.

@@ -1,6 +1,7 @@
 ---
 name: wtf.write-feature
-description: This skill should be used when a user wants to create a GitHub Feature issue, break down an Epic into user-facing capabilities, write user stories in domain language, or capture what a domain actor can do — for example "create a feature", "write a feature for this epic", "add a feature to an epic", "break this epic into features", "write user stories for this feature", or "describe what this actor can do". Use this skill to write a single Feature. Use `wtf.epic-to-features` to generate the full set of Features for an Epic at once. Not applicable to Tasks, Epics, or bug reports.
+description: This skill should be used when a user wants to create a GitHub Feature issue, break down an Epic into user-facing capabilities, write user stories in domain language, or capture what a domain actor can do — for example "create a feature", "write a feature for this epic", "add a feature to an epic", "break this epic into features", "write user stories for this feature", or "describe what this actor can do". Use this skill to write a single Feature. Use `wtf.epic-to-features` to generate the full set of Features for an Epic at once. Supports two planning modes — `guided` (step-by-step questions) and `flow` (derive, one consolidated review) — passed as an argument or read from `.wtf/config.json`. Not applicable to Traces, Epics, or bug reports.
+argument-hint: "[capability] [guided|flow]"
 ---
 
 # Write Feature
@@ -14,6 +15,34 @@ Create a GitHub Feature issue that defines a user-facing capability. Fetch the p
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. That result controls whether native sub-issue and dependency links are created in step 10.
 
 If invoked from `wtf.epic-to-features` or `wtf.write-epic`, skip this step. The orchestrator already ran it. Also skip on re-invocations in the same session (e.g. "Write next Feature" loop in step 11).
+
+### 0b. Resolve the planning mode and the feature scope
+
+Run the **Resolve the mode** block from `../references/planning-mode.md`. An explicit `guided` or `flow` argument in the invocation wins over config. `$WTF_PLAN` shapes steps 3 and 8 below. Every quality gate runs in both modes.
+
+Then resolve the feature scope from `.wtf/config.json` with the same read pattern:
+
+```bash
+WTF_SCOPE=$(python3 - <<'PY' 2>/dev/null || true
+import json
+try:
+    print((json.load(open(".wtf/config.json")).get("feature_scope") or "").strip())
+except Exception:
+    pass
+PY
+)
+```
+
+If `$WTF_SCOPE` is not `single-story` or `grouped`, ask once. Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How many user stories should this Feature carry?"
+- header: "Feature scope"
+- options:
+  - **Single-story** → `single-story` — the Feature carries exactly one user story
+  - **Grouped** → `grouped` — the Feature carries co-related stories that share one Spine
+
+`$WTF_SCOPE` shapes steps 4 and 9 below. The scope gate (step 9) may override it for this Feature with a stated reason recorded in the body.
+
+If invoked from `wtf.epic-to-features`, use the planning mode and the feature scope the orchestrator passed in. Do not re-resolve either.
 
 ### 1. Identify the parent Epic
 
@@ -68,9 +97,16 @@ Clarification questions are split into two tiers. Work through all Required ques
 
 For each unanswered item above, call `AskUserQuestion` (per `../references/questioning-style.md`). Stop when you have enough for a complete draft.
 
-### 4. Derive user stories
+**In `flow` mode:** answer these questions yourself first — from the Epic, the codebase, the glossary, and the steering docs. Only the genuinely unanswerable items survive. Batch those into **one** `AskUserQuestion` call instead of asking one by one. If every item resolves, ask nothing.
 
-Based on the Epic's goal, the capability name, and clarified details, write 2–4 user stories in "As a **_, I want _** so that \_\_\_" format. Derive these. Do not ask the user.
+### 4. Derive user stories and scenarios
+
+Based on the Epic's goal, the capability name, and clarified details, write the user stories in "As a **_, I want _** so that \_\_\_" format. Derive these. Do not ask the user. `$WTF_SCOPE` sets the count:
+
+- **`single-story`** — exactly one user story.
+- **`grouped`** — 2–4 co-related stories that share one Spine.
+
+For each story, derive its Acceptance Criteria. Then derive canonical Gherkin scenarios from those ACs. Each AC maps to one or more scenarios. Step 7 writes them into the Feature body per story — story, ACs, scenarios — per the FEATURE template. The Feature body is the canonical, PM-editable home of all scenarios. Traces claim subsets of them by name. They never own them.
 
 **DDD rules for user stories** (see `../references/ddd-writing-rules.md`):
 
@@ -86,7 +122,7 @@ If issues are found, correct them silently. Note the changes when showing the dr
 
 ### 6. Vertical slice assessment
 
-Run Stage 1 of `../references/scope-gates.md` on the gathered context and user stories. Feature bar: an end-to-end slice that delivers one coherent, independently releasable user-facing capability. Concrete test — if this feature shipped tomorrow with no other unshipped features, could a domain actor use it and gain business value? If no, it fails.
+Run Stage 1 of `../references/scope-gates.md` on the gathered context and user stories. Feature bar: one step toward the Epic, carrying 1..n co-related user stories that share one Spine. Concrete test — if this feature shipped tomorrow with no other unshipped features, could a domain actor use it and gain business value? If no, it fails.
 
 Evaluate:
 
@@ -96,7 +132,7 @@ Evaluate:
 
 ### 7. Draft the Feature
 
-Acceptance Criteria must map 1:1 to user stories. Edge Cases must name at least 2 explicit failure or boundary scenarios.
+Each story block carries its own Acceptance Criteria and its canonical scenarios (from step 4). Edge Cases must name at least 2 explicit failure or boundary cases, so Deepening Traces can claim scenarios that cover them.
 
 Apply strict STE per `../references/ste-writing.md` before writing any durable body.
 
@@ -105,28 +141,29 @@ Load the FEATURE template per `../references/issue-template-loading.md` (verify 
 **DDD writing rules for this draft** (see `../references/ddd-writing-rules.md` for full rules):
 
 - **Bounded Context:** Fill the Bounded Context field and name the seam if the feature crosses contexts.
-- **Domain Events:** List events this feature emits or consumes using past-tense domain names. These become integration contracts for child Tasks.
-- **Acceptance Criteria:** Every AC must be an observable, domain-relevant outcome — not an implementation detail.
+- **Domain Events:** List events this feature emits or consumes using past-tense domain names. These become integration contracts for child Traces.
+- **Acceptance Criteria:** Every AC must be an observable, domain-relevant outcome — not an implementation detail. Write them per story.
+- **Scenarios:** Write each story's canonical Gherkin under that story. Traces claim these scenarios by name. PMs and designers edit them here, not in Trace issues.
 - **Edge Cases:** Name edge cases using domain language, not implementation state.
+- **Delivery Override:** Fill this section only when the user asks for a non-default delivery mode for this Feature. Record the mode (`staged` | `trunk`) and the reason. Otherwise leave it blank — the `delivery` key in `.wtf/config.json` rules.
 
-### 7b. Propose a Task list
+### 7b. Propose the Trace Plan
 
-Based on the Acceptance Criteria just drafted, derive a proposed list of Tasks that together implement this Feature. Each task should be a vertical slice — one observable, user-facing behavior end-to-end.
+From the stories and their scenarios, derive the **Trace Plan**: an ordered checklist. Item 1 is the Skeleton. It claims the primary story's happy-path scenario, minimally, through every layer. Every story other than the primary one then gets exactly one **Extension** entry, placed before that story's Deepening entries. Each later item names its Spine Position, its story, its Scenario Claim (the claimed scenario names), and what it adds to the Spine. The Scenario Claims of one story's Traces must partition that story's scenarios — full cover, no overlap.
 
-Present the list as named-but-unnumbered checklist items and add them to the **Proposed Tasks** section of the draft:
+Add the checklist to the **Trace Plan** section of the draft:
 
 ```markdown
-## Proposed Tasks
+## Trace Plan
 
-- [ ] Add settlement status field to Payment Aggregate
-- [ ] Expose settlement status on the payments API endpoint
-- [ ] Display settlement status in the merchant dashboard UI
-- [ ] Send settlement notification email when status changes
+1. [ ] ☄️ Skeleton — Merchant sees settlement status for one completed payment (claims: "Status shown for a settled payment")
+2. [ ] ☄️ Extension — Merchant filters settlements by date range (claims: all scenarios)
+3. [ ] ☄️ Deepening — settlement status failure modes (claims: "Status for a failed settlement", "Status while settlement is pending")
 ```
 
-Do not ask a separate question for this. It is shown as part of the draft in step 9. The user can adjust the task list during that review.
+Do not ask a separate question for this. It is shown as part of the draft in step 10. The user can adjust the plan during that review.
 
-This list is written into the Feature body and becomes the starting point for `wtf.feature-to-tasks`. It reads the Proposed Tasks checklist directly rather than re-deriving from ACs. Write it carefully. It will drive task creation.
+This plan is written into the Feature body and becomes the starting point for `wtf.feature-to-traces`. It reads the Trace Plan checklist directly rather than re-deriving it from the scenarios. The plan is a living aim, not a contract — `wtf.refine` re-aims it after each Trace lands. Still, write it carefully. It will drive Trace creation.
 
 ### 8. Run Definition of Ready checklist
 
@@ -152,23 +189,32 @@ If "Design handoff complete" is flagged as a blocker, also call `AskUserQuestion
 
 If the user provides a link via the free-text escape hatch, add it to the Design Reference section of the issue body.
 
+**In `flow` mode:** do not interrogate DoR items one by one. Auto-waive the human-process items ("User stories agreed by PO", "Design handoff complete") with the note `Waived (flow mode)` in the issue body. Evaluate the derivable items ("Acceptance criteria written and reviewed", "Edge cases identified") against the draft yourself. The user objects at the step 10 review if a waiver is wrong.
+
 ### 9. Scope gate
 
 Run Stage 2 of `../references/scope-gates.md` on the written draft. Even if step 6 passed, drafting sometimes exposes scope that was invisible in the abstract.
 
 **Feature-level split signals** (heuristics — use judgement, not rigid thresholds):
 
-- More than 6 Acceptance Criteria covering meaningfully different behaviors — not variations on one behavior (six ways a payment can fail is not six separate features).
+- More than 6 Acceptance Criteria across the stories covering meaningfully different behaviors — not variations on one behavior (six ways a payment can fail is not six separate features).
+- In `grouped` mode, a story that does not share the Spine with the others. The split question is always: do these stories share one Spine? A story that needs its own Spine belongs in its own Feature.
 - The user stories reference more than one domain actor where each actor's need is independently satisfiable (e.g. a Manager story and a Customer story that could ship as separate features).
-- The capability name contains "and" connecting two separable actions (e.g. "Merchant can view and export settlements").
-- The Feature would require more than 6–8 Tasks to implement a single coherent behavior — likely two features bundled together.
-- There is a natural early-release point: a subset of the ACs could ship and deliver value on its own.
+- The capability name contains "and" connecting two separable actions (e.g. "Merchant can view and export settlements"). This signal splits Features.
+- In `single-story` mode, the draft carries more than one story.
+- There is a natural early-release point: a subset of the stories could ship and deliver value on its own.
+
+A story too big for one agent pass is **not** a split signal here. Depth handles that later: `wtf.feature-to-traces` plans a Skeleton plus Deepening Traces. Never split a story into layer slices.
 
 If no signals fire, proceed to user review. If one or more fire, follow the Stage 2 procedure. State the signals. Explain the risk. Propose a concrete split (two focused capability names following the **[Actor] can [verb] [object]** pattern). Use the keep/split/stop ask from `../references/scope-gates.md`.
+
+**Scope override:** the gate may keep a draft that departs from `$WTF_SCOPE` — for example, two stories so entangled that a split breaks the Spine. State the reason to the user. Record it as a one-line note at the top of the User Stories section. Overrides are the exception. The config is the rule.
 
 On **Split it** → return to step 3 with the chosen focused capability as the seed, carrying forward the already-fetched Epic context. Only re-ask clarification questions that the narrowed scope makes ambiguous.
 
 ### 10. Review with user
+
+This review runs in **both** planning modes. In standalone `flow` mode it is the one consolidated review — everything before it asked nothing it could derive. When `wtf.epic-to-features` orchestrates in `flow` mode, its batch review replaces this step; skip it there.
 
 Show the draft. Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Any changes before I create the issue?"
@@ -224,13 +270,13 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:
-  - **Plan all Tasks** → propose the full Task list for this Feature and create them one by one (default)
-  - **Write one Task** → write a single Task for this Feature now
+  - **Plan all Traces** → walk this Feature's Trace Plan and create the Trace issues one by one (default)
+  - **Write one Trace** → write a single Trace for this Feature now
   - **Write next Feature** → write the next Feature for the same Epic (N remaining — replace N with the actual count, or omit if none)
   - **Stop here** → exit, no further action
 
-- **Plan all Tasks** → invoke the `wtf.feature-to-tasks` skill, passing the Feature number in as context.
-- **Write one Task** → proceed with the `wtf.write-task` skill, passing the Feature number in as context.
+- **Plan all Traces** → invoke the `wtf.feature-to-traces` skill, passing the Feature number in as context.
+- **Write one Trace** → proceed with the `wtf.write-trace` skill, passing the Feature number in as context.
 - **Write next Feature** → restart this skill from step 2, reusing the same Epic (skip re-fetching it). If the Epic has a Feature Breakdown list, propose the next uncreated Feature as the default capability name.
 - **Stop here** → exit.
 

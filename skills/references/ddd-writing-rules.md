@@ -1,11 +1,11 @@
 ---
 name: DDD Writing Rules
-description: Shared DDD vocabulary and anti-pattern rules for writing Epics, Features, and Tasks in Ubiquitous Language. Referenced by write-epic, write-feature, and write-task.
+description: Shared DDD vocabulary and anti-pattern rules for writing Epics, Features, and Traces in Ubiquitous Language. Referenced by write-epic, write-feature, and write-trace.
 ---
 
 # DDD Writing Rules
 
-Apply these rules whenever you write or review Epic, Feature, or Task content.
+Apply these rules whenever you write or review Epic, Feature, or Trace content.
 
 ## Prose mechanics (STE)
 
@@ -55,7 +55,7 @@ Reframe in business terms before you write.
 
 ## Bounded Context Seams
 
-Name every bounded context explicitly. When a Feature or Task crosses a seam:
+Name every bounded context explicitly. When a Feature or Trace crosses a seam:
 
 - Identify which context **emits** and which **consumes**
 - Use each context's own vocabulary on its side of the seam

@@ -40,7 +40,7 @@ gh extension list
 Check the output for both extensions below. If an extension is missing, install it:
 
 ```bash
-# Sub-issue hierarchy (epic → feature → task)
+# Sub-issue hierarchy (epic → feature → trace)
 gh extension install yahsan2/gh-sub-issue
 
 # Issue dependency tracking (X blocks Y)
@@ -125,7 +125,7 @@ Required files:
 - `BUG.md`
 - `EPIC.md`
 - `FEATURE.md`
-- `TASK.md`
+- `TRACE.md`
 
 First resolve where this skill's payload is installed. `npx skills add` drops `wtf.setup` under the skills root (`~/.claude/skills/wtf.setup`, `.claude/skills/wtf.setup`, or the `.agents/skills` equivalent). The bundled files (`references/`, `shared-references/`, `hooks/`) are included inside it.
 
@@ -149,7 +149,7 @@ mkdir -p .github/ISSUE_TEMPLATE
 cp "$SETUP_DIR/references/BUG.md"     .github/ISSUE_TEMPLATE/BUG.md
 cp "$SETUP_DIR/references/EPIC.md"    .github/ISSUE_TEMPLATE/EPIC.md
 cp "$SETUP_DIR/references/FEATURE.md" .github/ISSUE_TEMPLATE/FEATURE.md
-cp "$SETUP_DIR/references/TASK.md"    .github/ISSUE_TEMPLATE/TASK.md
+cp "$SETUP_DIR/references/TRACE.md"   .github/ISSUE_TEMPLATE/TRACE.md
 ```
 
 Copy only files that are missing. Do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
@@ -172,9 +172,9 @@ Do not overwrite the file if it already exists.
 
 ### 7. Choose the issue-classification mode and provision it
 
-WTF classifies every issue as an **Epic**, **Feature**, **Task**, or **Bug**.
+WTF classifies every issue as an **Epic**, **Feature**, **Trace**, or **Bug**.
 
-There are two mechanisms. One is native **GitHub issue types** (an organization-only feature). That leaves labels free for your own segmentation. The other is the `epic`/`feature`/`task`/`bug` **labels** (portable to any repo).
+There are two mechanisms. One is native **GitHub issue types** (an organization-only feature). That leaves labels free for your own segmentation. The other is the `epic`/`feature`/`trace`/`bug` **labels** (portable to any repo).
 
 See `../references/issue-classification.md`. Pick the mode once here. Record it in `.wtf/config.json` so every skill resolves it the same way. Lifecycle labels (`implemented`, `designed`, `verified`) are always created in both modes.
 
@@ -187,10 +187,10 @@ OWNER_TYPE=$(gh api "users/$OWNER" --jq '.type' 2>/dev/null)   # "User" or "Orga
 
 **Step B — pick the mode.**
 
-- If `OWNER_TYPE` is **not** `Organization` (a personal account, or detection failed): native issue types are unavailable. GitHub gates them to organizations. Set `CLASS_MODE=labels` and tell the user plainly: *"This is a personal-account repo, so GitHub issue types are not available (they are org-only). WTF will classify with the `epic`/`feature`/`task`/`bug` labels."* Skip to Step D.
+- If `OWNER_TYPE` is **not** `Organization` (a personal account, or detection failed): native issue types are unavailable. GitHub gates them to organizations. Set `CLASS_MODE=labels` and tell the user plainly: *"This is a personal-account repo, so GitHub issue types are not available (they are org-only). WTF will classify with the `epic`/`feature`/`trace`/`bug` labels."* Skip to Step D.
 
 - If `OWNER_TYPE` is `Organization` **and** `repo-write-ok` and `token-scopes-ok` (from step 4b) are both true, call `AskUserQuestion` (per `../references/questioning-style.md`):
-  - question: "This repo is in an org, so WTF can classify issues with native GitHub issue types (Epic/Feature/Task/Bug) instead of labels — leaving labels free for your own segmentation like `phase-2`. Use native issue types?"
+  - question: "This repo is in an org, so WTF can classify issues with native GitHub issue types (Epic/Feature/Trace/Bug) instead of labels — leaving labels free for your own segmentation like `phase-2`. Use native issue types?"
   - header: "Classification"
   - options:
     - **Native issue types (recommended)** → `CLASS_MODE=types`
@@ -200,13 +200,13 @@ OWNER_TYPE=$(gh api "users/$OWNER" --jq '.type' 2>/dev/null)   # "User" or "Orga
 
 **Step C — provision native types** (only when `CLASS_MODE=types`).
 
-Run the **Provision native types** block from `../references/issue-classification.md`. It creates `Epic` (`Task`/`Bug`/`Feature` ship as org defaults).
+Run the **Provision native types** block from `../references/issue-classification.md`. It creates `Epic` and `Trace` (`Task`/`Bug`/`Feature` ship as org defaults — the `Task` default stays unused).
 
 Then verify all four resolved. If any is missing (for example you are not an org owner), fall back to labels:
 
 ```bash
 HAVE=$(gh api "orgs/$OWNER/issue-types" --jq '[.[].name]' 2>/dev/null)
-for t in Epic Feature Task Bug; do
+for t in Epic Feature Trace Bug; do
   printf '%s' "$HAVE" | grep -qi "\"$t\"" || { echo "⚠️ could not provision issue type: $t — falling back to labels"; CLASS_MODE=labels; }
 done
 ```
@@ -215,21 +215,21 @@ When this falls back, warn that native types need org-owner rights. WTF will use
 
 **Step D — create labels.** Always create the lifecycle labels.
 
-Create the kind labels (`epic`/`feature`/`task`/`bug`) **only in `labels` mode**. In `types` mode omit them on purpose so the label space stays free for your own segmentation.
+Create the kind labels (`epic`/`feature`/`trace`/`bug`) **only in `labels` mode**. In `types` mode omit them on purpose so the label space stays free for your own segmentation.
 
 `--force` is idempotent. It updates color/description if the label already exists. Otherwise it creates the label:
 
 ```bash
 # Lifecycle labels — always, both modes:
 gh label create implemented --color 0e8a16 --description "Implementation complete — ready for QA" --force
-gh label create designed    --color f9d0c4 --description "Design coverage added to the Task"      --force
+gh label create designed    --color f9d0c4 --description "Design coverage added to the Trace"     --force
 gh label create verified    --color 006b75 --description "QA verified — ready for merge"          --force
 
 # Kind labels — labels mode only:
 if [ "$CLASS_MODE" = labels ]; then
   gh label create epic    --color 5319e7 --description "Strategic initiative spanning multiple features"      --force
   gh label create feature --color 0075ca --description "User-facing capability delivered as a vertical slice" --force
-  gh label create task    --color e4e669 --description "Implementable vertical slice of a Feature"            --force
+  gh label create trace   --color e4e669 --description "One pass over a Feature's spine — one story, one Scenario Claim, end-to-end" --force
   gh label create bug     --color d73a4a --description "Something is broken"                                  --force
 fi
 ```
@@ -250,7 +250,7 @@ In `labels` mode leave the templates as they are. The rewrite is conservative. I
 if [ "$CLASS_MODE" = types ]; then
   python3 - <<'PY'
 import re, pathlib
-kinds = {"BUG": ("bug", "Bug"), "EPIC": ("epic", "Epic"), "FEATURE": ("feature", "Feature"), "TASK": ("task", "Task")}
+kinds = {"BUG": ("bug", "Bug"), "EPIC": ("epic", "Epic"), "FEATURE": ("feature", "Feature"), "TRACE": ("trace", "Trace")}
 d = pathlib.Path(".github/ISSUE_TEMPLATE")
 for fname, (lbl, typ) in kinds.items():
     p = d / f"{fname}.md"
@@ -282,6 +282,113 @@ PY
 Commit `.wtf/config.json` so every teammate classifies issues the same way. Record `classification: types|labels` for the status report.
 
 > **Closing convention:** GitHub has no native setting to require PR-based closure. Skill behavior enforces this. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (will not implement) and `--reason "duplicate"` only. Surface this convention in the status report.
+
+### 7a-bis. Enable automatic head-branch deletion
+
+Trace PRs stack: a Trace branches off the branch of the Trace it builds on rather than waiting for a merge (`../references/branch-setup.md`). GitHub retargets a stacked PR to its parent's base **only when the parent's head branch is deleted on merge**. Without this setting, a human merging through the web UI strands every PR above them.
+
+Check it, and turn it on when the token allows:
+
+```bash
+gh repo view --json deleteBranchOnMerge --jq '.deleteBranchOnMerge'
+```
+
+If `false`, ask the user (per `../references/questioning-style.md`):
+
+- question: "WTF stacks Trace pull requests. GitHub only re-points a stacked PR when the branch below it is deleted on merge. Turn on automatic head-branch deletion?"
+- header: "Branch cleanup"
+- options:
+  - **Enable it (recommended)** → run the API call below
+  - **Leave it off** → warn that stacked PRs will need their base re-pointed by hand, and record this in the status report
+
+```bash
+gh api -X PATCH "repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)" \
+  -F delete_branch_on_merge=true
+```
+
+If the call fails on permissions, say so plainly and tell the user to set **Settings → General → Automatically delete head branches** themselves. Record `delete_branch_on_merge: true|false` for the status report.
+
+### 7b. Choose the planning mode
+
+WTF planning skills work in one of two modes. See `../references/planning-mode.md`. `guided` asks at each step. `flow` derives everything it can and presents one consolidated review. Both modes run the same quality gates.
+
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "How should WTF planning skills work by default? You can override per invocation with a `guided` or `flow` argument."
+- header: "Planning"
+- options:
+  - **Guided (recommended to start)** → `PLAN_MODE=guided` — the skill asks step by step; best while the team still shapes its specs
+  - **Flow** → `PLAN_MODE=flow` — the skill drafts the full batch and asks once; best when Epics and steering docs already answer most questions
+
+Record the mode next to the classification key. The write preserves other keys:
+
+```bash
+python3 - ".wtf/config.json" "$PLAN_MODE" <<'PY'
+import json, sys, pathlib
+path, mode = sys.argv[1], sys.argv[2]
+p = pathlib.Path(path)
+data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
+data["planning"] = mode
+p.write_text(json.dumps(data, indent=2) + "\n")
+PY
+```
+
+Record `planning: guided|flow` for the status report.
+
+### 7c. Choose the feature scope
+
+WTF Features carry 1..n user stories. This knob sets how many. It controls artifact granularity. It is orthogonal to the planning mode, which controls interaction density. `wtf.write-feature`'s scope gate may override it per Feature with a stated reason.
+
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+
+- question: "How many user stories should a Feature carry by default? Single-story keeps the traditional one-feature-one-story shape. Grouped lets a Feature carry multiple co-related stories that share one Spine — fewer Features, richer Trace sequences."
+- header: "Feature scope"
+- options:
+  - **Single-story** → `SCOPE_MODE=single-story` — every Feature carries exactly one user story; Feature ≈ story ≈ one Trace (plus Deepening Traces when needed)
+  - **Grouped** → `SCOPE_MODE=grouped` — a Feature carries multiple co-related stories sharing one Spine; the agentic mode
+
+Record the mode next to the other keys. The write preserves other keys:
+
+```bash
+python3 - ".wtf/config.json" "$SCOPE_MODE" <<'PY'
+import json, sys, pathlib
+path, mode = sys.argv[1], sys.argv[2]
+p = pathlib.Path(path)
+data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
+data["feature_scope"] = mode
+p.write_text(json.dumps(data, indent=2) + "\n")
+PY
+```
+
+Record `feature_scope: single-story|grouped` for the status report.
+
+### 7d. Choose the delivery mode
+
+The delivery mode sets where Trace PRs merge. See `../references/branch-setup.md`. A human may override it per Feature with a stated reason. The override is recorded in the Feature body.
+
+Call `AskUserQuestion` (per `../references/questioning-style.md`):
+
+- question: "Where should Trace PRs merge by default? Staged merges each Trace into its feature branch, then the feature PR merges into main when the Trace Plan is exhausted. Trunk merges each Trace PR into main directly."
+- header: "Delivery"
+- options:
+  - **Staged (recommended)** → `DELIVERY_MODE=staged` — safe everywhere; each `trace/<n>-<slug>` branch starts from the feature branch
+  - **Trunk** → `DELIVERY_MODE=trunk` — Trace PRs merge into `main`; the Feature issue closes when its Trace Plan is exhausted
+
+If the user picks **Trunk**, show this caution before you write the config: *"Trunk delivery merges every Trace PR into `main` directly. Unfinished Features are live on `main`. This mode presumes feature-flag or dark-launch discipline. Without it, partial features reach production."*
+
+Record the mode next to the other keys. The write preserves other keys:
+
+```bash
+python3 - ".wtf/config.json" "$DELIVERY_MODE" <<'PY'
+import json, sys, pathlib
+path, mode = sys.argv[1], sys.argv[2]
+p = pathlib.Path(path)
+data = json.loads(p.read_text()) if p.exists() and p.read_text().strip() else {}
+data["delivery"] = mode
+p.write_text(json.dumps(data, indent=2) + "\n")
+PY
+```
+
+Record `delivery: staged|trunk` for the status report.
 
 ### 8. Install intervention-tracker hook
 
@@ -464,9 +571,12 @@ Issue templates
   BUG.md                  ✅  (or ✅ installed from references)
   EPIC.md                 ✅  (or ✅ installed from references)
   FEATURE.md              ✅  (or ✅ installed from references)
-  TASK.md                 ✅  (or ✅ installed from references)
+  TRACE.md                ✅  (or ✅ installed from references)
 PR template               ✅  (or ✅ installed from references)
-Issue classification      ✅  native types (Epic/Feature/Task/Bug)  (or  ✅ labels: epic, feature, task, bug)
+Issue classification      ✅  native types (Epic/Feature/Trace/Bug)  (or  ✅ labels: epic, feature, trace, bug)
+Planning mode             ✅  guided  (or  ✅ flow)
+Feature scope             ✅  single-story  (or  ✅ grouped)
+Delivery mode             ✅  staged  (or  ⚠️ trunk — presumes feature-flag / dark-launch discipline)
 Lifecycle labels          ✅  implemented, designed, verified
 Intervention hook         ✅  installed (global)  (or  ✅ installed (repo)  /  ⚪ skipped  /  ⚠️ manual paste required)
 Body encoding guard       ✅  verified (python3)  (or  ⚠️ Python is 'py'/'python', not 'python3' — alias it or body ops fail  /  ⚠️ Python 3 not found — guard inert, raw-gh fallback  /  ⚠️ helper not copied)

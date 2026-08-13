@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0–1 (gh setup already confirmed, Epic already fetched). Use the Epic from `evals/fixtures/multi-actor-epic.json`, field `epic`. The `existing_features` array is empty — no Features have been created yet. Run step 2 only: propose the full Feature list. Output the proposed list.",
+      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0, 0b, and 1 (gh setup already confirmed, planning mode `guided` and feature scope `single-story` already resolved, Epic already fetched). Use the Epic from `evals/fixtures/multi-actor-epic.json`, field `epic`. The `existing_features` array is empty — no Features have been created yet. Run step 2 only: propose the full Feature list. Output the proposed list.",
       "expected_output": "A proposed Feature list covering both the Merchant and Finance Manager actors, with at least one Feature per actor, all following the [Actor] can [verb] [object] pattern and using no implementation vocabulary.",
       "files": ["evals/fixtures/multi-actor-epic.json"],
       "expectations": [
@@ -15,7 +15,7 @@
     },
     {
       "id": 2,
-      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0–1 (gh setup already confirmed, Epic already fetched). Use the Epic from `evals/fixtures/existing-features-epic.json`, field `epic`. The `existing_features` field lists Features already created under this Epic — do not re-propose them. Run step 2 only: propose the remaining Features. Output the proposed list.",
+      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0, 0b, and 1 (gh setup already confirmed, planning mode `guided` and feature scope `single-story` already resolved, Epic already fetched). Use the Epic from `evals/fixtures/existing-features-epic.json`, field `epic`. The `existing_features` field lists Features already created under this Epic — do not re-propose them. Run step 2 only: propose the remaining Features. Output the proposed list.",
       "expected_output": "The output explicitly acknowledges the two Features already created (Feature #10 and Feature #11) before listing only the remaining Features. The remaining proposals cover Finance Manager capabilities and the notification capability, totalling at least 2 new Features.",
       "files": ["evals/fixtures/existing-features-epic.json"],
       "expectations": [
@@ -27,7 +27,7 @@
     },
     {
       "id": 3,
-      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0–1 (gh setup already confirmed, Epic already fetched). Use the Epic from `evals/fixtures/ordered-capabilities-epic.json`, field `epic`. No existing Features. Run step 2 only: propose the full Feature list. Output the proposed list.",
+      "prompt": "Run wtf.epic-to-features in test mode. Skip steps 0, 0b, and 1 (gh setup already confirmed, planning mode `guided` and feature scope `single-story` already resolved, Epic already fetched). Use the Epic from `evals/fixtures/ordered-capabilities-epic.json`, field `epic`. No existing Features. Run step 2 only: propose the full Feature list. Output the proposed list.",
       "expected_output": "A proposed Feature list of 5 Features corresponding to the 5 Success Metrics, ordered so that view precedes filter and filter precedes export for the Merchant actor.",
       "files": ["evals/fixtures/ordered-capabilities-epic.json"],
       "expectations": [

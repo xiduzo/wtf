@@ -27,7 +27,7 @@ Run in parallel with the Agent tool:
 
 **GitHub signals (optional — skip if unavailable):**
 
-- Open and closed Epics (issues labeled `epic`) for strategic intent
+- Open and closed Epics for strategic intent — list per the **List issues of a kind** query (kind `Epic`) in `../references/issue-classification.md`
 - Any issues or discussions that reference product goals or principles
 
 Synthesize internally. Do not dump raw research at the user.
@@ -48,7 +48,7 @@ Ask only about items research could not determine, in priority order. For each u
 - Apply strict STE per `../references/ste-writing.md` before you write any durable body (shared process Step 4 also requires this).
 - Every sentence uses domain language — the words domain experts and stakeholders use.
 - Target users are named domain actors. Never write "users" or "admins".
-- Strategic goals are business outcomes. They are not features or technical tasks.
+- Strategic goals are business outcomes. They are not features or technical work items.
 - Bounded context names stay consistent with vocabulary found in the codebase.
 
 ## Step 8 — Continue options

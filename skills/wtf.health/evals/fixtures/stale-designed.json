@@ -1,9 +1,9 @@
 {
-  "_note": "Fixture for eval 3 — one task stale (designed but not implemented for well over 7 days). updatedAt is 2025-01-01 so the task is always stale regardless of when the eval runs.",
+  "_note": "Fixture for eval 3 — one trace stale (designed but not implemented for well over 7 days). updatedAt is 2025-01-01 so the trace is always stale regardless of when the eval runs. Arrays match gh issue list --json number,title,labels,updatedAt output; features also carry body (User Stories + Trace Plan). The Trace Plan claims all scenarios, so no Skeleton or partition-gap finding fires.",
   "epics": [
     {
       "number": 5,
-      "title": "Settlement Visibility",
+      "title": "🎯 Settlement Visibility",
       "labels": [{"name": "epic"}],
       "updatedAt": "2025-01-01T09:00:00Z"
     }
@@ -11,16 +11,17 @@
   "features": [
     {
       "number": 10,
-      "title": "Merchant can view settlement status in merchant dashboard",
-      "labels": [{"name": "feature"}],
-      "updatedAt": "2025-01-01T09:00:00Z"
+      "title": "🚀 Merchant can view settlement status in merchant dashboard",
+      "labels": [{"name": "feature"}, {"name": "designed"}],
+      "updatedAt": "2025-01-01T09:00:00Z",
+      "body": "## User Stories\n\n### Story: Merchant sees settlement status in the dashboard\nAs a Merchant, I want to see settlement status in the merchant dashboard, so that I can track payouts without contacting support.\n\n```gherkin\nScenario: Settlement status shown in the merchant dashboard\n  Given a Merchant has settlements\n  When the Merchant opens the merchant dashboard\n  Then each settlement shows its settlement status\n```\n\n## Trace Plan\n\n1. [ ] ☄️ Skeleton — Merchant sees settlement status in the merchant dashboard (claims: \"Settlement status shown in the merchant dashboard\")"
     }
   ],
-  "tasks": [
+  "traces": [
     {
       "number": 17,
-      "title": "Display settlement status in merchant dashboard UI",
-      "labels": [{"name": "task"}, {"name": "designed"}],
+      "title": "☄️ Skeleton — Merchant sees settlement status in the merchant dashboard",
+      "labels": [{"name": "trace"}, {"name": "designed"}],
       "updatedAt": "2025-01-01T10:00:00Z"
     }
   ],

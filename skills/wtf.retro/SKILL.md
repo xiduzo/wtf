@@ -7,7 +7,7 @@ description: This skill should be used when a team wants to close out a complete
 
 Close a completed Epic with a structured retrospective.
 
-This skill compares what was planned (original Epic spec) against what shipped (closed Tasks + PRs).
+This skill compares what was planned (original Epic spec and the Features' Trace Plans) against what shipped (closed Traces + PRs).
 It reports deviations.
 It routes learnings into steering docs.
 It closes the Epic so the team starts the next initiative with a clean slate.
@@ -33,16 +33,22 @@ Fetch the Epic and its full hierarchy:
 gh issue view <epic_number>
 gh sub-issue list <epic_number>              # feature numbers
 # For each feature (in parallel):
-gh issue view <feature_number>
-gh sub-issue list <feature_number>           # task numbers
-# For each task (in parallel):
-gh issue view <task_number>
+gh issue view <feature_number>               # body holds the Trace Plan
+gh sub-issue list <feature_number>           # trace numbers (legacy Task issues appear here too)
+# For each trace (in parallel):
+gh issue view <trace_number>
 ```
+
+Treat legacy Task children as legacy Traces per `../references/issue-classification.md`.
 
 Also fetch:
 - All PRs that closed issues under this Epic (search by `Closes #<n>` in merged PRs):
   ```bash
   gh pr list --state merged --json number,title,body,mergedAt --limit 100
+  ```
+- Each Feature's issue comments, to collect refine's Re-aim audit trail (headings `## Refinement — <date>` and `## Re-aim (headless) — after Trace #<n> — <date>`):
+  ```bash
+  gh issue view <feature_number> --comments
   ```
 - The original Epic creation date and the date of the last merged PR (actual duration)
 
@@ -51,7 +57,7 @@ Also fetch:
 Verify all work is actually done before you run a retro:
 
 - All child Features are closed
-- All child Tasks are closed (or explicitly marked `won't implement`)
+- All child Traces (and legacy Tasks) are closed (or explicitly marked `won't implement`)
 - No open PRs targeting feature branches under this Epic
 
 If anything is still open, call `AskUserQuestion` (per `../references/questioning-style.md`):
@@ -65,21 +71,23 @@ If anything is still open, call `AskUserQuestion` (per `../references/questionin
 
 Build a side-by-side comparison:
 
-**Planned** (from original Epic spec):
+**Planned** (from original Epic spec and Feature bodies):
 - Goal statement
 - Success Metrics
 - Feature Breakdown (original list from Epic body)
+- Each Feature's Trace Plan (current state, plus its first shape from the Re-aim audit trail)
 - Bounded Context
 
 **Shipped** (from closed issues and PRs):
 - Features actually created and merged
-- Tasks actually created and merged
+- Traces actually created and merged (legacy Tasks counted with them, marked legacy)
 - Actual calendar duration (Epic opened → last PR merged)
 
 Identify deviations:
 - Features planned but not built (descoped or deferred)
 - Features added that were not in the original breakdown (scope growth)
-- Tasks that took significantly more iterations than expected (PR re-open, multiple verify cycles)
+- Traces that took significantly more iterations than expected (PR re-open, multiple verify cycles)
+- Re-aim history per Feature, from the audit comments collected in step 1: how many re-aims, scenarios added, scenarios moved between Traces, and every human-approved drop. Heavy re-aiming is a signal — the first aim missed, and that is retro input, not a failure.
 - Success Metrics: were they actually achieved? State what you can verify from the spec. Flag ones that require manual measurement.
 
 ### 4. Gather learnings
@@ -92,7 +100,7 @@ For each question below, call `AskUserQuestion` (per `../references/questioning-
 Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What was harder or took longer than planned in this Epic?"
 - header: "Friction points"
-- options: 2–3 inferences from the deviation analysis (e.g. "Feature #X needed 3 verify cycles", "Task #Y was unscoped after implementation started")
+- options: 2–3 inferences from the deviation analysis (e.g. "Feature #X needed 3 verify cycles", "Feature #Y re-aimed 4 times before its Trace Plan settled")
 
 **Q2 — What should we do differently next time?**
 
@@ -166,10 +174,11 @@ The retro summary must include:
 | Item | Planned | Shipped | Delta |
 |------|---------|---------|-------|
 | Features | [n] | [n] | [+n added / -n descoped] |
-| Tasks | [n] | [n] | ... |
+| Traces | [n in first Trace Plans] | [n] | ... |
 
-**Descoped:** [list features/tasks that were planned but not built — with reason]  
-**Added:** [list features/tasks added beyond original scope — with reason]
+**Descoped:** [list Features/Traces that were planned but not built — with reason]  
+**Added:** [list Features/Traces added beyond original scope — with reason]  
+**Re-aims:** [n] across [n] Features — scenarios added [n], moved [n], dropped [n, human-approved]
 
 ### Success Metrics
 
@@ -219,7 +228,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 
 If "Close as completed":
 ```bash
-gh issue close <epic_number> --comment "Closed after retro — all Features and Tasks merged."
+gh issue close <epic_number> --comment "Closed after retro — all Features and Traces merged."
 ```
 
 ### 9. Print the final summary
@@ -229,7 +238,8 @@ Retro complete — Epic #<n>: <title>
 ──────────────────────────────────────
 Duration:      [n] days
 Features:      [n] shipped / [n] descoped
-Tasks:         [n] merged
+Traces:        [n] merged
+Re-aims:       [n]
 Learnings:     [n] captured → TECH.md, QA.md, ...
 Epic status:   closed ✅
 ```

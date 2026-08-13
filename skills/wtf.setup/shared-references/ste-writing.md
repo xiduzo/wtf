@@ -60,7 +60,7 @@ Domain terms enter STE as technical nouns (TN) and technical verbs (TV). Build t
 
 1. If `docs/glossary.md` exists, read it. Prefer the greppable term list (see **Glossary shape** below). Add every listed term.
 2. If `docs/steering/VISION.md` exists, extract Target Users (actors) and Bounded Contexts (context names, key domain objects). Add them.
-3. If the skill has a parent Epic / Feature / Task in hierarchy, extract named actors, domain verbs, and domain objects from those bodies. Add them.
+3. If the skill has a parent Epic / Feature / Trace in hierarchy, extract named actors, domain verbs, and domain objects from those bodies. Add them.
 4. If a Bounded Context wiki page or other in-repo glossary was already fetched for this skill, add its terms.
 5. Merge into one session set. Use one name per thing (Rule 1.11). If two aliases appear, pick the glossary form and use only that.
 

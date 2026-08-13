@@ -1,10 +1,10 @@
 # Sub-Agent Protocol
 
-Rules for any skill that spawns sub-agents via the Agent tool to execute wtf skill steps in parallel. Examples: `wtf.loop`, `wtf.verify-task` in Full Feature mode, `wtf.refine` during cascade.
+Rules for any skill that spawns sub-agents via the Agent tool to execute wtf skill steps in parallel or headless. Examples: `wtf.loop`, `wtf.verify-trace` in Full Feature mode, `wtf.refine` during cascade, and `wtf.loop`'s headless `wtf.refine` invocation after each verified Trace.
 
 ## Why this matters
 
-Sub-agents do NOT inherit the parent session's loaded skills. A sub-agent spawned from `wtf.loop` cannot see `wtf.implement-task`'s instructions unless those instructions are embedded in its prompt. Referencing a skill by name from inside a sub-agent prompt will fail. The sub-agent has no way to resolve it.
+Sub-agents do NOT inherit the parent session's loaded skills. A sub-agent spawned from `wtf.loop` cannot see `wtf.implement-trace`'s instructions unless those instructions are embedded in its prompt. Referencing a skill by name from inside a sub-agent prompt will fail. The sub-agent has no way to resolve it.
 
 ## Rules
 
@@ -14,10 +14,10 @@ When a sub-agent needs to execute the steps of another wtf skill, the parent mus
 
 The practical pattern is:
 
-1. Read the target skill file (for example `skills/wtf.implement-task/SKILL.md`) at the moment the sub-agent is spawned.
+1. Read the target skill file (for example `skills/wtf.implement-trace/SKILL.md`) at the moment the sub-agent is spawned.
 2. Extract the body (skip YAML frontmatter).
 3. Paste it into the sub-agent's prompt under a heading like "# Inline instructions — execute the steps below".
-4. Prepend an override section that replaces interactive behavior (see rule 2). Pass any already-known context (task number, branch name, parent feature) so the sub-agent does not re-ask.
+4. Prepend an override section that replaces interactive behavior (see rule 2). Pass any already-known context (trace number, branch name, parent feature) so the sub-agent does not re-ask.
 
 Reading at runtime (rather than hard-coding the steps in the orchestrator skill) keeps the sub-agent in sync with the underlying skill without manual mirroring.
 
@@ -35,13 +35,13 @@ If a genuine blocker or ambiguity requires human input, the sub-agent must retur
 
 ```
 NEEDS_INPUT
-task: #<n>
+trace: #<n>
 question: <the question text>
 options: <list of options>
 context: <relevant details>
 ```
 
-The orchestrator collects all `NEEDS_INPUT` results after each phase. It groups them by task. It presents them to the user via a single `AskUserQuestion` call. It re-dispatches the affected sub-agents with the answers embedded in their prompts before continuing.
+The orchestrator collects all `NEEDS_INPUT` results after each phase. It groups them by trace. It presents them to the user via a single `AskUserQuestion` call. It re-dispatches the affected sub-agents with the answers embedded in their prompts before continuing.
 
 ### 4. Mandatory side effects still run
 
@@ -51,13 +51,15 @@ The mandatory label transitions are:
 
 | After step | Command |
 |---|---|
-| Implementation TDD cycle complete | `gh issue edit <task_number> --add-label "implemented"` |
-| QA verification passes | `gh issue edit <task_number> --add-label "verified"` |
+| Implementation TDD cycle complete | `gh issue edit <trace_number> --add-label "implemented"` |
+| QA verification passes | `gh issue edit <trace_number> --add-label "verified"` |
 | Design handoff written | `gh issue edit <issue_number> --add-label "designed"` |
+
+Headless `wtf.refine` has its own mandatory side effect: the audit-trail comment is always posted, per its skill.
 
 ### 5. Isolation and worktree
 
-When multiple sub-agents run in parallel, use `isolation: "worktree"`. Each agent then works on an independent copy of the repo. The worktree is branched from the current feature branch at spawn time. Instruct the sub-agent to run `git pull --rebase origin <feature_branch>` before starting work. It should not assume any particular local state.
+When multiple sub-agents run in parallel, use `isolation: "worktree"`. Each agent then works on an independent copy of the repo. The worktree is branched from the Trace's base branch (see `./branch-setup.md`) at spawn time. Instruct the sub-agent to run `git pull --rebase origin <base_branch>` before starting work. It should not assume any particular local state.
 
 See `./conflict-graph.md` for how to schedule sub-agents so overlapping files never run in parallel.
 

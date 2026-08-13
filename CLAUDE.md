@@ -6,9 +6,10 @@
 - `skills/references/` — **source of truth** for cross-skill reference docs (see below). Skills load these at runtime via `../references/<name>.md`.
 - `skills/wtf.setup/shared-references/` — **generated** vendored copy of `skills/references/` (minus dev-only `eval-fixture-convention.md`) that rides along in the `wtf.setup` payload. `npx skills add` installs each `wtf.*` skill dir individually, so `skills/references/` (no `SKILL.md`) never ships; `wtf.setup` carries this copy and writes it to `<skills-root>/references/` at setup time so installed skills can resolve `../references/...`. **Never edit by hand** — regenerate with `bash skills/wtf.setup/sync-shared-references.sh` after changing any reference doc.
 - `skills/wtf.setup/hooks/` — scripts that ride along in the `wtf.setup` payload: `track-interventions.py` (registered into `settings.json`) and `gh-body.py` (a UTF-8-safe gh body utility copied into the repo at `.wtf/gh-body.py`, not a settings hook).
-- `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN) and `docs/spikes/`.
-- `.claude/skills/` — symlinked mirror used by the Claude Code plugin runtime. **Never edit.** Regenerate from `skills/` if stale.
-- `.wtf/` — per-repo artifacts `wtf.setup` writes into the consuming repo: `gh-body.py` (the body helper) and `config.json` (`{"classification": "types"|"labels"}` — the issue-classification mode every skill resolves via `skills/references/issue-classification.md`).
+- `docs/` — project docs, including `docs/steering/` (VISION, TECH, QA, DESIGN), `docs/spikes/`, and `docs/adr/` (decision records).
+- `CONTEXT.md` — the domain glossary: the DDD ubiquitous language for the WTF work model (Trace, Skeleton, Extension Trace, Deepening Trace, Spine, Spine Position, Scenario Claim, Re-aim). Use its terms exactly.
+- `.claude/skills/` and `.agents/` — git-ignored. If a runtime installs or links WTF into this repo, that copy is disposable and always stale. **Never edit it, never commit it, never read it to answer a question about a skill** — read `skills/` instead. Delete it when it drifts.
+- `.wtf/` — per-repo artifacts `wtf.setup` writes into the consuming repo: `gh-body.py` (the body helper) and `config.json` with four keys: `"classification": "types"|"labels"` (issue-kind mechanism, resolved via `skills/references/issue-classification.md`), `"planning": "guided"|"flow"` (interaction density, resolved via `skills/references/planning-mode.md`), `"feature_scope": "single-story"|"grouped"` (stories per Feature, resolved by `wtf.setup` / `wtf.write-feature` / `wtf.epic-to-features`), and `"delivery": "staged"|"trunk"` (where Trace PRs merge, resolved via `skills/references/branch-setup.md`).
 
 ## Canonical skill location
 
@@ -22,12 +23,12 @@ Edit skill files in `skills/<skill-name>/SKILL.md`. Any other path is a runtime 
 | wtf.changelog | `skills/wtf.changelog/SKILL.md` |
 | wtf.create-pr | `skills/wtf.create-pr/SKILL.md` |
 | wtf.design-feature | `skills/wtf.design-feature/SKILL.md` |
-| wtf.design-task | `skills/wtf.design-task/SKILL.md` |
+| wtf.design-trace | `skills/wtf.design-trace/SKILL.md` |
 | wtf.epic-to-features | `skills/wtf.epic-to-features/SKILL.md` |
-| wtf.feature-to-tasks | `skills/wtf.feature-to-tasks/SKILL.md` |
+| wtf.feature-to-traces | `skills/wtf.feature-to-traces/SKILL.md` |
 | wtf.health | `skills/wtf.health/SKILL.md` |
 | wtf.hotfix | `skills/wtf.hotfix/SKILL.md` |
-| wtf.implement-task | `skills/wtf.implement-task/SKILL.md` |
+| wtf.implement-trace | `skills/wtf.implement-trace/SKILL.md` |
 | wtf.loop | `skills/wtf.loop/SKILL.md` |
 | wtf.pr-review | `skills/wtf.pr-review/SKILL.md` |
 | wtf.refine | `skills/wtf.refine/SKILL.md` |
@@ -40,16 +41,16 @@ Edit skill files in `skills/<skill-name>/SKILL.md`. Any other path is a runtime 
 | wtf.steer-qa | `skills/wtf.steer-qa/SKILL.md` |
 | wtf.steer-tech | `skills/wtf.steer-tech/SKILL.md` |
 | wtf.steer-vision | `skills/wtf.steer-vision/SKILL.md` |
-| wtf.verify-task | `skills/wtf.verify-task/SKILL.md` |
+| wtf.verify-trace | `skills/wtf.verify-trace/SKILL.md` |
 | wtf.write-epic | `skills/wtf.write-epic/SKILL.md` |
 | wtf.write-feature | `skills/wtf.write-feature/SKILL.md` |
-| wtf.write-task | `skills/wtf.write-task/SKILL.md` |
+| wtf.write-trace | `skills/wtf.write-trace/SKILL.md` |
 
 Keep this table in sync with `skills/` when adding/removing skills.
 
 ## Skill invocation policy
 
-**Never invoke wtf skills automatically.** Only activate on explicit `/` slash command (e.g. `/wtf.loop`, `/wtf.write-task`). Do not auto-trigger from inferred intent, conversation context, or keywords — even when the user's phrasing matches a skill's description.
+**Never invoke wtf skills automatically.** Only activate on explicit `/` slash command (e.g. `/wtf.loop`, `/wtf.write-trace`). Do not auto-trigger from inferred intent, conversation context, or keywords — even when the user's phrasing matches a skill's description.
 
 ## Shared references
 
@@ -57,18 +58,19 @@ Cross-skill references live in `skills/references/`:
 
 | File | Purpose |
 |---|---|
-| `branch-setup.md` | Trunk-based branch hierarchy, slug rules, worktree policy |
+| `branch-setup.md` | Trunk-based branch hierarchy, slug rules, worktree policy, delivery-mode resolve (`staged`/`trunk`) |
 | `commit-conventions.md` | Commit message format used across skills |
-| `conflict-graph.md` | Dependency / file-conflict model for parallel task execution |
+| `conflict-graph.md` | File-conflict graph for parallel scheduling — across Features, and across a Feature's Traces once its Skeleton lands |
 | `ddd-writing-rules.md` | Ubiquitous-language rules for issue/Gherkin authoring |
 | `gh-body-helper.md` | Cross-platform UTF-8-safe issue/PR body read & write (`.wtf/gh-body.py`) |
 | `gh-setup.md` | `gh` CLI + extension install + sub-issue/dependency cookbook |
 | `issue-classification.md` | Native issue types vs. labels — mode resolve, classify, query, detect |
 | `issue-template-loading.md` | Template verify + halt-or-setup + body-file create pattern |
 | `lifecycle-labels.md` | Label semantics + absent/overwrite gate templates |
+| `planning-mode.md` | `guided` vs `flow` planning — mode resolve, flow deltas, escalation |
 | `questioning-style.md` | How skills should prompt the user |
 | `scope-gates.md` | Definition-of-Ready / Definition-of-Done gates |
-| `spec-hierarchy.md` | Task → Feature → Epic traversal (extension + body-scrape) |
+| `spec-hierarchy.md` | Trace → Feature → Epic traversal (extension + body-scrape) |
 | `ste-writing.md` | Strict ASD-STE100 for durable artifacts; DDD glossary as TN/TV allowlist |
 | `steering-doc-process.md` | How steering docs are created, refined, and consumed |
 | `subagent-protocol.md` | Contract for subagent delegation |
@@ -94,15 +96,15 @@ The harness runs each eval with-skill and without-skill, grades expectations, an
 | Skill | Evals | Status |
 |---|---|---|
 | `wtf.health` | 3 (clean, implemented-not-verified, stale-designed) | ✅ |
-| `wtf.loop` | 5 (linear-chain, parallel-tasks, diamond-file-conflict, contradiction-spec, external-blocker) | ✅ |
-| `wtf.create-pr` | 3 (feat-branch, fix-branch, refactor-branch — no-Task path) | ✅ |
+| `wtf.loop` | 5 (linear-chain, parallel-features, diamond-file-conflict, contradiction-spec, external-blocker) | ✅ |
+| `wtf.create-pr` | 3 (feat-branch, fix-branch, refactor-branch — no-Trace path) | ✅ |
 | `wtf.refine` | 4 (scope-narrowed, domain-language-correction, technical-constraint, conflicting-insights) | ✅ |
 | `wtf.changelog` | 3 (all-added, mixed-added-fixed, drop-internal-refactor) | ✅ |
-| `wtf.write-task` | 3 checkpoint evals (gherkin-generation, scope-gate, ambiguous-task) | ✅ |
+| `wtf.write-trace` | 3 checkpoint evals (claim-selection, depth-split-draft, ambiguous-claim) | ✅ |
 | `wtf.pr-review` | 3 checkpoint evals (missing-test-coverage, schema-drift, scope-creep) | ✅ |
-| `wtf.report-bug` | 3 checkpoint evals (failing-gherkin-scenario, domain-language-restatement, no-linked-task) | ✅ |
+| `wtf.report-bug` | 3 checkpoint evals (failing-gherkin-scenario, domain-language-restatement, no-linked-trace) | ✅ |
 | `wtf.epic-to-features` | 3 checkpoint evals (multi-actor-epic, existing-features-epic, ordered-capabilities-epic) | ✅ |
-| `wtf.feature-to-tasks` | 3 checkpoint evals (migration-implied, cross-layer-feature, complex-edge-case) | ✅ |
+| `wtf.feature-to-traces` | 3 checkpoint evals (migration-implied, cross-layer-feature, complex-edge-case) | ✅ |
 | `wtf.reflect` | 5 checkpoint evals (arch-gotcha→TECH, flaky-test→QA, domain-drift→VISION, component-misuse→DESIGN, ambiguous→TECH-default) | ✅ |
 | `wtf.hotfix` | 3 checkpoint evals (branch-naming, scope-gate, pr-body-completeness) | ✅ |
 

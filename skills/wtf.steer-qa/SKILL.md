@@ -36,7 +36,7 @@ Produce a concrete draft of Test Strategy, Test Patterns, and Commands from rese
 Ask only about items research could not determine. For each unanswered item, call `AskUserQuestion` (per `../references/questioning-style.md`):
 
 1. **Coverage thresholds** — question: "What is the minimum acceptable test coverage?" / header: "Coverage thresholds" / options: pre-fill with thresholds found in test config or `CLAUDE.md`.
-2. **Definition of Done** — question: "What must be true before any task can be merged?" / header: "Definition of Done" / options: pre-fill with DoD items from `CLAUDE.md` or existing task templates.
+2. **Definition of Done** — question: "What must be true before any trace can be merged?" / header: "Definition of Done" / options: pre-fill with DoD items from `CLAUDE.md` or existing trace templates.
 3. **Test environments** — question: "What environments are available for testing? (local, staging, CI)" / header: "Test environments" / options: pre-fill from CI config or README.
 4. **Known flaky areas** — question: "Are there known areas that produce non-deterministic test failures?" / header: "Known flaky areas" / options: pre-fill with skipped tests or TODO comments found in step 2.
 5. **Mock strategy** — question: "Are there project-specific exceptions to the 'only mock at boundaries' rule?" / header: "Mock strategy" / options: pre-fill with mock patterns found in existing tests.
@@ -46,6 +46,7 @@ Ask only about items research could not determine. For each unanswered item, cal
 - Apply strict STE per `../references/ste-writing.md` before you write any durable body (shared process Step 4 also requires this).
 - Coverage thresholds are stated as enforced minimums. They are not targets.
 - Test commands must be exact and match what CI actually runs.
+- If the project has a Gherkin runner (playwright-bdd, cucumber-js, behave, …), name it under Gherkin → Test Mapping. `wtf.verify-trace` reads that declaration.
 - Definition of Done items are written as checkboxes — concrete and binary.
 - Known Flaky Areas is honest. It is not aspirational. Flag real issues.
 

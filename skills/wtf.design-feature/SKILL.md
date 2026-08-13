@@ -1,13 +1,13 @@
 ---
 name: wtf.design-feature
-description: This skill should be used when a designer wants to produce a holistic design for a full feature before it is broken into tasks — for example "design feature #X", "create the Figma flow for this feature", "map the UX for this feature", "design the full user journey for feature #X", "create a feature design handoff", or "add design coverage to feature #X". Covers the full feature journey (all user stories, all screens, cross-screen states) and writes the Design Handoff section back into the Feature issue, fulfilling the Definition of Ready gate. Not applicable to individual Tasks — use `wtf.design-task` for per-task Gherkin-level coverage.
+description: This skill should be used when a designer wants to produce a holistic design for a full feature before Traces are cut — for example "design feature #X", "create the Figma flow for this feature", "map the UX for this feature", "design the full user journey for feature #X", "create a feature design handoff", or "add design coverage to feature #X". Covers the full feature journey (all user stories, all screens, cross-screen states) and writes the Design Handoff section back into the Feature issue, fulfilling the Definition of Ready gate. Not applicable to individual Traces — use `wtf.design-trace` for per-trace coverage of the claimed scenarios.
 ---
 
 # Design Feature
 
-Take a Feature as a designer. Produce a full design for the user journey before tasks are cut.
+Take a Feature as a designer. Produce a full design for the user journey before Traces are cut.
 
-Map every user story to screens and states. Find shared components across the feature. Write a complete Design Handoff into the Feature issue. Then `wtf.feature-to-tasks` can derive better tasks. Then `wtf.design-task` can reuse feature-level decisions.
+Map every user story to screens and states. Find shared components across the feature. Write a complete Design Handoff into the Feature issue. Then `wtf.feature-to-traces` can derive a better Trace Plan. Then `wtf.design-trace` can reuse feature-level decisions.
 
 ## Process
 
@@ -22,7 +22,7 @@ Skip this step if another skill already ran gh-setup this session.
 If the user gave an issue number, use it. Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "Which Feature are you designing?"
 - header: "Feature"
-- options: from recent open issues labeled `feature`
+- options: from recent open Feature issues (list per `../references/issue-classification.md`)
 
 Walk Feature → Epic per `../references/spec-hierarchy.md`. Extract user stories, ACs, Edge Cases, and Domain Events from the Feature. Extract Goal, Context, and Design Artifacts from the Epic.
 
@@ -123,9 +123,9 @@ Across all screens in the journey map, identify:
 
 - **Reused existing components** — already in the codebase (found in step 4). List component path and which screens use it
 - **New shared components** — appear on 2+ screens but do not exist yet. Name them with domain language
-- **Screen-specific components** — appear on only one screen. Note them. Do not detail them here. That is the job of `wtf.design-task`
+- **Screen-specific components** — appear on only one screen. Note them. Do not detail them here. That is the job of `wtf.design-trace`
 
-This component map reduces duplication when `wtf.design-task` runs per task.
+This component map reduces duplication when `wtf.design-trace` runs per Trace.
 
 ### 8. Draft the Design Handoff
 
@@ -174,10 +174,10 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:
-  - **Break into Tasks** → run `feature-to-tasks`. Design context will inform task breakdown (default)
+  - **Plan Traces** → run `feature-to-traces`. Design context will inform the Trace Plan (default)
   - **Design another Feature** → design another Feature for the same Epic
   - **Stop here** → exit. No further action
 
-- **Break into Tasks** → follow the `wtf.feature-to-tasks` skill. Pass the Feature number as context. Tell the user that `wtf.design-task` will inherit the shared component map from this Design Handoff.
+- **Plan Traces** → follow the `wtf.feature-to-traces` skill. Pass the Feature number as context. Tell the user that `wtf.design-trace` will inherit the shared component map from this Design Handoff.
 - **Design another Feature** → restart from step 1. Reuse the same Epic context.
 - **Stop here** → exit.

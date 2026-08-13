@@ -1,5 +1,5 @@
 {
-  "_note": "Task using 'Customer' throughout. Insight: domain language correction — use 'Merchant' instead. Expected change map: DDD language changed yes, Gherkin steps affected yes, Contracts affected yes.",
+  "_note": "Legacy Task issue (label `task`, pre-Trace-model shape with in-body Gherkin) using 'Customer' throughout. Kept deliberately as a legacy Task: the skill must detect it and treat it as a legacy Trace whose in-body Gherkin is canonical and edited in place (the scenario canonicality guard does not fire). Insight: domain language correction — use 'Merchant' instead. Expected change map: legacy Trace detected, DDD language changed yes, Gherkin steps affected yes, Contracts affected yes.",
   "issue": {
     "number": 31,
     "title": "Task: Send settlement confirmation to customer",
