@@ -78,15 +78,17 @@
     {
       "id": 6,
       "prompt": "Run wtf.loop for Feature #5 — Payment settlement. Test mode: skip step 0 (gh setup already confirmed) and step 1 (hierarchy already fetched). Use the graph from `evals/fixtures/sibling-traces-parallel.json` as the pre-built input — its `feature`, `nodes` (each with its Trace body), `edges`, `pull_requests`, and `remote_branches` fields replace the output of `gh issue view`, `gh sub-issue list`, `gh issue-dependency list`, `gh pr list`, and `git ls-remote`. Delivery is `staged` per the fixture's `config`. Skeleton #10 is already merged and its branch is gone. Skip AskUserQuestion in step 3 and auto-approve the execution plan. Output only the proposed execution plan (step 3 format), including for every unfinished Trace the branch it is cut from and its PR base.",
-      "expected_output": "An execution plan with one Feature unit. Skeleton #10 is shown as merged and is not scheduled. Extension #11 and Deepening #12 sit in the same trace sub-phase and run in parallel (disjoint Impacted Areas), both cut from and targeting feature/5-payment-settlement. Deepening #13 sits in the next trace sub-phase because it shares src/settlements/export/ with #11; it stacks on trace/11-… (PR base trace/11-…) as soon as that branch is pushed and green, without waiting for #11's PR to merge.",
+      "expected_output": "An execution plan with one Feature unit. Skeleton #10 is shown as merged and is not scheduled. Extension #11 and Deepening #12 sit in the same trace sub-phase and build in parallel (disjoint Impacted Areas), both cut from feature/5-payment-settlement. #11 joins first and targets feature/5-payment-settlement. #12 joins after it: it rebases onto trace/11-… and targets it, so the Feature keeps one linear stack. Deepening #13 sits in the next trace sub-phase because it shares src/settlements/export/ with #11. It is cut from and targets the stack tip trace/12-… once #12 has joined, without waiting for any Trace PR to merge.",
       "files": [
         "evals/fixtures/sibling-traces-parallel.json"
       ],
       "expectations": [
-        "Traces #11 and #12 are placed in the same trace sub-phase and marked as running in parallel",
+        "Traces #11 and #12 are placed in the same trace sub-phase and marked as building in parallel",
         "Trace #13 is placed in a trace sub-phase after #11 (never alongside it)",
-        "The PR base for both #11 and #12 is the feature branch feature/5-payment-settlement, because Skeleton #10 already merged",
-        "Trace #13 is cut from and targets the trace/11-… branch (stacked PR), and the plan states it does not wait for #11's PR to merge",
+        "Trace #11 is cut from and targets the feature branch feature/5-payment-settlement, because Skeleton #10 already merged",
+        "Trace #12 joins the stack after #11: it rebases onto trace/11-… before its PR opens and its PR base is trace/11-…, so #11 and #12 never both target feature/5-payment-settlement",
+        "Trace #13 is cut from and targets trace/12-… (the stack tip once #12 has joined), and the plan states it does not wait for any Trace PR to merge",
+        "The plan shows Feature #5 as one linear stack (feature/5-… ← #11 ← #12 ← #13), not a tree",
         "Skeleton #10 is shown as already merged and is not scheduled for implementation again"
       ]
     },

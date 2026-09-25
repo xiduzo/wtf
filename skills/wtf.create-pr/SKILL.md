@@ -130,11 +130,11 @@ Apply edits, then proceed.
 
 ### 8. Create the PR
 
-Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`. The base is the **stack base** the branch was cut from. Resolve it with the `## Resolve the stack base` procedure in `../references/branch-setup.md` — read `Builds on` from the Trace body, look up `trace/<n>-*` on origin, fall back to the feature branch (`staged`) or `main` (`trunk`). Never derive it from git upstream: before the first push the branch has none, and after `git push -u` the upstream is the branch itself.
+Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`. For a `trace/*` branch the base is the **stack base**: the tip of the one stack of the Feature. Resolve it with the `## Resolve the stack base` procedure in `../references/branch-setup.md` — walk the open Trace PRs of the Feature from the root to the tip. Never derive it from git upstream: before the first push the branch has none, and after `git push -u` the upstream is the branch itself.
 
-- `trace/*` branch stacked on a still-open Trace → target that `trace/*` branch
-- `trace/*` branch whose base Trace already merged (its branch is gone), `staged` delivery → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
-- `trace/*` branch whose base Trace already merged, `trunk` delivery → target `main`
+- `trace/*` branch, another Trace PR of the Feature is open → target the stack tip (a `trace/*` branch)
+- `trace/*` branch, no other Trace PR of the Feature is open, `staged` delivery → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
+- `trace/*` branch, no other Trace PR of the Feature is open, `trunk` delivery → target `main`
 - Skeleton `trace/*` branch → the feature branch (`staged`) or `main` (`trunk`)
 - `feature/*` branch → target `main`
 - `hotfix/*` branch → target `main`
@@ -144,7 +144,7 @@ Determine the base branch from the current branch name and the delivery mode, pe
   - header: "Base branch"
   - options: from `git branch -r`
 
-Never target a branch this one did not fork from — the diff would carry the intervening Trace's commits. When the base is another `trace/*` branch and no native stack is used (see below), say so in the PR body: this is a stacked PR, it merges after its base, and GitHub retargets it automatically when the base merges with its head branch deleted.
+**Join the stack first.** A `trace/*` branch must contain its stack base. The tip moves when a sibling joins first. If the branch does not contain the base, rebase onto it, run the tests, and push — per "Join the stack" in `../references/branch-setup.md`. Never target a branch this one does not contain — the diff would carry the commits of another Trace. When the base is another `trace/*` branch and no native stack is used (see below), say so in the PR body: this is a stacked PR, it merges after its base, and GitHub retargets it automatically when the base merges with its head branch deleted.
 
 Write the body to a temp file (`$BODY`) with the Write tool.
 Then create the PR via the gh body helper (`../references/gh-body-helper.md`) so the description survives UTF-8 on Windows:
@@ -152,13 +152,13 @@ Then create the PR via the gh body helper (`../references/gh-body-helper.md`) so
 ```bash
 # $BODY is the temp file you wrote the PR body to with the Write tool.
 
-# stacked trace branch — base is the Trace it builds on:
+# stacked trace branch — base is the stack tip:
 python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
   --body-file "$BODY" \
   --base trace/<base-trace-number>-<base-trace-slug>
 
-# trace branch whose base Trace merged, or a Skeleton — staged delivery:
+# trace branch with no other open Trace PR, or a Skeleton — staged delivery:
 python3 .wtf/gh-body.py create --pr \
   --title "<title>" \
   --body-file "$BODY" \
@@ -173,7 +173,7 @@ python3 .wtf/gh-body.py create --pr \
 
 Print the PR URL.
 
-**Native stack.** When the base is a `trace/*` branch, link this PR into its native stack per `../references/branch-setup.md` "Native stacks": `gh stack link <bottom-pr> ... <this-pr>`, PR numbers bottom to top along this PR's base chain. The command creates the stack or updates it. GitHub then renders the stack on every PR, so do not add the "stacked PR" note to the body. `wtf.setup` installs `gh-stack`. If `gh extension list` does not show it, skip the link and keep the "stacked PR" note in the body (the fallback in "Native stacks").
+**Native stack.** When the base is a `trace/*` branch, link this PR into its native stack per `../references/branch-setup.md` "Native stacks". Run `gh stack link <bottom-pr> ... <this-pr>` with the open Trace PRs of the Feature, bottom to top, ending with this PR. The command creates the stack or updates it. GitHub then renders the stack on every PR, so do not add the "stacked PR" note to the body. `wtf.setup` installs `gh-stack`. If `gh extension list` does not show it, skip the link and keep the "stacked PR" note in the body (the fallback in "Native stacks").
 
 ### 9. Update the Trace issue (if linked)
 

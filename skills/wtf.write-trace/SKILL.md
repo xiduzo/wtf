@@ -63,7 +63,7 @@ Decide the position from the claim state:
 - **Extension** — the first Trace of a further story on an existing Spine.
 - **Deepening** — further scenarios of a story already started. Always cite the story it deepens. A Deepening Trace is never storyless.
 
-Record **Builds on**: the issue numbers of the Traces whose code this one needs. An Extension builds on the Skeleton. A Deepening builds on the Trace that started its story (Skeleton or Extension) and on any later Trace of that story whose code it needs. Never name "the previous entry" by habit — two entries that build on the same Trace are siblings. The Skeleton builds on nothing. This replaces free-form dependency questioning. **Builds on** drives both the blocked-by link in step 10 and the stack base in `wtf.implement-trace`, so name only real code dependencies: two Traces that both build on the Skeleton and touch different files will run at the same time.
+Record **Builds on**: the issue numbers of the Traces whose code this one needs. An Extension builds on the Skeleton. A Deepening builds on the Trace that started its story (Skeleton or Extension) and on any later Trace of that story whose code it needs. Never name "the previous entry" by habit — two entries that build on the same Trace are siblings. The Skeleton builds on nothing. This replaces free-form dependency questioning. **Builds on** drives the blocked-by link in step 10, the readiness gate in `wtf.implement-trace`, and the trace sub-phases in `wtf.loop`. Name only real code dependencies: two Traces that both build on the Skeleton and touch different files build at the same time.
 
 ### 4. Claim assessment
 

@@ -75,7 +75,7 @@ Using the dependency graph and the Feature units built in step 1:
    phases: [
      { phase: 1, sub_phases: [
        { sub: 1, units: [
-           Feature #5 (traces: [#10] → [#11, #12] → [#13]),   # #11 and #12 share no files — parallel
+           Feature #5 (traces: [#10] → [#11, #12] → [#13]),   # #11 and #12 share no files — build in parallel, join #11 then #12
            Feature #6 (traces: [#20])
          ] },                                                  # no file overlap between #5 and #6 — parallel
        { sub: 2, units: [Task #14 (legacy)] }                  # overlaps with #5 — run after
@@ -84,7 +84,7 @@ Using the dependency graph and the Feature units built in step 1:
    ]
    ```
 
-   A Trace's branch stacks on the Trace it builds on rather than waiting for a merge (`../../references/branch-setup.md`), so a later trace-sub-phase gates on a pushed, green branch — not on a merged PR.
+   Each Feature delivers through one linear stack (`../../references/branch-setup.md`). A later trace-sub-phase gates on every Trace of the earlier sub-phase having joined that stack (PR open and green) — not on a merged PR.
 
 ## Gate — surface all findings at once
 

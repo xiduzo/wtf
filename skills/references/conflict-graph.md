@@ -8,7 +8,7 @@ The graph arbitrates file conflicts at two levels.
 
 **Across Features.** A Feature node carries its whole Trace set. Two Features run in parallel only when no Trace of one can touch a file of the other.
 
-**Within one Feature, after the Skeleton lands.** The Skeleton is never in the graph: it lays the Spine, every later Trace of the Feature depends on it, so it runs first and alone. Once its code exists, the Feature's remaining Traces enter a graph of their own. Siblings with no shared files run at the same time, each in its own worktree. Traces that share files land in later sub-phases and stack on each other in Trace Plan order.
+**Within one Feature, after the Skeleton lands.** The Skeleton is never in the graph: it lays the Spine, every later Trace of the Feature depends on it, so it runs first and alone. Once its code exists, the Feature's remaining Traces enter a graph of their own. Siblings with no shared files build at the same time, each in its own worktree. Traces that share files land in later sub-phases. Every Trace still joins the one stack of the Feature: sub-phase by sub-phase, and in Trace Plan order inside a sub-phase.
 
 Two Traces of one Feature often *do* share files — that is what a Spine is. Expect the intra-Feature graph to serialize much of the set. It buys the disjoint cases, which are common once a Feature carries more than one story: an Extension Trace for story 2 rarely touches the files a Deepening Trace for story 1 touches.
 
@@ -64,6 +64,8 @@ Assign units to sub-phases in issue-number order (stable):
 - Assign the first unit to sub-phase 1.
 - For each subsequent unit: assign the lowest-numbered sub-phase whose already-assigned units share no conflict edge with this unit.
 
+Inside a Feature, color the Traces in Trace Plan order instead. Also put each Trace in a sub-phase after the sub-phase of every Trace it builds on. A Trace cannot start before its Builds-on code has joined the stack of the Feature.
+
 ### 4. Handle missing Impacted Areas
 
 If an issue has no `## Impacted Areas` *and* inherits nothing from any ancestor, treat it as conflicting with all others. This is common for bugs and loose issues. Assign it to its own sub-phase. Note this in the execution plan so the user understands why it is serialized.
@@ -87,7 +89,7 @@ Sub-phases execute sequentially. Units within a single sub-phase spawn in parall
 
 Before advancing to the next sub-phase, every unit in the current sub-phase must have its **code landed on the branch the next sub-phase will branch from** — not necessarily merged to `main`.
 
-- **Intra-Feature (Traces).** The gate is the previous Trace's branch, pushed and green. Do not wait for its PR to merge. The next Trace stacks on that branch per `./branch-setup.md`, so the code it needs is already there. Waiting for a human to review would idle the run for no gain.
+- **Intra-Feature (Traces).** The gate is that every Trace of the previous sub-phase has joined the stack of the Feature: its PR is open and green. Do not wait for its PR to merge. The next Trace branches off the stack tip per `./branch-setup.md`, so the code it needs is already there. Waiting for a human to review would idle the run for no gain.
 - **Cross-Feature.** The gate is a merged PR, because the next Feature branches off `main` (or the feature branch) and cannot see another Feature's unmerged stack. For a Feature unit in `staged` delivery that is the feature PR; in `trunk` delivery it is the Feature's final Trace PR. Poll until `MERGED`:
 
 ```bash

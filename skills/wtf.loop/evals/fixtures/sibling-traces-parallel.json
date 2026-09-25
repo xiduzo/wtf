@@ -1,5 +1,5 @@
 {
-  "_note": "One Feature whose Skeleton #10 already merged (its trace/10-… branch was deleted on merge). Extension #11 and Deepening #12 both build on #10 and declare disjoint Impacted Areas; Deepening #13 builds on #11 and overlaps its files. Expected: #11 and #12 in the same trace sub-phase (parallel, each in its own worktree, PR base = feature branch); #13 in a later trace sub-phase, stacked on trace/11-… without waiting for #11's merge.",
+  "_note": "One Feature whose Skeleton #10 already merged (its trace/10-… branch was deleted on merge). Extension #11 and Deepening #12 both build on #10 and declare disjoint Impacted Areas; Deepening #13 builds on #11 and overlaps its files. Expected: #11 and #12 in the same trace sub-phase (building in parallel, each in its own worktree); #11 targets the feature branch; #12 joins after #11 by rebasing onto trace/11-… and targets it; #13 in a later trace sub-phase, cut from and targeting the stack tip trace/12-…, without waiting for any merge. The Feature ends as one linear stack, never a tree.",
   "config": {
     "delivery": "staged"
   },

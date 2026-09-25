@@ -69,44 +69,57 @@ git pull --rebase origin feature/<feature-number>-<feature-slug>
 
 ## Resolve the stack base
 
-Trace branches **stack**. A Trace branches off the branch of the Trace it builds on, as soon as that Trace's code exists. It never waits for that Trace's PR to merge. A human reviewing is not a reason for the next Trace to idle.
+Each Feature delivers through **one linear stack** of Trace PRs. A Trace never waits for a merge. It branches off the top of its Feature's stack as soon as the code below it exists. A human reviewing is not a reason for the next Trace to idle.
 
-The Skeleton is always first and always alone — it lays the Spine, so every later Trace of the Feature depends on it.
+The **stack tip** is the head branch of the highest open Trace PR of the Feature. When no Trace PR of the Feature is open, the tip is the **root**: the feature branch (`staged`) or `main` (`trunk`). The Skeleton is always first and always alone. It lays the Spine, so every later Trace of the Feature depends on it.
 
-The **stack base** comes from the Trace body's `Builds on` line, never from the git upstream of the current branch:
-
-| The Trace | Stack base |
-|---|---|
-| Skeleton | the feature branch (`staged`) or `main` (`trunk`) |
-| A later Trace whose **Builds on** Trace is still open | that Trace's branch |
-| A later Trace whose **Builds on** Trace already merged | the feature branch (`staged`) or `main` (`trunk`) |
-
-Two Traces that build on the same Trace and share no files are **siblings**. Both branch off the same stack base and run at the same time, each in its own worktree. Two Traces that share files stack one on the other, in Trace Plan order.
+The **stack base** of a Trace is the stack tip at the time the Trace branches or joins. It comes from the open PRs on GitHub, never from the git upstream of the current branch. `Builds on` does not select the base. The tip contains every Trace below it, so it carries the code of every Builds-on Trace that joined.
 
 ```bash
-# Inputs: TRACE_NUMBER; WTF_DELIVERY (resolved above); the feature branch name in staged delivery.
-BODY_FILE=$(python3 .wtf/gh-body.py read "$TRACE_NUMBER")
-BUILDS_ON=$(grep -m1 -E '^- Builds on:' "$BODY_FILE" | grep -oE '#[0-9]+' | tr -d '#' | tr '\n' ' ')
+# Inputs: TRACE_NUMBER; FEATURE_NUMBER (per ./spec-hierarchy.md); WTF_DELIVERY (resolved above).
+FEATURE_BODY=$(python3 .wtf/gh-body.py read "$FEATURE_NUMBER")
+# The Traces of this Feature: the first #<n> on each Trace Plan item.
+PLAN_RE=$(sed -n '/^## Trace Plan/,/^## /p' "$FEATURE_BODY" | grep -E '^[0-9]+\.' \
+  | awk 'match($0,/#[0-9]+/){print substr($0,RSTART+1,RLENGTH-1)}' | paste -sd'|' -)
 
-git fetch origin --prune
-STACK_BASE=""
-for n in $BUILDS_ON; do
-  b=$(git ls-remote --heads origin "trace/$n-*" | awk '{sub("refs/heads/","",$2); print $2}' | head -1)
-  [ -n "$b" ] && STACK_BASE="$b"     # an open Builds-on branch wins; the last one in plan order when several are open
+case "$WTF_DELIVERY" in staged) STACK_BASE="feature/<feature-number>-<feature-slug>" ;; *) STACK_BASE=main ;; esac
+# Walk up the open Trace PRs of this Feature, from the root to the tip.
+while :; do
+  up=$(gh pr list --state open --base "$STACK_BASE" --json headRefName \
+    --jq "[.[].headRefName | select(test(\"^trace/($PLAN_RE)-\"))] | join(\" \")")
+  set -- $up
+  [ $# -eq 0 ] && break
+  [ $# -gt 1 ] && { echo "forked stack on $STACK_BASE: $up"; exit 1; }
+  case "$1" in "trace/$TRACE_NUMBER-"*) break ;; esac   # this Trace already joined: keep the base below it
+  STACK_BASE="$1"
 done
-if [ -z "$STACK_BASE" ]; then
-  case "$WTF_DELIVERY" in staged) STACK_BASE="feature/<feature-number>-<feature-slug>" ;; *) STACK_BASE=main ;; esac
-fi
 echo "stack base: $STACK_BASE"
 ```
 
 Rules:
 
-- An open Builds-on branch means that Trace is still in review. Stack on it. Never wait.
-- A missing branch means that Trace merged — its branch was deleted on merge. Fall back to the feature branch (`staged`) or `main` (`trunk`).
-- Two Builds-on Traces both open, and neither branch contains the other (siblings): wait for one of them to merge, then stack on the other. Do not merge one sibling into the other — that pollutes its PR.
-- A Skeleton has no Builds-on. It always uses the fallback.
+- A Trace with an open PR has **joined** the stack. A Trace with a branch and no PR has not joined. Nothing stacks on it.
+- A Trace can start only when every Builds-on Trace has joined or merged. A Builds-on Trace with only a branch has not joined. Open its PR first.
+- A merged Trace has left the stack. GitHub retargets the PR above it to the root, so the walk no longer finds it.
+- The Skeleton opens the stack. No Trace PR of the Feature is open yet, so the walk stops at the root.
+- Two open Trace PRs on one base mean a forked stack from an older run. Stop and tell the user. Do not guess the order.
+- An empty `PLAN_RE` means the Trace Plan links no Trace issues. Stop. Link the issues in the plan first.
 - The PR base always equals the stack base.
+
+### Join the stack
+
+A Trace joins the stack when its PR opens. `wtf.loop` sets the join order: trace sub-phase first, then Trace Plan order inside a sub-phase.
+
+The tip can move while a Trace builds: a sibling can join first. So resolve the stack base again just before the PR opens. If the branch does not contain that base, rebase onto it:
+
+```bash
+git fetch origin
+git merge-base --is-ancestor "origin/$STACK_BASE" HEAD || git rebase "origin/$STACK_BASE"
+# Run the project's test command. Then push:
+git push --force-with-lease -u origin HEAD
+```
+
+Siblings share no files, so the rebase is clean. The test run proves that the combined code works. Then open the PR against the stack base and link it into the native stack. For a Trace that built alone, the base did not move and the rebase does nothing.
 
 ## Trace branch — create or resume
 
@@ -146,7 +159,7 @@ A stacked PR can never merge before the PR it is based on. Merge bottom-up, in s
 
 ### Native stacks
 
-`wtf.setup` installs the `github/gh-stack` extension. After each stacked PR opens, link it into its native stack. Pass PR numbers, bottom to top, from the stack root up to this PR:
+`wtf.setup` installs the `github/gh-stack` extension. After each stacked PR opens, link it into its native stack. Pass the PR numbers of the open Trace PRs of the Feature, bottom to top, up to this PR:
 
 ```bash
 gh stack link <bottom-pr> <next-pr> ... <this-pr>   # bottom to top
@@ -154,7 +167,7 @@ gh stack link <bottom-pr> <next-pr> ... <this-pr>   # bottom to top
 
 `gh stack link` creates the stack when none exists and updates it when one does. PRs already in the stack stay in it. Pass PR numbers, not branch names: a branch name with no open PR makes the command open a PR on its own. A native stack renders the stack map on every PR, so the PR body must not say "stacked on #N".
 
-A native stack is one linear chain. Link only the PRs on this PR's own base chain, not every open Trace PR of the Feature.
+The open Trace PRs of a Feature form one linear chain, so one native stack holds all of them. The walk in "Resolve the stack base" finds them in stack order.
 
 Merge bottom-up with `gh pr merge --merge --delete-branch`. The head branch must be deleted. `gh stack merge` merges every layer up to a chosen PR in one atomic operation. It is for a human in an interactive terminal: pick the merge-commit method, never squash.
 
@@ -197,23 +210,23 @@ Hotfix branches never depend on a feature branch. They target `main` directly.
 |---|---|---|
 | `trace/*` — Skeleton | `staged` | parent `feature/*` |
 | `trace/*` — Skeleton | `trunk` | `main` |
-| `trace/*` — stacked on an open Trace | any | that Trace's `trace/*` branch |
-| `trace/*` — its base Trace already merged | `staged` | parent `feature/*` |
-| `trace/*` — its base Trace already merged | `trunk` | `main` |
+| `trace/*` — another Trace PR of the Feature is open | any | the stack tip: the head branch of the highest open Trace PR |
+| `trace/*` — no other Trace PR of the Feature is open | `staged` | parent `feature/*` |
+| `trace/*` — no other Trace PR of the Feature is open | `trunk` | `main` |
 | `feature/*` | `staged` | `main` |
 | `hotfix/*` | any | `main` |
 | `task/*` (legacy) | any | parent `feature/*` |
 | anything else | — | ask the user |
 
-The PR base always equals the stack base the branch was cut from. Never open a Trace PR against a branch the Trace did not branch from — the diff would carry the intervening Trace's commits.
+The PR base always equals the stack base the branch was cut from or rebased onto. Never open a Trace PR against a branch the Trace does not contain — the diff would carry the commits of another Trace.
 
 ## Worktree decision (cross-feature parallelism)
 
 When a skill spawns multiple sub-agents that edit code at the same time, set Agent `isolation: "worktree"`. Each sub-agent then has its own copy of the repo. This applies to `wtf.loop` — Feature units, and sibling Traces of one Feature. `wtf.verify-trace` Full Feature mode verifies Traces one at a time in one checkout; it isolates only its legacy Task children.
 
-Worktrees isolate anything that runs **at the same time**: separate Features, and sibling Traces of one Feature that share no files. A Trace stacked on another Trace does not need its own worktree — it runs after, on the same branch line. Schedule siblings with `./conflict-graph.md` before spawning them.
+Worktrees isolate anything that runs **at the same time**: separate Features, and sibling Traces of one Feature that share no files. Siblings build at the same time, but they join the one stack of the Feature one after the other. A Trace that shares files with an earlier Trace runs after it, on the same line, and needs no worktree of its own. Schedule siblings with `./conflict-graph.md` before spawning them.
 
-The worktree branches from the Trace's stack base at spawn time. Spawn a Trace as soon as its stack base exists on origin — the Builds-on Trace's branch is pushed and green, or that Trace merged. Never wait for a merge. Only the conflict graph serializes siblings.
+The worktree branches from the stack tip at spawn time. Siblings that spawn together share that base. Spawn a Trace as soon as every Builds-on Trace has joined the stack or merged. Never wait for a merge. Only the conflict graph serializes siblings. Each sibling rebases onto the new tip when it joins — see "Join the stack".
 
 Before work starts, each sub-agent must run `git pull --rebase origin <stack-base>`.
 

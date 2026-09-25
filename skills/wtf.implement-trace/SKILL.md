@@ -57,24 +57,29 @@ Load `docs/steering/TECH.md` per the **strict consumer-side load** in `../refere
 
 ### 5. Sequencing gate and branch setup
 
-A Trace needs the **code** of the Trace it builds on, not its merge. Before you branch, resolve the stack base:
+A Trace needs the **code** of the Trace it builds on, not its merge. Each Feature delivers through one linear stack of Trace PRs, and this Trace branches off its top. Before you branch:
 
-1. Read the Builds-on Trace numbers from the Spine Position section. When they are absent, use the Trace Plan order in the Feature body.
-2. A Skeleton builds on nothing. Its stack base is the feature branch (`staged`) or `main` (`trunk`). It passes this gate without a check.
-3. Otherwise run the **Resolve the stack base** procedure in `../references/branch-setup.md`. It reads the `Builds on` line from the Trace body and looks the branch up by number, so the slug need not be known:
+1. **Readiness.** Read the Builds-on Trace numbers from the Spine Position section. Each one must have joined the stack (its PR is open) or merged. Check each one:
 
    ```bash
-   git fetch origin --prune
-   git ls-remote --heads origin "trace/<n>-*"   # a hit → still open, stack on it
+   gh pr list --state all --limit 500 --json number,state,headRefName \
+     --jq '.[] | select(.headRefName | startswith("trace/<n>-")) | "\(.number) \(.state)"'
    ```
 
-   - **Branch exists** → it is the stack base. Do not wait for its PR. Verify the branch is green: if the base branch has an open PR (`gh pr list --head <branch> --state open --json number -q '.[0].number'`), run `gh pr checks <pr_number>`; otherwise check the branch's latest workflow run with `gh run list --branch <branch> --limit 1 --json conclusion -q '.[0].conclusion'`. If neither exists (no CI), run the project's test command on that branch once. If the branch is red, warn the user and ask before stacking on it.
-   - **Branch is gone** → that Trace merged and GitHub already retargeted anything stacked on it. The stack base is the feature branch (`staged`) or `main` (`trunk`).
-   - **Neither the branch nor a merged PR exists** → the Trace this one builds on has not been implemented. Warn the user and stop. Continue only when the user explicitly overrides.
+   - **`OPEN`** → it joined the stack. Do not wait for its merge.
+   - **`MERGED`** → its code is on the feature branch (`staged`) or `main` (`trunk`).
+   - **Only a branch, no PR** → it has not joined. Nothing stacks on a branch without a PR. Tell the user to open its PR first with `wtf.create-pr`, then stop.
+   - **Neither** → the Trace this one builds on has not been implemented. Warn the user and stop. Continue only when the user explicitly overrides.
+
+   A Skeleton builds on nothing. It passes this gate without a check.
+2. **Stack base.** Run the **Resolve the stack base** procedure in `../references/branch-setup.md`. It walks the open Trace PRs of the Feature from the root to the tip. The tip is the stack base. With no open Trace PR, the base is the feature branch (`staged`) or `main` (`trunk`).
+3. **Green check.** When the stack base is a `trace/*` branch, verify it is green: run `gh pr checks <pr_number>` on its PR. If there is no CI, run the project's test command on that branch once. If the branch is red, warn the user and ask before stacking on it.
+
+A sibling can join the stack while this Trace builds. That is expected. `wtf.create-pr` rebases onto the new tip before the PR opens (see "Join the stack" in `../references/branch-setup.md`).
 
 Then set up branches per `../references/branch-setup.md`: resolve the delivery mode (config plus per-feature override), generate the slug, and create or resume `trace/<trace-number>-<trace-slug>` off the stack base. In `staged` delivery, create or check out the feature branch first when the stack base is the feature branch. In `trunk` delivery, do not create a feature branch. Resolve any conflicts before you continue.
 
-Tell the user what this Trace stacked on, and that its PR will target that branch.
+Tell the user what this Trace stacked on. Its PR targets the stack tip at the time the PR opens.
 
 ### 6. Explore the codebase
 

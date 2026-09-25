@@ -298,7 +298,7 @@ Commit `.wtf/config.json` so every teammate classifies issues the same way. Reco
 
 ### 7a. Enable automatic head-branch deletion
 
-Trace PRs stack: a Trace branches off the branch of the Trace it builds on rather than waiting for a merge (`../references/branch-setup.md`). GitHub retargets a stacked PR to its parent's base **only when the parent's head branch is deleted on merge**. Without this setting, a human merging through the web UI strands every PR above them.
+Trace PRs stack: a Trace branches off the top of its Feature's stack rather than waiting for a merge (`../references/branch-setup.md`). GitHub retargets a stacked PR to its parent's base **only when the parent's head branch is deleted on merge**. Without this setting, a human merging through the web UI strands every PR above them.
 
 Check it, and turn it on when the token allows:
 

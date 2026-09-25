@@ -22,20 +22,22 @@ The conflict-free sub-phases from step 2d are the unit of cross-feature parallel
 
 Within one Feature, run two stages:
 
-1. **Skeleton, alone.** It lays the Spine, so every later Trace depends on it. Nothing else in the Feature starts until its code is pushed and green.
-2. **Everything else, colored.** Apply `../../references/conflict-graph.md` to the Feature's remaining Traces, using each Trace's `## Impacted Areas`. Traces with no shared files run at the same time, each in its own worktree. Traces that share files fall into later sub-phases and stack in Trace Plan order.
+1. **Skeleton, alone.** It lays the Spine, so every later Trace depends on it. Nothing else in the Feature starts until the Skeleton has joined the stack: its PR is open and green.
+2. **Everything else, colored.** Apply `../../references/conflict-graph.md` to the Feature's remaining Traces, using each Trace's `## Impacted Areas`. Traces with no shared files build at the same time, each in its own worktree. Traces that share files fall into later sub-phases.
 
 Expect much of a Feature's set to serialize — Traces of one Feature share files by construction. The win is the disjoint case, which shows up as soon as a Feature carries more than one story.
 
 Execution order: phases in order → sub-phases in order → within each sub-phase, all Feature units and legacy Tasks in parallel → within each Feature, Skeleton then its own colored sub-phases.
 
-**A Trace never waits for a merge.** It branches off the branch of the Trace it builds on, as soon as that code exists, and opens its PR against that branch — see `../../references/branch-setup.md` "Trace branch" and "Stack mechanics". Human review latency no longer idles the run. GitHub retargets each stacked PR when its parent merges with its head branch deleted, so the stack unwinds on its own.
+**One Feature, one stack.** Every Trace of a Feature joins one linear stack of PRs. A Trace joins when its PR opens. The **join order** is the schedule order: trace sub-phase first, then Trace Plan order inside a sub-phase. Siblings build at the same time, but they join one after the other. A sibling that finishes early waits until every Trace before it in the join order has joined or merged. At the end of the run, the open Trace PRs of each Feature form one stack, never a tree.
 
-**Worktrees isolate anything running at the same time**: separate Features, and sibling Traces of one Feature. Spawn each concurrent trace sub-agent with `isolation: "worktree"`. The worktree branches from that Trace's **stack base**, resolved per `../../references/branch-setup.md` "Resolve the stack base". The sub-agent must run `git pull --rebase origin <stack_base>` before starting work. A Trace stacked behind another needs no worktree of its own — it runs after, on the same line.
+**A Trace never waits for a merge.** It branches off the stack tip as soon as every Builds-on Trace has joined. It opens its PR against the tip. See `../../references/branch-setup.md` "Resolve the stack base", "Join the stack", and "Stack mechanics". Human review latency does not idle the run. GitHub retargets each stacked PR when its parent merges with its head branch deleted, so the stack unwinds on its own.
+
+**Worktrees isolate anything running at the same time**: separate Features, and sibling Traces of one Feature. Spawn each concurrent trace sub-agent with `isolation: "worktree"`. The worktree branches from the **stack tip** at spawn time, resolved per `../../references/branch-setup.md` "Resolve the stack base". Siblings that spawn together share that base. The sub-agent must run `git pull --rebase origin <stack_base>` before starting work. A Trace that runs after another, on the same line, needs no worktree of its own.
 
 **Advancement gates** follow `../../references/conflict-graph.md`:
 
-- Between Trace sub-phases *inside* a Feature: the previous sub-phase's branches are pushed and green. No merge required.
+- Between Trace sub-phases *inside* a Feature: every Trace of the previous sub-phase has joined the stack — its PR is open and green. No merge required.
 - Between cross-Feature sub-phases: PRs merged — the feature PR in `staged` delivery, the Feature's final Trace PR in `trunk`, plus every legacy Task PR. Poll until merged:
 
 ```bash
@@ -52,9 +54,9 @@ For each Trace, in Trace Plan order within its Feature unit:
 
 ### a. Stack + dependency gate (lightweight re-check)
 
-The Trace's stack base must exist and carry the code of the Trace it builds on — pushed and green. It does **not** need to be merged. Verify this on resume. Then re-check the Trace's and its Feature's **internal** blockers from the graph built in step 1.
+Every Builds-on Trace must have joined the stack (its PR is open and green) or merged. A merge is **not** required. Verify this on resume. Then re-check the Trace's and its Feature's **internal** blockers from the graph built in step 1.
 
-An internal blocker inside the same Feature is satisfied by a pushed, green branch. An internal blocker in another Feature still needs a merged PR — a different Feature's unmerged stack is not visible from this branch line. The full dependency validation already ran in step 2d — this check only guards against the case where an earlier unit in this run was skipped or its PR was not merged.
+An internal blocker inside the same Feature is satisfied by a joined, green Trace. An internal blocker in another Feature still needs a merged PR — a different Feature's unmerged stack is not visible from this branch line. The full dependency validation already ran in step 2d — this check only guards against the case where an earlier unit in this run was skipped or its PR was not merged.
 
 If an internal blocker is a parent node (Feature/Epic — it carries `rolls_up` children), expand it to its descendant Traces (and legacy Tasks) and check those PRs instead: a parent issue can stay open until its feature PR merges, so testing the parent's state mid-run would falsely block.
 
@@ -83,7 +85,7 @@ If all internal blockers are resolved, continue silently.
 
 The sub-agent runs the inlined implement-trace steps. It must:
 
-- Set up the trace branch off its **stack base** — resolved per `../../references/branch-setup.md` "Resolve the stack base" (create the feature branch first in `staged` delivery when the base is the feature branch and it is absent)
+- Set up the trace branch off its **stack base**: the stack tip at spawn time, resolved per `../../references/branch-setup.md` "Resolve the stack base" (create the feature branch first in `staged` delivery when the base is the feature branch and it is absent)
 - Run the TDD cycle against the claimed scenarios per `../../references/commit-conventions.md`
 - Explicitly run `gh issue edit <trace_number> --add-label "implemented"` — mandatory, per the sub-agent protocol
 - Return the **"Revealed:"** learnings block — what the Trace exposed about the Spine, the plan, or the spec
@@ -113,9 +115,11 @@ Capture the verify results (pass/fail per claimed scenario) for the re-aim in st
 
 ### d. Open PR, wait for pipeline, merge
 
-The sub-agent runs the inlined create-pr steps. The PR base is this Trace's **stack base** per `../../references/branch-setup.md` "Base-branch policy" — the branch of the Trace it builds on when that Trace is still open, otherwise the feature branch (`staged`) or `main` (`trunk`). The inlined create-pr steps also link the PR into its native stack (per `../../references/branch-setup.md` "Native stacks"). `wtf.setup` installs `gh-stack` for this. Without the extension, the steps keep the "stacked PR" note in the body instead. Closure happens via `Closes #<trace_number>` in the PR body per `../../references/commit-conventions.md` — do not call `gh issue close` directly.
+**Join in order.** Open this PR only after every Trace before it in the join order has joined or merged. The orchestrator holds a finished sibling until then. This keeps one linear stack per Feature.
 
-**Opening this PR does not block the Feature's other Traces.** Traces in the next sub-phase branch off this Trace's branch as soon as it is pushed and green. Everything below runs alongside them, not in front of them. In `trunk` delivery, when this Trace exhausts the Trace Plan, the body also carries `Closes #<feature_number>` on its own line. Run non-interactively — no confirmation, title review, or body approval.
+The sub-agent runs the inlined create-pr steps. First they join the stack per `../../references/branch-setup.md` "Join the stack". They resolve the stack base again, rebase onto it if the tip moved, run the tests, and push. The PR base is that **stack base**: the stack tip. When no other Trace PR of the Feature is open, it is the feature branch (`staged`) or `main` (`trunk`). The inlined create-pr steps also link the PR into the native stack of the Feature (per `../../references/branch-setup.md` "Native stacks"). `wtf.setup` installs `gh-stack` for this. Without the extension, the steps keep the "stacked PR" note in the body instead. Closure happens via `Closes #<trace_number>` in the PR body per `../../references/commit-conventions.md` — do not call `gh issue close` directly.
+
+**Opening this PR does not block the Feature's other Traces.** Traces in the next sub-phase branch off the stack tip as soon as this PR is open and green. Everything below runs alongside them, not in front of them. In `trunk` delivery, when this Trace exhausts the Trace Plan, the body also carries `Closes #<feature_number>` on its own line. Run non-interactively — no confirmation, title review, or body approval.
 
 After the PR is opened, poll its pipeline until all status checks complete:
 

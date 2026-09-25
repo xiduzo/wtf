@@ -111,7 +111,7 @@ The first Trace of a Feature is the **Skeleton**: the primary story's happy path
 
 The Feature body stays canonical for all stories and their Gherkin. Traces claim scenarios and never re-derive them. The Trace Plan is a living aim, not a contract. After each landed Trace, `wtf.refine` re-aims the plan. The autonomous re-aim owns the order only: it can reorder, re-batch, and move scenarios between entries. A human approves every change to the set of scenarios the plan delivers.
 
-Trace branches stack. Each branch forks from the branch of the Trace it builds on, so no Trace waits for a merge. `wtf.create-pr` links each stacked Trace PR into a native GitHub stack with `gh-stack`. Without the extension, GitHub still retargets each stacked PR when the PR below it merges.
+Each Feature delivers through one linear stack of Trace PRs. Each Trace branches off the top of the stack, so no Trace waits for a merge. Traces that share no files build at the same time, then join the stack one after the other. `wtf.create-pr` links each stacked Trace PR into a native GitHub stack with `gh-stack`. Without the extension, GitHub still retargets each stacked PR when the PR below it merges.
 
 Legacy Task issues stay readable. Read paths treat them as legacy Traces. Write paths never create Tasks again.
 
@@ -196,7 +196,8 @@ The result: specs stay legible as the project grows. Agents generate code agains
 │                                                                              │
 │  builds dependency graph → topological sort → pre-flight checks              │
 │  chains: implement-trace → verify-trace → create-pr → re-aim                 │
-│      (per trace, spine order; Features parallel)                             │
+│      (one linear PR stack per Feature; Features parallel)                    │
+│      see "Inside wtf.loop" below                                             │
 │  resumes from last completed trace if interrupted                            │
 │  ends with: feature → main PR (staged) or trace PRs → main (trunk)           │
 │                                                                              │
@@ -245,6 +246,69 @@ CROSS-CUTTING  (run any time, any scope):
 ```
 
 The Trace issue is the single source of truth. The designer, the developer, and QA each append their own section to it, in sequence. Each skill offers to chain to the next step. When requirements change after creation, `wtf.refine` keeps the hierarchy aligned without rewriting the unchanged sections.
+
+### Inside `wtf.loop`
+
+`wtf.loop` runs in five steps. Each Feature ends as one linear stack of Trace PRs, and that stack merges back into `main`.
+
+```
+/wtf.loop <Epic or Feature>
+  │
+  ▼
+1 GRAPH         Epic → Features → Traces, plus their blocked-by links
+  │
+  ▼
+2 PRE-FLIGHT    specs complete · no contradictions · paths exist · deps valid
+  │             schedule: phases by dependency → sub-phases by shared files
+  ▼
+3 PLAN REVIEW   you approve the execution plan before any code is written
+  │
+  ▼
+4 EXECUTE       Features that share no files run in parallel. Inside each one:
+  │
+  │  ┌─ Feature #5 ─────────────────────────────────────────────────────────┐
+  │  │                                                                      │
+  │  │  sub-phase 1   #10 Skeleton       alone: it lays the Spine           │
+  │  │  sub-phase 2   #11 Extension  ─┐  no shared files, so they build     │
+  │  │                #12 Deepening  ─┘  at the same time in two worktrees  │
+  │  │  sub-phase 3   #13 Deepening      shares files with #11, so it waits │
+  │  │                                                                      │
+  │  │  every Trace   implement → verify → join the stack → open PR         │
+  │  │                → CI green → merge → wtf.refine re-aims the plan ↺    │
+  │  │                                                                      │
+  │  └──────────────────────────────────────────────────────────────────────┘
+  ▼
+5 DELIVER       the stack of each Feature goes back to main
+
+
+THE STACK       one linear stack per Feature, never a tree
+
+    PR #63   trace/13 ──► trace/12       top of the stack
+    PR #62   trace/12 ──► trace/11       built next to #11, then rebased onto it
+    PR #61   trace/11 ──► trace/10
+    PR #60   trace/10 ──► feature/5-…    bottom: the Skeleton
+
+    gh-stack shows the stack map on every PR. Each PR shows only its own diff.
+    A Trace never waits for a merge. The next one branches off the top as soon
+    as the PR below it is open and green.
+
+
+BACK TO MAIN
+
+  staged (default)
+    main ──┬─────────────────────────────────────────●──►    feature PR: Closes #5
+           └── feature/5-… ──●──────●──────●──────●──┘
+                            #10    #11    #12    #13         Trace PRs merge in, bottom-up
+
+  trunk
+    main ──●──────●──────●──────●──►                         each Trace PR merges into main
+          #10    #11    #12    #13                           #13 also carries Closes #5
+
+    PRs merge bottom-up. A merge deletes the branch, and GitHub retargets the
+    PR above it. Without required reviews, the loop merges each PR when CI is
+    green. With required reviews, the loop keeps going, and the open PRs wait
+    for a reviewer as one stack.
+```
 
 ## Skill reference
 
@@ -343,7 +407,7 @@ All three write their output into the Trace issue.
 | `wtf.create-pr` | "create a PR" | Open a PR with a description derived from the Trace, Feature, and Epic |
 | `wtf.pr-review` | "review PR #42" | Review a PR's code against the linked Trace spec |
 
-`wtf.create-pr` reads the full spec hierarchy and the branch diff. It writes a PR description that explains why the change exists. The base branch follows the delivery mode: the feature branch in `staged`, `main` in `trunk`. A Trace that builds on an open Trace targets that Trace's branch instead. The skill links a stacked Trace PR into its native GitHub stack with `gh-stack`. It checks the verification status and offers to run `wtf.verify-trace` first.
+`wtf.create-pr` reads the full spec hierarchy and the branch diff. It writes a PR description that explains why the change exists. The base branch follows the delivery mode: the feature branch in `staged`, `main` in `trunk`. When another Trace PR of the Feature is open, a Trace targets the top of the Feature's stack instead. The skill links a stacked Trace PR into its native GitHub stack with `gh-stack`. It checks the verification status and offers to run `wtf.verify-trace` first.
 
 `wtf.pr-review` reads the diff against the Trace's claimed scenarios, Contracts, and Impacted Areas. It checks spec adherence, contract compliance, test coverage, and code quality against `TECH.md`. It posts a GitHub PR review: approve, request changes, or comment.
 
