@@ -79,6 +79,21 @@ npx skills update
 
 Override the planning mode per invocation, for example `/wtf.epic-to-features 42 flow`.
 
+The `delivery` key decides how the Trace PRs of a Feature reach `main`:
+
+```
+staged (default)
+  main ──┬─────────────────────────────────────────●──►  the feature PR closes the Feature
+         └── feature/5-… ──●──────●──────●──────●──┘
+                          #10    #11    #12    #13       Trace PRs merge into the feature branch
+
+trunk
+  main ──●──────●──────●──────●──►                       each Trace PR merges into main
+        #10    #11    #12    #13                         the last one closes the Feature
+```
+
+Trace PRs merge bottom-up with a merge commit. Each merge deletes the head branch, so GitHub retargets the next PR in the stack.
+
 ## How it works
 
 One framework across the lifecycle:
@@ -187,39 +202,37 @@ The result: specs stay legible as the project grows. Agents generate code agains
 │         │                                                                    │
 └─────────┼────────────────────────────────────────────────────────────────────┘
           │
-          │
           │  executed by
-          ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                  AUTONOMOUS EXECUTION  (wtf.loop)                            │
-│                                                                              │
-│  builds dependency graph → topological sort → pre-flight checks              │
-│  chains: implement-trace → verify-trace → create-pr → re-aim                 │
-│      (one linear PR stack per Feature; Features parallel)                    │
-│      see "Inside wtf.loop" below                                             │
-│  resumes from last completed trace if interrupted                            │
-│  ends with: feature → main PR (staged) or trace PRs → main (trunk)           │
-│                                                                              │
-│          OR  run each step manually via DISCIPLINE PICKUP:                   │
-│                                                                              │
-│     wtf.design-trace        wtf.implement-trace       wtf.verify-trace       │
-│  Gherkin → UI states      Tech approach + TDD        Scenario verdict        │
-│  inherits from            (per trace)                (per trace, by QA)      │
-│  design-feature ↑                                                            │
-│                                   │                         │                │
-│                                   ▼                         ▼                │
-│                                                                              │
-│                              wtf.create-pr          wtf.report-bug           │
-│                             PR from full            links failing            │
-│                             hierarchy context       scenario → Trace         │
-│                                                                              │
-│                              wtf.pr-review                                   │
-│                             code vs spec            ← tech lead reviews      │
-│                             (distinct from          PR before merge          │
-│                              verify-trace)                                   │
-│                                                                              │
-└──────────────────────────────────┬───────────────────────────────────────────┘
+          │
+          ├─────────────────────────────────────────────────────────────────────────────────────────────────┐
+          │                                                                                                 │
+          ▼                                                                                                 ▼
+┌──────────────────────────────────────────────────────────────────────────────┐    ┌──────────────────────────────────────────────┐
+│                                                                              │    │                                              │
+│                  DISCIPLINE PICKUP  (one skill at a time)                    │    │   AUTONOMOUS EXECUTION  (wtf.loop)           │
+│                                                                              │    │                                              │
+│     wtf.design-trace        wtf.implement-trace       wtf.verify-trace       │    │   1 graph     Epic → Features → Traces       │
+│  Gherkin → UI states      Tech approach + TDD        Scenario verdict        │    │   2 check     specs, paths, dependencies     │
+│  inherits from            (per trace)                (per trace, by QA)      │    │   3 review    you approve the plan           │
+│  design-feature ↑                                                            │    │   4 execute   per Feature, in parallel       │
+│                                   │                         │                │    │                                              │
+│                                   ▼                         ▼                │    │     #10 Skeleton      first, alone           │
+│                                                                              │    │     #11 Extension  ─┐ no shared files:       │
+│                              wtf.create-pr          wtf.report-bug           │    │     #12 Deepening  ─┘ build side by side     │
+│                             PR from full            links failing            │    │     #13 Deepening     shares files: waits    │
+│                             hierarchy context       scenario → Trace         │    │                                              │
+│                                                                              │    │     each Trace: implement → verify →         │
+│                              wtf.pr-review                                   │    │     join stack → PR → CI → merge → re-aim ↺  │
+│                             code vs spec            ← tech lead reviews      │    │                                              │
+│                             (distinct from          PR before merge          │    │   5 deliver   one linear stack per Feature   │
+│                              verify-trace)                                   │    │     #10 ◄─ #11 ◄─ #12 ◄─ #13                 │
+│                                                                              │    │     each PR targets the PR to its left       │
+│  Each skill offers to chain to the next step.                                │    │                                              │
+│                                                                              │    │   resumes from the last finished Trace       │
+│                                                                              │    │                                              │
+└──────────────────────────────────┬───────────────────────────────────────────┘    └───────────────────────┬──────────────────────┘
+                                   │                                                                        │
+                                   ├────────────────────────────────────────────────────────────────────────┘
                                    │
                                    │  after merge
                                    ▼
@@ -247,68 +260,7 @@ CROSS-CUTTING  (run any time, any scope):
 
 The Trace issue is the single source of truth. The designer, the developer, and QA each append their own section to it, in sequence. Each skill offers to chain to the next step. When requirements change after creation, `wtf.refine` keeps the hierarchy aligned without rewriting the unchanged sections.
 
-### Inside `wtf.loop`
-
-`wtf.loop` runs in five steps. Each Feature ends as one linear stack of Trace PRs, and that stack merges back into `main`.
-
-```
-/wtf.loop <Epic or Feature>
-  │
-  ▼
-1 GRAPH         Epic → Features → Traces, plus their blocked-by links
-  │
-  ▼
-2 PRE-FLIGHT    specs complete · no contradictions · paths exist · deps valid
-  │             schedule: phases by dependency → sub-phases by shared files
-  ▼
-3 PLAN REVIEW   you approve the execution plan before any code is written
-  │
-  ▼
-4 EXECUTE       Features that share no files run in parallel. Inside each one:
-  │
-  │  ┌─ Feature #5 ─────────────────────────────────────────────────────────┐
-  │  │                                                                      │
-  │  │  sub-phase 1   #10 Skeleton       alone: it lays the Spine           │
-  │  │  sub-phase 2   #11 Extension  ─┐  no shared files, so they build     │
-  │  │                #12 Deepening  ─┘  at the same time in two worktrees  │
-  │  │  sub-phase 3   #13 Deepening      shares files with #11, so it waits │
-  │  │                                                                      │
-  │  │  every Trace   implement → verify → join the stack → open PR         │
-  │  │                → CI green → merge → wtf.refine re-aims the plan ↺    │
-  │  │                                                                      │
-  │  └──────────────────────────────────────────────────────────────────────┘
-  ▼
-5 DELIVER       the stack of each Feature goes back to main
-
-
-THE STACK       one linear stack per Feature, never a tree
-
-    PR #63   trace/13 ──► trace/12       top of the stack
-    PR #62   trace/12 ──► trace/11       built next to #11, then rebased onto it
-    PR #61   trace/11 ──► trace/10
-    PR #60   trace/10 ──► feature/5-…    bottom: the Skeleton
-
-    gh-stack shows the stack map on every PR. Each PR shows only its own diff.
-    A Trace never waits for a merge. The next one branches off the top as soon
-    as the PR below it is open and green.
-
-
-BACK TO MAIN
-
-  staged (default)
-    main ──┬─────────────────────────────────────────●──►    feature PR: Closes #5
-           └── feature/5-… ──●──────●──────●──────●──┘
-                            #10    #11    #12    #13         Trace PRs merge in, bottom-up
-
-  trunk
-    main ──●──────●──────●──────●──►                         each Trace PR merges into main
-          #10    #11    #12    #13                           #13 also carries Closes #5
-
-    PRs merge bottom-up. A merge deletes the branch, and GitHub retargets the
-    PR above it. Without required reviews, the loop merges each PR when CI is
-    green. With required reviews, the loop keeps going, and the open PRs wait
-    for a reviewer as one stack.
-```
+Run the Traces by hand with the discipline pickup skills, or let `wtf.loop` run them all. The loop builds each Feature as one linear stack of Trace PRs. Without required reviews, it merges each PR when CI is green. With required reviews, the open PRs wait for a reviewer as one stack.
 
 ## Skill reference
 
