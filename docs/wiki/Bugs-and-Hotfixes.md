@@ -3,15 +3,15 @@
 | Skill | Trigger | Purpose |
 | --- | --- | --- |
 | `wtf.report-bug` | "report a bug" | File a structured Bug issue linked to the originating Trace |
-| `wtf.hotfix` | "production is down", "emergency fix for #X" | Cut a hotfix branch from `main` and fix. Bypasses the planning hierarchy. |
+| `wtf.hotfix` | "production is down", "emergency fix for #X" | Create a hotfix branch from `main` and fix the problem. Skips the planning hierarchy. |
 
 ## Report a bug
 
-`wtf.report-bug` records the failing Gherkin scenarios as reproducible evidence and links the originating Trace and Feature.
+`wtf.report-bug` records the failing Gherkin scenarios as evidence that you can reproduce. It links the Bug to the originating Trace and Feature.
 
 ## Hotfix
 
-`wtf.hotfix` serves production incidents where the full flow is too slow. It skips the planning spine:
+Use `wtf.hotfix` for a production incident when the full workflow is too slow. The skill skips the planning hierarchy:
 
 ```mermaid
 gitGraph
@@ -28,9 +28,10 @@ gitGraph
   cherry-pick id: "fix"
 ```
 
-1. Cut a `hotfix/<bug>-<slug>` branch from `main`.
-2. Write the failing test first, then the fix.
-3. Open a PR back to `main`.
-4. Optionally, after the merge, cherry-pick the fix onto a release branch.
+1. Create a `hotfix/<bug>-<slug>` branch from `main`.
+2. Write a test that fails.
+3. Write the fix.
+4. Open a PR to `main`.
+5. Optional: after the merge, cherry-pick the fix onto a release branch.
 
-A scope gate redirects a large fix to the normal workflow.
+If the fix is large, a scope gate sends it to the normal workflow.

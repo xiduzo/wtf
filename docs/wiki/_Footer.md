@@ -1,1 +1,1 @@
-These pages come from [`docs/wiki/`](https://github.com/xiduzo/wtf/tree/main/docs/wiki) in the repo. Edit them there. A workflow overwrites any change made in the wiki itself.
+The source of these pages is [`docs/wiki/`](https://github.com/xiduzo/wtf/tree/main/docs/wiki) in the repo. Edit the pages there. A workflow overwrites each change that you make in the wiki.

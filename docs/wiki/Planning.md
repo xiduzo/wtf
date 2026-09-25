@@ -1,6 +1,6 @@
 # Planning
 
-Planning turns an initiative into Epic → Feature → Trace issues on GitHub. A spike can come first. `wtf.refine` keeps the tree aligned when requirements change.
+Planning turns an initiative into Epic, Feature, and Trace issues on GitHub. A spike can come first. When the requirements change, `wtf.refine` updates the tree.
 
 ```mermaid
 flowchart TB
@@ -28,9 +28,9 @@ flowchart TB
 
 | Skill | Trigger | Purpose |
 | --- | --- | --- |
-| `wtf.spike` | "run a spike on X" | Time-boxed technical investigation before you commit to an approach |
+| `wtf.spike` | "run a spike on X" | A time-boxed technical investigation before you select an approach |
 
-`wtf.spike` defines the question, time-boxes the investigation, and researches the codebase and docs. It derives two or three approaches with trade-offs and writes a recommendation to `docs/spikes/`. The findings feed `wtf.write-epic` or `wtf.write-trace`.
+`wtf.spike` defines the question, time-boxes the investigation, and researches the codebase and docs. It derives two or three approaches with their trade-offs. Then it writes a recommendation to `docs/spikes/`. The findings are input for `wtf.write-epic` or `wtf.write-trace`.
 
 ## Epic → Feature → Trace
 
@@ -38,9 +38,9 @@ flowchart TB
 | --- | --- | --- |
 | `wtf.write-epic` | "create an epic" | Define a strategic initiative |
 | `wtf.write-feature` | "create a feature" | Describe one user-facing capability with its stories and Gherkin |
-| `wtf.write-trace` | "create a trace" | Claim one story's scenarios as one implementation pass |
+| `wtf.write-trace` | "create a trace" | Claim the scenarios of one story as one implementation pass |
 
-Each skill reads the parent issue, guides you through a structured workflow, and ends with a created and linked GitHub issue. Features carry the user stories with their canonical Gherkin scenarios. Traces claim a subset of those scenarios and never re-derive them. See [The Trace model](The-Trace-Model.md).
+Each skill reads the parent issue and guides you through a structured workflow. It ends with a new GitHub issue, linked to its parent. The Feature holds the user stories and their canonical Gherkin scenarios. A Trace claims a subset of those scenarios and never re-derives them. See [The Trace model](The-Trace-Model.md).
 
 ## Batch decomposition
 
@@ -49,7 +49,9 @@ Each skill reads the parent issue, guides you through a structured workflow, and
 | `wtf.epic-to-features` | "break down this epic" | Propose and create all Features for an Epic |
 | `wtf.feature-to-traces` | "plan all traces for feature #12" | Validate the Trace Plan and create all Traces for a Feature |
 
-Both skills propose the full plan first. `wtf.feature-to-traces` validates the Feature's Trace Plan, or derives one for an older Feature. It then creates the Trace issues in spine order with sequential dependency links. In `guided` mode you create each item one by one, with pause, skip, and add controls. In `flow` mode the skill shows one consolidated review and then creates the batch. That is two user gates in total: confirm the plan, approve the tree.
+The two skills show the full plan first. `wtf.feature-to-traces` validates the Trace Plan of the Feature. When the Feature has no Trace Plan, the skill derives one. Then it creates the Trace issues in Spine order. It links each Trace to the Traces that it builds on.
+
+In `guided` mode, you confirm each item, with pause, skip, and add controls. In `flow` mode, the skill shows one consolidated review and then creates the batch. Thus `flow` has two user gates: confirm the plan, and approve the tree.
 
 ## Feature design
 
@@ -57,14 +59,14 @@ Both skills propose the full plan first. `wtf.feature-to-traces` validates the F
 | --- | --- | --- |
 | `wtf.design-feature` | "design feature #12" | Map the full UX flow for a Feature and write the Design Handoff |
 
-`wtf.design-feature` reads the Feature's user stories and Acceptance Criteria and derives every screen and state in the journey. It collects or scaffolds Figma frames and writes the result into the **Design Handoff** section of the Feature issue. That satisfies the Definition of Ready gate "Design handoff complete" before you cut the Traces.
+`wtf.design-feature` reads the user stories and Acceptance Criteria of the Feature. It derives each screen and state of the user journey. It collects or scaffolds Figma frames. Then it writes the result into the **Design Handoff** section of the Feature issue. This satisfies the Definition of Ready gate "Design handoff complete" before you create the Traces.
 
-The Epic's **Design Artifacts** field is different. It holds upstream strategic inputs, such as vision prototypes and UX research. The Feature's Design Handoff is the execution-level output that developers build against. The shared component map from this skill flows into `wtf.design-trace`.
+The **Design Artifacts** field of the Epic is different. It holds strategic input, such as vision prototypes and UX research. The Design Handoff of the Feature is the output that developers build against. `wtf.design-trace` uses the shared component map from this skill.
 
 ## Re-aim with `wtf.refine`
 
 | Skill | Trigger | Purpose |
 | --- | --- | --- |
-| `wtf.refine` | "re-aim feature #12" | Update an existing Epic, Feature, or Trace from new insights. The single Re-aim mechanism. |
+| `wtf.refine` | "re-aim feature #12" | Update an Epic, Feature, or Trace from new insights. This is the only Re-aim mechanism. |
 
-`wtf.refine` merges insights from the conversation, GitHub comments, and referenced docs. It re-validates only the affected sections and shows a section-by-section diff before it applies the update. It posts an audit-trail comment and cascades scenario edits to the Traces that claim them. `wtf.loop` runs it headless as the Re-aim step after each verified Trace.
+`wtf.refine` merges insights from the conversation, GitHub comments, and referenced docs. It validates only the affected sections again. Before it applies the update, it shows a diff for each section. It posts an audit-trail comment. It also copies each scenario edit to the Traces that claim that scenario. `wtf.loop` runs it without prompts as the Re-aim step after each verified Trace.
