@@ -46,7 +46,7 @@ if [ "$WTF_CLASS" = types ]; then
 else
   gh issue list --label "epic"       --state open --json number,title,labels,updatedAt --limit 50
   gh issue list --label "feature"    --state open --json number,title,body,labels,updatedAt --limit 100
-  gh issue list --label "trace,task" --state open --json number,title,labels,updatedAt --limit 200
+  gh issue list --search 'state:open (label:trace OR label:task)' --json number,title,labels,updatedAt --limit 200   # --label "a,b" is AND
   gh issue list --label "bug"        --state open --json number,title,labels,updatedAt --limit 50
 fi
 ```
@@ -58,6 +58,8 @@ Also fetch open PRs to detect traces with an open PR but no `verified` label:
 ```bash
 gh pr list --state open --json number,title,headRefName,body --limit 50
 ```
+
+Resolve the delivery mode once per `../references/branch-setup.md` ("Resolve the delivery mode"). A Feature's Delivery Override wins for that Feature. Step 3 reads it for the Feature-completion rows.
 
 ### 3. Classify issues into health categories
 
@@ -77,7 +79,8 @@ For each issue, check its labels against the expected lifecycle:
 | A story other than the primary has no Extension entry | ⚠️ Story not on the Spine — re-aim the Trace Plan |
 | Partition gap — a story scenario in the Feature body that no Trace Plan entry claims | ⚠️ Unclaimed scenarios — re-aim the Trace Plan |
 | Has child Traces, none `implemented` | 🔵 In progress |
-| All child Traces `verified`, Feature still open | ✅ Feature complete — needs Feature PR |
+| All child Traces `verified`, every Trace PR merged, Feature still open — `staged` delivery | ✅ Feature complete — needs Feature PR |
+| All child Traces `verified`, every Trace PR merged, Feature still open — `trunk` delivery | ⚠️ Feature not closed — the final Trace PR lacked `Closes #<feature>` |
 
 Read each Feature body's User Stories and Trace Plan for the Skeleton, Extension, and partition checks. The primary story is the story named by the Skeleton entry. Compare the scenario names per story against the Scenario Claims in the Trace Plan entries. Do not check the synced scenario copies in Trace bodies — `wtf.verify-trace` owns drift detection.
 
@@ -88,6 +91,7 @@ Read each Feature body's User Stories and Trace Plan for the Skeleton, Extension
 | `designed` but not `implemented` for > 7 days | 🕐 Stale — may be forgotten |
 | `implemented` but not `verified` | ⏳ Waiting for QA |
 | `verified` but no open or merged PR | ⏳ Waiting for PR |
+| `verified` but its Trace Plan entry is unchecked | ⚠️ Trace Plan out of sync — tick the entry |
 | Has open PR but not `verified` | ⚠️ PR open without QA sign-off |
 | `implemented` + `verified` + PR merged | ✅ Done |
 
@@ -130,11 +134,11 @@ Bugs:     [n open]  ([n] stale)
 
   [#n] Feature: <title>
        All traces verified — Feature PR not opened
-       Next: run create-pr targeting main
+       Next: run create-pr from the feature branch targeting main (staged) — or, in trunk delivery, open a PR that carries `Closes #<n>`
 
   [#n] Bug: <title>
        Open [n days], no linked Trace
-       Next: run write-trace to create a fix Trace
+       Next: run hotfix for a production fix, or refine the Feature so a Deepening Trace claims the failing scenario
 
 🕐  Stale ([n])
 

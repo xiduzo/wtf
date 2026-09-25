@@ -17,6 +17,8 @@ For each Trace, verify:
 
 - `designed` label is present (unless the user waived design)
 - The story and the Scenario Claim are present in the body
+- Spine Position names a position, and `Builds on` names only Traces that appear earlier in the same Trace Plan (a Skeleton names none)
+- `## Impacted Areas` has at least one entry — an empty section serializes the Trace against every sibling; report it as a finding, not a blocker
 
 For each Epic, verify:
 
@@ -43,7 +45,7 @@ Read each level of the hierarchy and check for contradictions:
 
 ## c. Codebase reality check
 
-For each Feature's Impacted Areas, each Trace's Technical Approach (when present), and each legacy Task's Impacted Areas and Contracts:
+For each Trace's `## Impacted Areas` and Technical Approach (when present), and each legacy Task's Impacted Areas and Contracts:
 
 - Check that referenced modules, files, or interfaces exist in the codebase
 - Check that API shapes in legacy Contracts match current code signatures

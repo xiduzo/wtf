@@ -2,7 +2,7 @@
 
 Every WTF planning skill uses this file to decide how much it asks and how much it derives. The mode controls interaction density. It never controls quality.
 
-Read this from any skill that authors Epics, Features, or Traces. The current consumers are `wtf.write-feature`, `wtf.epic-to-features`, and `wtf.feature-to-traces`. Other planning skills adopt it the same way.
+Read this from any skill that authors Epics, Features, or Traces. The current consumers are `wtf.write-feature`, `wtf.epic-to-features`, `wtf.feature-to-traces`, and `wtf.write-trace`. Other planning skills adopt it the same way.
 
 There are two modes:
 
@@ -15,6 +15,7 @@ There are two modes:
 - [What flow mode changes](#what-flow-mode-changes)
 - [What no mode changes](#what-no-mode-changes)
 - [Escalation in flow mode](#escalation-in-flow-mode)
+- [Hand-offs](#hand-offs) — pass `$WTF_PLAN` down the chain
 - [Mid-run switches](#mid-run-switches)
 
 ## Resolve the mode
@@ -73,6 +74,12 @@ Flow mode is not silent mode. Escalate when derivation hits a wall:
 - A missing fact no source answers (an unnamed domain actor, an unknown constraint).
 
 Collect escalations the way `wtf.loop` does. Batch them. Present them in a single `AskUserQuestion` per round. Sub-agents return `NEEDS_INPUT` blocks per `./subagent-protocol.md`; the orchestrator asks on their behalf. Never let a sub-agent ask the user directly.
+
+## Hand-offs
+
+A skill that chains into another planning skill passes `$WTF_PLAN` along — `wtf.epic-to-features` → `wtf.write-feature` → `wtf.feature-to-traces` → `wtf.write-trace`. The callee never re-resolves the mode.
+
+A nested skill runs in the caller's mode. In `flow`, its per-item asks (claim confirmation, contracts, draft review, next-step offer) do not fire. It derives what it can, returns `NEEDS_INPUT` for the rest, and the caller's consolidated review stands in for its own.
 
 ## Mid-run switches
 

@@ -88,7 +88,7 @@ The PR will be written from diff context alone (step 5).
 
 ### 5. Inspect the diff
 
-Determine the base branch per the Base-branch policy in `../references/branch-setup.md` (same as step 8).
+Determine the base branch per the Base-branch policy in `../references/branch-setup.md`, resolved with its "Resolve the stack base" procedure (same as step 8).
 Then collect the branch diff against that base:
 
 ```bash
@@ -130,12 +130,7 @@ Apply edits, then proceed.
 
 ### 8. Create the PR
 
-Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`. The base is the **stack base** the branch was cut from:
-
-```bash
-# The stack base is the upstream this branch forked from:
-git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null
-```
+Determine the base branch from the current branch name and the delivery mode, per the Base-branch policy table in `../references/branch-setup.md`. The base is the **stack base** the branch was cut from. Resolve it with the `## Resolve the stack base` procedure in `../references/branch-setup.md` — read `Builds on` from the Trace body, look up `trace/<n>-*` on origin, fall back to the feature branch (`staged`) or `main` (`trunk`). Never derive it from git upstream: before the first push the branch has none, and after `git push -u` the upstream is the branch itself.
 
 - `trace/*` branch stacked on a still-open Trace → target that `trace/*` branch
 - `trace/*` branch whose base Trace already merged (its branch is gone), `staged` delivery → target the parent feature branch (`feature/<feature-number>-<feature-slug>`)
@@ -149,7 +144,7 @@ git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null
   - header: "Base branch"
   - options: from `git branch -r`
 
-Never target a branch this one did not fork from — the diff would carry the intervening Trace's commits. When the base is another `trace/*` branch, say so in the PR body: this is a stacked PR, it merges after its base, and GitHub retargets it automatically when the base merges with its head branch deleted.
+Never target a branch this one did not fork from — the diff would carry the intervening Trace's commits. When the base is another `trace/*` branch and no native stack is used (see below), say so in the PR body: this is a stacked PR, it merges after its base, and GitHub retargets it automatically when the base merges with its head branch deleted.
 
 Write the body to a temp file (`$BODY`) with the Write tool.
 Then create the PR via the gh body helper (`../references/gh-body-helper.md`) so the description survives UTF-8 on Windows:
@@ -177,6 +172,8 @@ python3 .wtf/gh-body.py create --pr \
 ```
 
 Print the PR URL.
+
+**Native stack (optional).** If `gh extension list` shows `gh-stack` and the base is a `trace/*` branch, link the Feature's open Trace PRs into one native stack per `../references/branch-setup.md` "Native stacks": `gh stack unstack <stack-number>` when one exists, then `gh stack link <bottom-pr> ... <this-pr>` bottom to top. GitHub then renders the stack on every PR, so do not add the "stacked PR" note to the body.
 
 ### 9. Update the Trace issue (if linked)
 

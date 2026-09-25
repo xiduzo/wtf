@@ -17,5 +17,23 @@ The Task layer claimed to hold vertical slices but invited horizontal layering: 
 - Concurrency moves rather than disappears. Layer tasks of one Feature could run in parallel; Traces build on each other's Spine and cannot. Two things recover most of it. **Trace branches stack** — a Trace forks from the branch of the Trace it builds on as soon as that code is pushed and green, never waiting for a merge, and GitHub retargets each stacked PR when the one below it merges with its head branch deleted (so `wtf.setup` enables `delete_branch_on_merge`). **The Skeleton is the only true serialization point** — after it lands, the Feature's remaining Traces are colored by the same file-conflict graph that schedules Features, so Traces sharing no files run at once. The residual cost is a restack when review changes a Trace others sit on, and it is paid only for the Traces above it.
 - A phased 4-stage migration touches ~22 skills and 13+ references (foundations → authoring → execution → periphery).
 - Read paths treat legacy Task issues as legacy-Traces indefinitely. Write paths never create Tasks again.
-- Five skills rename without deprecation aliases: write-task → write-trace, feature-to-tasks → feature-to-traces, implement-task → implement-trace, verify-task → verify-trace, design-task → design-trace. A changelog rename table covers the migration.
+- Five skills rename without deprecation aliases: write-task → write-trace, feature-to-tasks → feature-to-traces, implement-task → implement-trace, verify-task → verify-trace, design-task → design-trace. The rename table under Migration covers the move.
 - `.wtf/config.json` gains `feature_scope` and `delivery`. The Trace kind (☄️) is provisioned like Epic. 🛠 retires and is never reused.
+
+## Migration
+
+Rename table for repos and habits that predate this decision. Read paths still recognize every left-hand entry; write paths only produce the right-hand one.
+
+| Before | After | Note |
+|---|---|---|
+| `wtf.write-task` | `wtf.write-trace` | no alias |
+| `wtf.feature-to-tasks` | `wtf.feature-to-traces` | no alias |
+| `wtf.implement-task` | `wtf.implement-trace` | no alias |
+| `wtf.verify-task` | `wtf.verify-trace` | no alias |
+| `wtf.design-task` | `wtf.design-trace` | no alias |
+| `.github/ISSUE_TEMPLATE/TASK.md` | `.github/ISSUE_TEMPLATE/TRACE.md` | `wtf.setup` installs `TRACE.md`; delete `TASK.md` from consuming repos |
+| `task` label / `Task` issue type | `trace` label / `Trace` issue type | legacy `task` issues stay readable as legacy Traces |
+| 🛠 title prefix | ☄️ title prefix | 🛠 is retired and never reused |
+| `task/<n>-<slug>` branches | `trace/<n>-<slug>` branches | `task/*` is still matched read-only by `wtf.create-pr` and `wtf.pr-review` |
+| Task body: Functional Description, in-body Gherkin, Impacted Areas | Trace body: Story, Scenario Claim, Spine Position, Impacted Areas | scenarios are canonical in the Feature; the Trace carries a synced copy |
+

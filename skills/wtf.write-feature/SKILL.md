@@ -149,7 +149,7 @@ Load the FEATURE template per `../references/issue-template-loading.md` (verify 
 
 ### 7b. Propose the Trace Plan
 
-From the stories and their scenarios, derive the **Trace Plan**: an ordered checklist. Item 1 is the Skeleton. It claims the primary story's happy-path scenario, minimally, through every layer. Every story other than the primary one then gets exactly one **Extension** entry, placed before that story's Deepening entries. Each later item names its Spine Position, its story, its Scenario Claim (the claimed scenario names), and what it adds to the Spine. The Scenario Claims of one story's Traces must partition that story's scenarios — full cover, no overlap.
+From the stories and their scenarios, derive the **Trace Plan**: an ordered checklist. Item 1 is the Skeleton. It claims the primary story's happy-path scenario, minimally, through every layer. It claims exactly one scenario. Every story other than the primary one then gets exactly one **Extension** entry, placed before that story's Deepening entries. Each later item names its Spine Position, its story, its Scenario Claim (the claimed scenario names), and what it adds to the Spine. Every Deepening entry names the story it deepens — a Deepening is never storyless. The Scenario Claims of one story's Traces must partition that story's scenarios — full cover, no overlap.
 
 Add the checklist to the **Trace Plan** section of the draft:
 
@@ -157,8 +157,8 @@ Add the checklist to the **Trace Plan** section of the draft:
 ## Trace Plan
 
 1. [ ] ☄️ Skeleton — Merchant sees settlement status for one completed payment (claims: "Status shown for a settled payment")
-2. [ ] ☄️ Extension — Merchant filters settlements by date range (claims: all scenarios)
-3. [ ] ☄️ Deepening — settlement status failure modes (claims: "Status for a failed settlement", "Status while settlement is pending")
+2. [ ] ☄️ Extension — Merchant filters settlements by date range (claims: "Settlements filtered by date range", "Empty result for a range with no settlements")
+3. [ ] ☄️ Deepening — Merchant sees settlement status for one completed payment: failure modes (claims: "Status for a failed settlement", "Status while settlement is pending")
 ```
 
 Do not ask a separate question for this. It is shown as part of the draft in step 10. The user can adjust the plan during that review.
@@ -275,8 +275,8 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
   - **Write next Feature** → write the next Feature for the same Epic (N remaining — replace N with the actual count, or omit if none)
   - **Stop here** → exit, no further action
 
-- **Plan all Traces** → invoke the `wtf.feature-to-traces` skill, passing the Feature number in as context.
-- **Write one Trace** → proceed with the `wtf.write-trace` skill, passing the Feature number in as context.
+- **Plan all Traces** → invoke the `wtf.feature-to-traces` skill, passing the Feature number and `$WTF_PLAN` in as context (per the Hand-offs rule in `../references/planning-mode.md`).
+- **Write one Trace** → proceed with the `wtf.write-trace` skill, passing the Feature number and `$WTF_PLAN` in as context (per the Hand-offs rule in `../references/planning-mode.md`).
 - **Write next Feature** → restart this skill from step 2, reusing the same Epic (skip re-fetching it). If the Epic has a Feature Breakdown list, propose the next uncreated Feature as the default capability name.
 - **Stop here** → exit.
 

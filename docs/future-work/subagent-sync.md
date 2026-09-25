@@ -4,7 +4,7 @@
 
 ## Problem
 
-`wtf.loop`, `wtf.verify-task` (Full Feature mode), and `wtf.refine` (cascade) spawn sub-agents that need the step-by-step content of other skills. Sub-agents do NOT inherit the parent session's loaded skills, so referencing a skill by name from inside a sub-agent prompt fails.
+`wtf.loop`, `wtf.verify-trace` (Full Feature mode), and `wtf.refine` (cascade) spawn sub-agents that need the step-by-step content of other skills. Sub-agents do NOT inherit the parent session's loaded skills, so referencing a skill by name from inside a sub-agent prompt fails.
 
 The current protocol (see `skills/references/subagent-protocol.md` rule 1) tells the orchestrator to:
 

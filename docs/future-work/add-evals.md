@@ -21,7 +21,7 @@ Best → worst for simple (single-turn) evals:
 |---|---|---|
 | `wtf.health` | Excellent ✅ | Pure classifier: GitHub issue state → triage report. Mock `gh issue list` JSON as fixture, assert report text. |
 | `wtf.loop` step 2d (conflict graph) | Excellent ✅ | Pure function: task set + impacted areas → sub-phase partition. Easy to assert partition correctness. |
-| `wtf.create-pr` (no-Task path) | Good ✅ | Diff + branch → PR title + body. Title assertable via Conventional Commits regex; body sections by substring. |
+| `wtf.create-pr` (no-Trace path) | Good ✅ | Diff + branch → PR title + body. Title assertable via Conventional Commits regex; body sections by substring. |
 | `wtf.refine` classify step | Good ✅ | Issue body + insight text → change map. Assert which sections got marked dirty. |
 | `wtf.changelog` | Good ✅ | Closed issues (fixtures) → Keep-a-Changelog markdown. Assert structure and absence of implementation vocabulary. |
 | `wtf.write-trace` | Good ✅ | Checkpoint evals: claim selection, depth split, ambiguity clarification. Each is a deterministic sub-function isolated from the interactive steps. |
@@ -29,7 +29,7 @@ Best → worst for simple (single-turn) evals:
 | `wtf.report-bug` | Good ✅ | Step 6 (bug report draft) checkpoint: failing scenario + task context → structured bug report. Assert all template sections present, Gherkin evidence included, domain language enforced. |
 | `wtf.epic-to-features` | Good ✅ | Step 2 (feature list proposal) checkpoint: epic fixture → feature list. Assert Actor-verb-object pattern, domain language only, no re-proposal of already-created features. |
 | `wtf.feature-to-traces` | Good ✅ | Trace Plan checkpoint: feature fixture → Trace Plan. Assert spine order, Scenario Claims partition the stories, each Trace maps to claimed scenarios. |
-| `wtf.write-epic`, `wtf.write-feature` | Poor (simple) | Heavy `AskUserQuestion` flow with no sub-step as deterministic as write-task's Gherkin generator or scope gate. Needs trajectory evals for meaningful coverage. |
+| `wtf.write-epic`, `wtf.write-feature` | Poor (simple) | Heavy `AskUserQuestion` flow with no sub-step as deterministic as write-trace's claim selection or scope gate. Needs trajectory evals for meaningful coverage. |
 | `wtf.reflect` | Fair ✅ | Step 4 routing (learning → TECH/QA/DESIGN/VISION) is deterministic. 5 evals cover all four targets plus the ambiguous-defaults-to-TECH case. |
 | `wtf.hotfix` | Fair ✅ | Step 4 (branch naming), step 6 (scope gate), and step 8 (PR body structure) are all deterministic checkpoints. Implementation step is codebase-dependent and untested. |
 | `wtf.retro` | Poor | Needs live GitHub issue/PR history to compare planned vs shipped. Cannot be fixture-mocked without enormous complexity. |

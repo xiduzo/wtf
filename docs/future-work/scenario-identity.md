@@ -84,14 +84,11 @@ The rejection still holds, for a stronger reason: regenerating a committed file 
 
 ---
 
-## 3. Repo gotchas that cost time last session
+## 3. Repo gotchas
 
-- **`skills/` is the only source of truth.** `.claude/skills/` was deleted (dead symlinks into a non-existent `.agents/skills/`) and both paths are now gitignored. Never read them.
+- **`skills/` is the only source of truth.** `.claude/skills/` and `.agents/` are gitignored runtime mirrors. Never read them.
 - **Templates are duplicated by hand, ×2.** `.github/ISSUE_TEMPLATE/<X>.md` and `skills/wtf.setup/references/<X>.md` must stay byte-identical. **`sync-shared-references.sh` does NOT cover them** — it only syncs `skills/references/` → `skills/wtf.setup/shared-references/`. Verify with `diff -q` after every template edit.
 - After editing anything in `skills/references/`, run `bash skills/wtf.setup/sync-shared-references.sh`.
-- **`rtk` silently mangles piped `grep` output** — multi-match greps return `"N matches in 0 files"` instead of the lines. Use `rtk proxy grep ...` to bypass.
-- `docs/skills-audit.md` is explicitly historical. Don't cite it as current state; `CLAUDE.md` is the maintained inventory.
-- The user's global `CLAUDE.md` asks for responses under 500 words and artifacts written to files rather than returned inline. The `ctx_*` MCP tools it references were **not available** in the last session — `ToolSearch` found no match. `WebFetch` is nominally blocked by that config but `WebSearch` worked fine.
 
 ## 4. Verification checklist before opening the PR
 

@@ -113,11 +113,11 @@ fi
 if [ "$WTF_CLASS" = types ]; then
   gh issue list --search 'state:open (type:"Epic" OR type:"Feature" OR type:"Trace")' --json number,title --limit 10
 else
-  gh issue list --label "epic,feature,trace" --state open --json number,title --limit 10
+  gh issue list --search 'state:open (label:epic OR label:feature OR label:trace)' --json number,title --limit 10
 fi
 ```
 
-(`--label "a,b,c"` is OR for labels. `type:"A" OR type:"B"` is OR for types.)
+(`--label "a,b,c"` is AND — an issue must carry every label. For OR in `labels` mode, use `--search` with `label:a OR label:b`. `type:"A" OR type:"B"` is OR for types.)
 
 When the repo may hold legacy Task issues, extend the filter — see [Legacy Task reads](#legacy-task-reads).
 
@@ -142,7 +142,7 @@ If `$KIND` is `Task` or `task`, treat the issue as a legacy Trace (see [Legacy T
 
 Repos that predate the Trace model hold `Task` issues (type `Task`, label `task`, prefix 🛠). Read paths treat them as legacy Traces. `wtf.health`, `wtf.refine`, and `wtf.retro` then stay complete in migrated repos.
 
-- **List** — when the repo may hold legacy Tasks, add the legacy filter. In `types` mode: `(type:"Trace" OR type:"Task")`. In `labels` mode: `--label "trace,task"`.
+- **List** — when the repo may hold legacy Tasks, add the legacy filter. In `types` mode: `(type:"Trace" OR type:"Task")`. In `labels` mode: `--search 'state:open (label:trace OR label:task)'` — never `--label "trace,task"`, which is AND.
 - **Detect** — the detect block above already matches `task`. Map `Task`/`task` to the Trace kind before you route.
 
 Write paths never create Tasks. Do not set the `Task` type on a new issue. Do not add the `task` label. No relabel migration runs — legacy Task issues stay as they are.

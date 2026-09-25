@@ -61,6 +61,8 @@ Record two booleans for the final report:
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
 - `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
 
+Optional: `github/gh-stack` — native stacked PRs for Trace stacks (`../references/branch-setup.md` "Native stacks"). Do not install it unasked. Mention it once, then move on.
+
 ### 4. Detect repo context
 
 ```bash
@@ -153,6 +155,14 @@ cp "$SETUP_DIR/references/TRACE.md"   .github/ISSUE_TEMPLATE/TRACE.md
 ```
 
 Copy only files that are missing. Do not overwrite existing templates. After copying, list the final contents of `.github/ISSUE_TEMPLATE/` to confirm.
+
+**Legacy `TASK.md`.** If `.github/ISSUE_TEMPLATE/TASK.md` exists, WTF no longer creates Tasks — write paths create Traces. Existing Task issues stay readable (legacy reads in `../references/issue-classification.md`). Call `AskUserQuestion` (per `../references/questioning-style.md`):
+
+- question: "A legacy Task template is present. Remove it?"
+- header: "Legacy template"
+- options:
+  - **Remove it (recommended)** → `git rm .github/ISSUE_TEMPLATE/TASK.md`
+  - **Keep it** → note it in the status report
 
 ### 6. Check PR template
 
@@ -283,7 +293,7 @@ Commit `.wtf/config.json` so every teammate classifies issues the same way. Reco
 
 > **Closing convention:** GitHub has no native setting to require PR-based closure. Skill behavior enforces this. Issues are only "closed as completed" when a merged PR contains `Closes #<n>`. Direct `gh issue close` calls are reserved for `--reason "not planned"` (will not implement) and `--reason "duplicate"` only. Surface this convention in the status report.
 
-### 7a-bis. Enable automatic head-branch deletion
+### 7a. Enable automatic head-branch deletion
 
 Trace PRs stack: a Trace branches off the branch of the Trace it builds on rather than waiting for a merge (`../references/branch-setup.md`). GitHub retargets a stacked PR to its parent's base **only when the parent's head branch is deleted on merge**. Without this setting, a human merging through the web UI strands every PR above them.
 
@@ -572,11 +582,13 @@ Issue templates
   EPIC.md                 ✅  (or ✅ installed from references)
   FEATURE.md              ✅  (or ✅ installed from references)
   TRACE.md                ✅  (or ✅ installed from references)
+  TASK.md                 ⚪  retired  (or  ⚠️ legacy template kept)
 PR template               ✅  (or ✅ installed from references)
 Issue classification      ✅  native types (Epic/Feature/Trace/Bug)  (or  ✅ labels: epic, feature, trace, bug)
 Planning mode             ✅  guided  (or  ✅ flow)
 Feature scope             ✅  single-story  (or  ✅ grouped)
 Delivery mode             ✅  staged  (or  ⚠️ trunk — presumes feature-flag / dark-launch discipline)
+Head-branch auto-delete   ✅  on  (or  ⚠️ off — a web-UI merge strands stacked PRs; set Settings → General → Automatically delete head branches)
 Lifecycle labels          ✅  implemented, designed, verified
 Intervention hook         ✅  installed (global)  (or  ✅ installed (repo)  /  ⚪ skipped  /  ⚠️ manual paste required)
 Body encoding guard       ✅  verified (python3)  (or  ⚠️ Python is 'py'/'python', not 'python3' — alias it or body ops fail  /  ⚠️ Python 3 not found — guard inert, raw-gh fallback  /  ⚠️ helper not copied)

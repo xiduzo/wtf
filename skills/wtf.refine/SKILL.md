@@ -35,7 +35,7 @@ Otherwise call `AskUserQuestion` (per `../references/questioning-style.md`):
 if [ "$WTF_CLASS" = types ]; then
   gh issue list --search 'state:open (type:"Epic" OR type:"Feature" OR type:"Trace" OR type:"Task")' --json number,title --limit 10
 else
-  gh issue list --label "epic,feature,trace,task" --state open --json number,title,labels --limit 10
+  gh issue list --search 'state:open (label:epic OR label:feature OR label:trace OR label:task)' --json number,title,labels --limit 10
 fi
 ```
 
@@ -89,13 +89,13 @@ If nothing was passed, call `AskUserQuestion` (per `../references/questioning-st
 - header: "Insight"
 - options: from plausible changes inferred from recent issue comments (e.g. the last comment's key point)
 
-**b. GitHub comments since last body edit**
+**b. GitHub comments since the last refinement**
 
-Extract comments posted after the issue body was last edited:
+Extract comments posted after the last audit-trail comment this skill posted (a comment whose body starts with `## Refinement —` or `## Re-aim (headless)`). If no such comment exists, fall back to the issue's `createdAt`. Do not compare against `updatedAt` — that is the issue's last activity, comments included, so nothing would ever match:
 
 ```bash
-gh issue view <issue_number> --json comments,updatedAt \
-  --jq '.updatedAt as $bodyUpdatedAt | .comments[] | select(.createdAt > $bodyUpdatedAt) | "[\(.author.login)] \(.body)"'
+gh issue view <issue_number> --json createdAt,comments \
+  --jq '(.createdAt) as $c0 | ([.comments[] | select(.body | test("^## (Refinement|Re-aim \\(headless\\)) —")) | .createdAt] | max // $c0) as $since | .comments[] | select(.createdAt > $since) | "[\(.author.login)] \(.body)"'
 ```
 
 Read each comment.
@@ -159,8 +159,9 @@ Notes on the Trace column:
 
 **Trace landed — re-aim.** The landed Trace's learnings re-aim the remaining plan.
 Affected section: the Feature's Trace Plan.
-Allowed moves: reorder the remaining entries, re-batch them, move scenarios between remaining entries, and add newly discovered scenarios to the right story and to plan entries.
-Landed (checked) entries stay untouched.
+Allowed moves: reorder the remaining entries, re-batch them, and move scenarios between remaining entries whose Traces carry neither `implemented` nor `verified`.
+Adding a newly discovered scenario, and any drop, is a **set change**. Interactive mode shows it in the diff for approval. Headless mode proposes it (see Headless mode) and never applies it.
+Landed entries — checked, or whose Trace carries `implemented` or `verified` — stay untouched.
 Validation: the partition re-check in step 4.
 
 **Scenario canonicality guard.** If an insight would edit scenario text on a **Trace** — the synced `<details>` copy — stop.
@@ -224,6 +225,7 @@ Keep unchanged scenarios exactly as they are.
 Mark the Trace Plan as potentially stale.
 Traces whose Scenario Claims name a changed scenario become cascade items (step 9).
 For a legacy Trace, re-derive its in-body Gherkin the same way.
+In headless mode a re-derivation that adds or removes a scenario is a set change — propose it, do not apply it (Scenario-set gate).
 
 **Scenario Claim changed (Trace) → Claim re-check**
 
@@ -376,6 +378,8 @@ For every Trace whose Scenario Claim names a changed, renamed, moved, or newly a
 2. Refresh the synced `<details>` copy from the Feature body. Keep its marker line: "Synced from Feature #N — edit there, not here".
 3. Strip stale lifecycle labels per the step 6 decision (`implemented`, `verified`).
 
+In headless mode the mechanical sync only touches Traces that carry neither `implemented` nor `verified`. A needed sync on a landed Trace is listed in the audit comment as a judgment item instead.
+
 Use the gh body helper (`../references/gh-body-helper.md`) for each body edit.
 List the synced Traces in the summary and in the audit comment.
 
@@ -420,7 +424,7 @@ A genuine blocker returns a `NEEDS_INPUT` block instead (protocol rule 3).
 | Step 1 — issue ask | Skip the ask. The Feature number is pre-loaded. Detection and hierarchy fetch still run. |
 | Step 2 — insight interview + 2d confirmation | Skip both. The pre-loaded learnings and verify results are the insight list. |
 | Step 3 — classify | Runs. The default change type is **Trace landed — re-aim**. Other change types may also fire from the learnings. |
-| Step 4 — validations | Runs. If a split signal fires, or the partition re-check fails and reordering alone cannot fix it, return `NEEDS_INPUT`. |
+| Step 4 — validations | Runs. If a split signal fires, or the partition re-check fails and reordering alone cannot fix it, return `NEEDS_INPUT`. A scenario re-derivation that changes the set returns a proposal, not an edit. |
 | Step 5 — diff review question | Skip the question. Apply the diff directly. |
 | Step 6 — stale label question | Resolve by rule: auto-strip per the stale-label table. Record the strips in the audit comment. |
 | Step 8 — audit comment | ALWAYS post it. Heading: `## Re-aim (headless) — after Trace #<n> — <YYYY-MM-DD>`. |
@@ -440,6 +444,7 @@ It MUST NOT change the scenario set on its own, in either direction. A set chang
 - delete a scenario or a story
 - loosen a Then step
 - remove a plan entry without moving its claimed scenarios to another entry
+- move a scenario out of an entry whose Trace is `implemented` or `verified`
 
 When the evidence supports a set change — growth or shrinkage:
 

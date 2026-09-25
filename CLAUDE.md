@@ -95,9 +95,9 @@ The harness runs each eval with-skill and without-skill, grades expectations, an
 
 | Skill | Evals | Status |
 |---|---|---|
-| `wtf.health` | 3 (clean, implemented-not-verified, stale-designed) | ✅ |
-| `wtf.loop` | 5 (linear-chain, parallel-features, diamond-file-conflict, contradiction-spec, external-blocker) | ✅ |
-| `wtf.create-pr` | 3 (feat-branch, fix-branch, refactor-branch — no-Trace path) | ✅ |
+| `wtf.health` | 4 (clean, implemented-not-verified, stale-designed, legacy-task-and-unticked-plan) | ✅ |
+| `wtf.loop` | 7 (linear-chain, parallel-features, diamond-file-conflict, contradiction-spec, external-blocker, sibling-traces-parallel, trunk-delivery-close) | ✅ |
+| `wtf.create-pr` | 4 (feat-branch, fix-branch, refactor-branch — no-Trace path; stacked-trace-branch — stacked Trace path) | ✅ |
 | `wtf.refine` | 4 (scope-narrowed, domain-language-correction, technical-constraint, conflicting-insights) | ✅ |
 | `wtf.changelog` | 3 (all-added, mixed-added-fixed, drop-internal-refactor) | ✅ |
 | `wtf.write-trace` | 3 checkpoint evals (claim-selection, depth-split-draft, ambiguous-claim) | ✅ |

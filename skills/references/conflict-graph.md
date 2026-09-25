@@ -36,7 +36,7 @@ For **every** unit in the input set — Feature, legacy Task, Epic, Bug, or any 
 gh issue view <issue_number> --json body --jq '.body'
 ```
 
-Parse the `## Impacted Areas` section. Collect all file paths, modules, and components listed. Bugs and loose issues often skip this section. Treat them like any other node below.
+Parse the `## Impacted Areas` section. Collect all file paths, modules, and components listed. Every Trace carries this section (the TRACE template ships it; `wtf.write-trace` fills it and `wtf.implement-trace` refines it). Bugs and loose issues often skip this section. Treat them like any other node below.
 
 **Inherit from parents (when a parent exists).** A node's *effective* impacted set is the union of:
 
@@ -67,6 +67,8 @@ Assign units to sub-phases in issue-number order (stable):
 ### 4. Handle missing Impacted Areas
 
 If an issue has no `## Impacted Areas` *and* inherits nothing from any ancestor, treat it as conflicting with all others. This is common for bugs and loose issues. Assign it to its own sub-phase. Note this in the execution plan so the user understands why it is serialized.
+
+A Trace with an empty `## Impacted Areas` is serialized against every other Trace of its Feature — name the empty Trace in the execution plan and recommend filling the section.
 
 If the issue is empty but an ancestor declares impacted areas, use the inherited set (step 1). Do not serialize unnecessarily.
 

@@ -8,8 +8,8 @@ Shared label semantics and gate templates for any skill that reads or writes lif
 |---|---|---|
 | `designed` | Design coverage produced (Design Reference / Handoff written) | `wtf.design-trace`, `wtf.design-feature` |
 | `implemented` | Code complete. All claimed Gherkin scenarios pass. | `wtf.implement-trace` |
-| `verified` | QA verified against the Scenario Claim + Edge Cases | `wtf.verify-trace` |
-| `merged` | PR merged to main (closes the issue) | GitHub on PR merge |
+| `verified` | QA verified against the Scenario Claim — exactly the claimed scenarios | `wtf.verify-trace` |
+| `merged` | PR merged into its base branch (closes the issue) | GitHub on PR merge |
 
 ## Canonical flow
 
@@ -67,3 +67,5 @@ gh issue edit <issue_number> --add-label "<label>"
 ```
 
 This call is **mandatory**. The consuming skill's gate depends on it. In sub-agent contexts the label call is non-skippable per `./subagent-protocol.md` rule 4.
+
+`wtf.verify-trace` also ticks the Trace's entry in the Feature's Trace Plan when it sets `verified`.

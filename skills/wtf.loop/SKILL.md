@@ -67,7 +67,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - options:
   - One option per open Feature (e.g. **Feature #<n> — <title>** → execute all Traces under this Feature)
   - One **Epic — all features** option if an Epic is available
-  - **Resume a previous run** → fetch open Traces not yet labeled `implemented` or `verified`. Reconcile against each Feature's Trace Plan checklist: a checked entry with a merged PR is done. Resume each Feature from its first unfinished entry, in plan order. Skip to step 4.
+  - **Resume a previous run** → fetch open Traces not yet labeled `implemented` or `verified`. Reconcile against each Feature's Trace Plan checklist: a checked entry with a merged PR is done. An unchecked entry whose Trace carries `verified` is a missing tick — tick it (per `wtf.verify-trace` "Tick the Trace Plan"), then treat it as done. Resume each Feature from its first unfinished entry, in plan order. Skip to step 4.
 
 **Fetch the hierarchy:**
 
@@ -199,7 +199,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 
 Run the per-trace sequence per `references/trace-execution.md`. The sequence is: a. merge + dependency gate, b. implement, c. verify, d. open PR + pipeline + merge, e. re-aim via headless refine, f. plan reconcile, g. progress update.
 
-The reference also covers the parallelism rules: Feature units in one sub-phase advance concurrently, one active Trace per Feature at a time. It lists the skill files to inline into each sub-agent prompt.
+The reference also covers the parallelism rules: Feature units in one sub-phase advance concurrently. Inside a Feature the Skeleton runs alone; once its branch is pushed and green, the remaining Traces run as their conflict-graph sub-phases and Builds-on order allow — siblings at the same time, stacked Traces one after the other. It lists the skill files to inline into each sub-agent prompt.
 
 Apply `../references/subagent-protocol.md` for every Agent call. The conflict-free sub-phases from step 2d drive cross-feature parallelism.
 
@@ -207,7 +207,7 @@ Collect every `NEEDS_INPUT` block and every re-aim set-change proposal into one 
 
 ### 5. Feature completion (delivery-mode aware)
 
-Run this per Feature unit, as soon as its Trace Plan is exhausted. Exhausted means: every plan entry is checked, every Trace PR is merged, and every Trace carries the `verified` label.
+Run this per Feature unit, as soon as its Trace Plan is exhausted. Exhausted means: every plan entry is checked, every Trace PR is merged, and every Trace carries the `verified` label. `wtf.verify-trace` ticks each entry when it sets `verified`; step 4f repairs a missing tick.
 
 **`staged` delivery** — open a PR from the feature branch to `main`. Confirm completion with both signals first:
 

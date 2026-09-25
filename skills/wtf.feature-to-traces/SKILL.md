@@ -1,6 +1,6 @@
 ---
 name: wtf.feature-to-traces
-description: This skill should be used when a user wants to plan and create the complete set of Traces for a Feature — for example "plan all traces", "create the traces for feature #42", "break this feature into traces", "execute the trace plan", or when chained from wtf.write-feature or wtf.epic-to-features. It validates the Feature's Trace Plan (or derives one for older Features), then creates the Trace issues in spine order with sequential dependency links. Supports two planning modes — `guided` (per-item confirmation) and `flow` (one consolidated review) — passed as an argument or read from `.wtf/config.json`. Use `wtf.write-trace` to write a single Trace in isolation.
+description: This skill should be used when a user wants to plan and create the complete set of Traces for a Feature — for example "plan all traces", "create the traces for feature #42", "break this feature into traces", or when chained from wtf.write-feature or wtf.epic-to-features. It validates the Feature's Trace Plan (or derives one for older Features), then creates the Trace issues in spine order with sequential dependency links. Supports two planning modes — `guided` (per-item confirmation) and `flow` (one consolidated review) — passed as an argument or read from `.wtf/config.json`. Use `wtf.write-trace` to write a single Trace in isolation.
 argument-hint: "[feature-number] [guided|flow]"
 ---
 
@@ -51,6 +51,7 @@ If the Feature body has a Trace Plan, that plan **is** the list. Do not re-deriv
 3. **One Skeleton, first** — exactly one Skeleton entry exists, and it is item 1. If a child Trace or legacy Task already laid the Spine, no Skeleton entry may remain open.
 4. **One Extension per further story** — every story other than the Skeleton's story has exactly one Extension entry. That entry precedes that story's Deepening entries.
 5. **Numbers match** — checked entries carry issue numbers that exist as children. Unchecked entries with numbers point at open child Traces.
+6. **Skeleton claims one scenario** — the Skeleton entry claims exactly one scenario, the primary story's happy path. Move any extra scenario to a Deepening entry of that story.
 
 For each gap, propose a concrete fix — a re-partitioned claim, a reordered list, a named story, a corrected checkbox. In `guided` mode, confirm each fix with the user as you find it. In `flow` mode, collect all fixes and confirm them in the step 4 review. Write confirmed fixes into the Feature body in step 4.
 
@@ -62,7 +63,7 @@ An older Feature may predate the Trace model. When the body has no Trace Plan, d
 
 1. **Backfill scenarios if needed.** If a story has no canonical Gherkin scenarios (legacy Feature shape), derive scenario names from its ACs and the Edge Cases first. Write full Gherkin per `../references/ddd-writing-rules.md`. These go into the Feature body with the plan — the Feature stays canonical.
 2. **Pick the primary story.** The Skeleton claims the primary story's happy-path scenario. Propose the story that most directly delivers the Feature's Goal. In `guided` mode, confirm the choice with the user. In `flow` mode, derive it and surface it in the step 4 review.
-3. **Order the entries.** Item 1 is the Skeleton — the primary story's happy path, minimally, through every layer. Then Extension entries for further stories. Then Deepening entries for remaining scenarios — edge cases, failure modes — each citing its story. A small story gets one entry that claims all its scenarios.
+3. **Order the entries.** Item 1 is the Skeleton — the primary story's happy path, minimally, through every layer. It claims exactly one scenario. Then Extension entries for further stories. Then Deepening entries for remaining scenarios — edge cases, failure modes — each citing its story. A small story gets one entry that claims all its scenarios.
 4. **Never slice by layer.** A legacy `Proposed Tasks` checklist in the body is not a Trace Plan. If it slices by layer (model → API → UI), do not adopt it. Say so, and derive depth-ordered entries instead. A story too big for one agent pass splits into a Skeleton plus Deepening entries — the escape valve is depth, not layers.
 
 Each entry names its story, its Scenario Claim (scenario names), and what it adds to the Spine, in the Trace Plan shape from the FEATURE template.
@@ -91,11 +92,12 @@ Apply strict STE per `../references/ste-writing.md` to the written plan entries.
 Work through the plan top to bottom. Skip entries that already carry an issue number. For each remaining entry:
 
 1. Announce: "Creating Trace [N/total]: _[entry summary]_".
-2. Follow the `wtf.write-trace` process with everything pre-answered:
+2. Follow the `wtf.write-trace` process with everything pre-answered. Pass `$WTF_PLAN` down (write-trace honors it per the Hand-offs rule in `../references/planning-mode.md`):
    - The Feature number and claim state (skip write-trace steps 0–1).
    - The plan entry as the confirmed story and Scenario Claim (write-trace step 2 needs no ask).
    - The Spine Position and Builds-on from the plan order (write-trace step 3 needs no ask).
-   - The previous entry's issue number as the blocked-by link. The Skeleton has no blocker. If legacy Task children laid the Spine, the first new Trace also has no blocker — note the legacy base in its body.
+   - The Builds-on Traces as blocked-by links, from the plan: an Extension builds on the Skeleton; a Deepening builds on the Trace that started its story and on any later Trace of that story whose code it needs. Two entries that build on the same Trace are siblings and get no link between them. The Skeleton has no blocker. If legacy Task children laid the Spine, the first new Trace also has no blocker — note the legacy base in its body.
+   - Impacted Areas drafted from the codebase (write-trace step 5); in `flow` mode the drafting sub-agents fill it.
    - Each created Trace is classified, linked as a sub-issue of the Feature, and recorded in the Trace Plan checklist per write-trace steps 10–11.
 3. In `guided` mode, before the next entry, call `AskUserQuestion` (per `../references/questioning-style.md`):
    - question: "Trace [N] created. Continue to Trace [N+1]: _[next entry summary]_?" (replace with actual values)

@@ -1,6 +1,6 @@
 ---
 name: wtf.write-trace
-description: This skill should be used when a user wants to create a single Trace issue under a Feature — for example "create a trace", "write a trace for this feature", "add a trace to feature #42", "claim these scenarios", "start the Skeleton", or "add a Deepening Trace". A Trace claims one story and a declared subset of that story's Gherkin scenarios from the Feature body. Scenarios are canonical in the Feature and are never re-derived here. Use `wtf.feature-to-traces` to plan and create the full Trace set for a Feature. Not applicable to Epics, Features, or bug reports.
+description: This skill should be used when a user wants to create a single Trace issue under a Feature — for example "create a trace", "write a trace for this feature", "add a trace to feature #42", "claim these scenarios", or "add a Deepening Trace". A Trace claims one story and a declared subset of that story's Gherkin scenarios from the Feature body. Scenarios are canonical in the Feature and are never re-derived here. Use `wtf.feature-to-traces` to plan and create the full Trace set for a Feature. Not applicable to Epics, Features, or bug reports.
 ---
 
 # Write Trace
@@ -14,6 +14,8 @@ Create a GitHub Trace issue — one pass over the Feature's Spine. The story and
 Run the setup check from `../references/gh-setup.md`. Stop if `gh` is not installed or not authenticated. Note whether the extensions are available. That result controls whether native sub-issue and dependency links are created in step 10.
 
 If invoked from `wtf.feature-to-traces` or `wtf.write-feature`, skip this step. The orchestrator already ran it. Also skip on re-invocations in the same session (e.g. "Next Trace in plan" loop in step 12).
+
+**Planning mode.** If an orchestrator passed `$WTF_PLAN`, honor it per the Hand-offs rule in `../references/planning-mode.md`: in `flow`, steps 2, 6, 9, and 12 do not ask — the passed plan entry is the claim, contracts derive from step 5 and the Feature's Domain Events, the orchestrator's consolidated review replaces step 9, and unanswerable facts return as `NEEDS_INPUT`. Standalone, the skill is always guided.
 
 ### 1. Identify the parent Feature and read its Trace state
 
@@ -57,11 +59,11 @@ Validate the confirmed claim:
 
 Decide the position from the claim state:
 
-- **Skeleton** — only when the Feature has no child Trace and no legacy Task child. The Skeleton is the first Trace. It claims the primary story's happy-path scenario, minimally, through every layer. Lean but complete — never a prototype.
+- **Skeleton** — only when the Feature has no child Trace and no legacy Task child. The Skeleton is the first Trace. It claims the primary story's happy-path scenario, minimally, through every layer. It claims exactly one scenario. Lean but complete — never a prototype.
 - **Extension** — the first Trace of a further story on an existing Spine.
 - **Deepening** — further scenarios of a story already started. Always cite the story it deepens. A Deepening Trace is never storyless.
 
-Record **Builds on**: the issue numbers of the Traces whose code this one needs — normally the previous Trace in plan order, and the Skeleton for anything that starts a new story. The Skeleton builds on nothing. This replaces free-form dependency questioning. **Builds on** drives both the blocked-by link in step 10 and the stack base in `wtf.implement-trace`, so name only real code dependencies: two Traces that both build on the Skeleton and touch different files will run at the same time.
+Record **Builds on**: the issue numbers of the Traces whose code this one needs. An Extension builds on the Skeleton. A Deepening builds on the Trace that started its story (Skeleton or Extension) and on any later Trace of that story whose code it needs. Never name "the previous entry" by habit — two entries that build on the same Trace are siblings. The Skeleton builds on nothing. This replaces free-form dependency questioning. **Builds on** drives both the blocked-by link in step 10 and the stack base in `wtf.implement-trace`, so name only real code dependencies: two Traces that both build on the Skeleton and touch different files will run at the same time.
 
 ### 4. Claim assessment
 
@@ -71,6 +73,7 @@ Trace-level split signals (heuristics — use judgment, not rigid thresholds):
 
 - The claim spans more than one story.
 - The claim is too large for one agent pass — many scenarios with distinct setup, or scenarios that touch unrelated failure domains.
+- The claim is a Skeleton with more than one scenario. Keep the happy path; move the rest to a Deepening of the same story.
 
 If a signal fires, split by **depth**: re-partition the claim into a smaller first claim plus Deepening Traces. Never split by layer (model → API → UI). Present the re-partition and confirm with the user.
 
@@ -78,6 +81,7 @@ If a signal fires, split by **depth**: re-partition the claim into a smaller fir
 
 Use the Agent tool to search the codebase for:
 
+- The files, modules, and components the claim will touch (for Impacted Areas).
 - Current interfaces at the integration points the claim touches (for Contracts & Interfaces).
 - Existing domain Event definitions to reuse rather than invent.
 - Observability patterns (logs, metrics, alerts) near the touched code paths.
@@ -106,6 +110,7 @@ Load the TRACE template per `../references/issue-template-loading.md` (verify ex
 - **Story** — copy it verbatim from the Feature. Do not re-derive it. Do not reword it.
 - **Scenario Claim** — list the claimed scenario names. Below them, fill the collapsed `<details>` block with the claimed scenarios copied verbatim from the Feature body. Set the summary line to "Claimed scenarios — synced from Feature #<feature_number> — edit there, not here".
 - **Spine Position** — the position from step 3 and the Builds-on Trace numbers. A Deepening Trace names the story it deepens.
+- **Impacted Areas** — the paths, modules, and components from step 5, grouped per the template bullets. Leave no bullet empty when step 5 found anything; the conflict graph serializes a Trace whose list is empty.
 - **Contracts & Interfaces** — from step 6.
 - **Technical Approach** — leave the placeholders. `wtf.implement-trace` fills this section.
 - **Observability** — fill from the patterns found in step 5. If the Trace has no production observability need, state "None required for this trace".
@@ -158,10 +163,10 @@ Print the Trace issue URL and number.
 gh sub-issue add <feature_number> <trace_number>
 ```
 
-If `gh-issue-dependency-available` and this Trace builds on a previous Trace (step 3), create the sequential blocking link:
+If `gh-issue-dependency-available` and this Trace builds on other Traces (step 3), create one blocking link per Builds-on Trace:
 
 ```bash
-gh issue-dependency add <trace_number> --blocked-by <previous_trace_number>
+gh issue-dependency add <trace_number> --blocked-by <builds_on_trace_number>
 ```
 
 If either extension is unavailable, warn the user. Do not write relationship references into the issue body.

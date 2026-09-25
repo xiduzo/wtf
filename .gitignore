@@ -10,3 +10,7 @@ skills/.DS_Store
 
 # Evals output
 wtf.*-workspace
+
+# Tool caches and skill-creator scratch
+.desc-opt/
+node-compile-cache/

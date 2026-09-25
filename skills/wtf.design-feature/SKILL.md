@@ -107,7 +107,7 @@ If available: for each screen in the journey map without a frame, call `generate
 Collect the generated frame URLs. Treat them as Path A frames for the coverage matrix and Design Handoff.
 
 **Path C — Scaffold brief only:**
-For each screen in the journey map, produce a text brief. List required UI elements, interactions, and relevant design tokens. This is a Figma-free design brief a designer or developer can execute. Use `references/component-spec-template.md` as the structure if available.
+For each screen in the journey map, produce a text brief. List required UI elements, interactions, and relevant design tokens. This is a Figma-free design brief a designer or developer can execute. Use `../wtf.design-trace/references/component-spec-template.md` as the structure if available.
 
 **Partial:**
 Collect available frame URLs. Run Path A validation on covered screens. For uncovered screens, call `AskUserQuestion` (per `../references/questioning-style.md`):

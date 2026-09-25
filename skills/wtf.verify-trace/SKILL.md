@@ -67,7 +67,7 @@ Fetch all sub-issues of the Feature using `gh sub-issue list <feature_number>` p
   - Drift gate (step 3) → do not resolve alone. Return as `NEEDS_INPUT` to the orchestrator
   - Per-scenario pass/fail in the interpretive walk (step 6) → return as `NEEDS_INPUT` to the orchestrator
   - Bug-filing prompts → defer to the aggregated step 10
-- Mandatory label (non-skippable): `gh issue edit <trace_number> --add-label "verified"` after verification passes.
+- Mandatory label (non-skippable): `gh issue edit <trace_number> --add-label "verified"` after verification passes. The sub-agent also ticks the Trace's entry in the Feature's Trace Plan (step 8, **Tick the Trace Plan**) — non-skippable for the same reason.
 
 Resolve any `NEEDS_INPUT` responses for a Trace before you start the next Trace.
 
@@ -234,7 +234,13 @@ Every Trace leaves the system releasable. Confirm the invariant with one short c
 
 1. Run the project's build and check gate on the Trace's branch (build, lint, type check — per `package.json` scripts or QA.md).
 2. Smoke the Spine. Confirm the happy path of the Skeleton, and of the Traces this one builds on, still works. One quick pass, no detail.
-3. Confirm the Observability items from the Trace body are present (logs, metrics, alerts). On a missing item, offer a bug report per the step 6 flow.
+3. Confirm the Observability items from the Trace body are present (logs, metrics, alerts). Record one row per item in an **Observability Results** table on the Trace issue, with the same read → Edit → edit flow as step 6. Add the section if it does not exist. Preserve all other sections:
+
+   | Observability item | Result    | Bug Filed    |
+   | ------------------ | --------- | ------------ |
+   | `<log / metric / alert>` | ✅/❌/N/A | yes / no / — |
+
+   On ❌, offer a bug report per the step 6 flow and set `Bug Filed`. When the Trace body says "None required for this trace", write a single row `None required` with Result `N/A`.
 
 Record one releasability line: `Releasable: yes` or `Releasable: no — <reason>`. A `no` forces the ❌ verdict, even when all claimed scenarios passed.
 
@@ -283,6 +289,14 @@ If the verdict is ✅ or ⚠️, add the `verified` lifecycle label:
 gh issue edit <trace_number> --add-label "verified"
 ```
 
+**Tick the Trace Plan.** The Feature's Trace Plan is the loop's completion signal. Right after the label, check this Trace's entry off. Use the read → modify → write flow from `../references/gh-body-helper.md`:
+
+1. `python3 .wtf/gh-body.py read <feature_number>` — fetch the current Feature body to a temp file.
+2. With the Edit tool, find the Trace Plan line that contains `#<trace_number>` as a whole token (`#12` must not match `#120`) and change its `[ ]` to `[x]`. Change nothing else.
+3. `python3 .wtf/gh-body.py edit <feature_number> --body-file "<path>"` — push it back.
+
+If no Trace Plan line names `#<trace_number>`, do not guess. Warn the user that the plan and the Trace are out of sync, and recommend `/wtf.refine` on the Feature to repair the entry. This step is mandatory in every invocation mode — `wtf.loop` reads the tick to know when the plan is exhausted.
+
 Print the updated Trace issue URL.
 
 ### 9. Offer to open a PR and close the issue
@@ -301,7 +315,7 @@ If the verdict is ✅ or ⚠️, call `AskUserQuestion` (per `../references/ques
 
 ### 10. Offer bug reports for remaining failures
 
-Check the Test Mapping results (steps 5–6) and the releasability findings (step 7). Find all rows where Result is ❌ and `Bug Filed` is `no`. These are the unfiled failures.
+Check the Test Mapping results (steps 5–6) and the Observability Results plus the releasability findings (step 7). Find all rows where Result is ❌ and `Bug Filed` is `no`. These are the unfiled failures.
 
 If none exist, skip this step entirely.
 

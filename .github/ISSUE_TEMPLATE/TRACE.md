@@ -47,6 +47,18 @@ Scenario:
 
 ---
 
+## Impacted Areas
+
+<!-- 👤 Developer — The files, modules, and components this Trace touches. The conflict graph schedules sibling Traces by this list. A Trace with no entries is serialized against every other Trace of its Feature. Refined by implement-trace once the Technical Approach names real paths. -->
+
+- Backend:
+- Frontend:
+- Database:
+- APIs:
+- External systems:
+
+---
+
 ## Contracts & Interfaces
 
 <!-- 👤 Tech Lead — These are the spec. Implementation must match these exactly. -->

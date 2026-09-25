@@ -17,7 +17,7 @@ The unit must be:
 Evaluate:
 
 - **Passes** → proceed to draft.
-- **Too broad** → propose a split. For an Epic or Feature, propose smaller slices. For a Trace, split by **depth**: a Skeleton plus Deepening Traces that re-partition the Scenario Claim. Never split a Trace by layer. Present the breakdown. Ask the user to confirm before continuing.
+- **Too broad** → propose a split. For an Epic or Feature, propose smaller slices. For a Trace, split by **depth**: a smaller first claim plus Deepening Traces of the same story that re-partition the Scenario Claim. A Skeleton keeps exactly one scenario — the happy path. Never split a Trace by layer. Present the breakdown. Ask the user to confirm before continuing.
 - **Has dependencies** → identify explicitly (what this depends on, what depends on this). Record issue numbers for later native-link creation. Do NOT write dependency references into the body yet. The create step handles native links and body writes together.
 
 ## Stage 2 — Scope gate (post-draft)

@@ -61,14 +61,14 @@ A Trace needs the **code** of the Trace it builds on, not its merge. Before you 
 
 1. Read the Builds-on Trace numbers from the Spine Position section. When they are absent, use the Trace Plan order in the Feature body.
 2. A Skeleton builds on nothing. Its stack base is the feature branch (`staged`) or `main` (`trunk`). It passes this gate without a check.
-3. Otherwise find the Trace this one builds on and check whether its branch still exists:
+3. Otherwise run the **Resolve the stack base** procedure in `../references/branch-setup.md`. It reads the `Builds on` line from the Trace body and looks the branch up by number, so the slug need not be known:
 
    ```bash
-   git fetch origin
-   git rev-parse --verify origin/trace/<n>-<slug>   # exists → still open, stack on it
+   git fetch origin --prune
+   git ls-remote --heads origin "trace/<n>-*"   # a hit → still open, stack on it
    ```
 
-   - **Branch exists** → it is the stack base. Do not wait for its PR. Verify the branch is green (`gh pr checks <pr_number>`); if it is red, warn the user and ask before stacking on it.
+   - **Branch exists** → it is the stack base. Do not wait for its PR. Verify the branch is green: if the base branch has an open PR (`gh pr list --head <branch> --state open --json number -q '.[0].number'`), run `gh pr checks <pr_number>`; otherwise check the branch's latest workflow run with `gh run list --branch <branch> --limit 1 --json conclusion -q '.[0].conclusion'`. If neither exists (no CI), run the project's test command on that branch once. If the branch is red, warn the user and ask before stacking on it.
    - **Branch is gone** → that Trace merged and GitHub already retargeted anything stacked on it. The stack base is the feature branch (`staged`) or `main` (`trunk`).
    - **Neither the branch nor a merged PR exists** → the Trace this one builds on has not been implemented. Warn the user and stop. Continue only when the user explicitly overrides.
 
@@ -127,7 +127,7 @@ Show the Technical Approach. Then call `AskUserQuestion` (per `../references/que
   - **I have constraints to share** → adjust the approach first
   - **Suggest an alternative** → describe a different approach
 
-Apply changes. Then update the Trace issue's Technical Approach section (including Aggregates & Invariants).
+Apply changes. Then update the Trace issue's Technical Approach section (including Aggregates & Invariants). Also fill or refine `## Impacted Areas` with the concrete paths the approach names — the conflict graph schedules sibling Traces by this section, and an empty section serializes this Trace against every sibling.
 
 > See `references/issue-body-update-pattern.md` for the read-merge-write pattern (it goes through the gh body helper).
 

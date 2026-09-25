@@ -1,0 +1,63 @@
+{
+  "_note": "Trunk delivery: `.wtf/config.json` says delivery=trunk and the Feature declares no override. One Feature with two Traces: Skeleton #30 then Deepening #31, sharing files. Expected: no feature branch anywhere; #30's PR targets main; #31 stacks on trace/30-… (PR base trace/30-…, retargeted to main when #30 merges); #31 is the final plan entry, so its PR body carries `Closes #7`; step 5 opens no feature PR.",
+  "config": {
+    "_note": "contents of .wtf/config.json",
+    "classification": "labels",
+    "planning": "guided",
+    "feature_scope": "single-story",
+    "delivery": "trunk"
+  },
+  "remote_branches": [
+    "main"
+  ],
+  "feature": {
+    "number": 7,
+    "title": "🚀 Feature: Settlement notifications",
+    "labels": [
+      "feature",
+      "designed"
+    ],
+    "body": "## Bounded Context\nPayments\n\n## User Stories\n\n### Story 1: Merchant is notified when a settlement completes\n- As a Merchant, I want an email when a settlement completes so that I do not have to poll the dashboard.\n\n```gherkin\nScenario: Email sent for a completed settlement\n  Given a Merchant has a pending settlement\n  When the settlement completes\n  Then the Merchant receives a settlement email\n\nScenario: No email for a settlement that fails\n  Given a Merchant has a pending settlement\n  When the settlement fails\n  Then no settlement email is sent and the failure is logged\n```\n\n## Trace Plan\n1. [ ] ☄️ Skeleton — Merchant is notified when a settlement completes: email for one completed settlement (claims: \"Email sent for a completed settlement\") #30\n2. [ ] ☄️ Deepening — Merchant is notified when a settlement completes: failure path (claims: \"No email for a settlement that fails\") #31\n\n## Delivery Override\n- Mode:\n- Reason:\n\n## Impacted Areas\n- src/notifications/"
+  },
+  "nodes": [
+    {
+      "number": 30,
+      "title": "☄️ Trace: Skeleton — settlement email happy path",
+      "type": "trace",
+      "state": "OPEN",
+      "labels": [
+        "trace",
+        "designed"
+      ],
+      "feature": 7,
+      "body": "## Spine Position\n- Position: Skeleton\n- Builds on: none\n\n## Impacted Areas\n- Backend: src/notifications/SettlementMailer.ts\n- Frontend: —\n- Database: —\n- APIs: —\n- External systems: SMTP relay"
+    },
+    {
+      "number": 31,
+      "title": "☄️ Trace: Deepening — no email on failed settlement",
+      "type": "trace",
+      "state": "OPEN",
+      "labels": [
+        "trace",
+        "designed"
+      ],
+      "feature": 7,
+      "body": "## Spine Position\n- Position: Deepening\n- Builds on: Trace #30\n\n## Impacted Areas\n- Backend: src/notifications/SettlementMailer.ts\n- Frontend: —\n- Database: —\n- APIs: —\n- External systems: SMTP relay"
+    }
+  ],
+  "edges": {
+    "30": {
+      "blocks": [
+        31
+      ],
+      "blocked_by": []
+    },
+    "31": {
+      "blocks": [],
+      "blocked_by": [
+        30
+      ]
+    }
+  },
+  "pull_requests": []
+}

@@ -31,7 +31,7 @@ Execution order: phases in order → sub-phases in order → within each sub-pha
 
 **A Trace never waits for a merge.** It branches off the branch of the Trace it builds on, as soon as that code exists, and opens its PR against that branch — see `../../references/branch-setup.md` "Trace branch" and "Stack mechanics". Human review latency no longer idles the run. GitHub retargets each stacked PR when its parent merges with its head branch deleted, so the stack unwinds on its own.
 
-**Worktrees isolate anything running at the same time**: separate Features, and sibling Traces of one Feature. Spawn each concurrent trace sub-agent with `isolation: "worktree"`. The worktree branches from that Trace's **stack base**, resolved per `branch-setup.md`. The sub-agent must run `git pull --rebase origin <stack_base>` before starting work. A Trace stacked behind another needs no worktree of its own — it runs after, on the same line.
+**Worktrees isolate anything running at the same time**: separate Features, and sibling Traces of one Feature. Spawn each concurrent trace sub-agent with `isolation: "worktree"`. The worktree branches from that Trace's **stack base**, resolved per `../../references/branch-setup.md` "Resolve the stack base". The sub-agent must run `git pull --rebase origin <stack_base>` before starting work. A Trace stacked behind another needs no worktree of its own — it runs after, on the same line.
 
 **Advancement gates** follow `../../references/conflict-graph.md`:
 
@@ -44,7 +44,7 @@ gh pr view <pr_number> --json state,mergedAt --jq '"\(.state) \(.mergedAt)"'
 
 Pass the full sub-phase conflict map to each sub-agent in its prompt context so it knows which files are exclusively owned by its worktree during execution.
 
-**If review changes an already-stacked Trace**, restack its descendants per `branch-setup.md` "Restack" before they continue, and report which Traces moved.
+**If review changes an already-stacked Trace**, restack its descendants per `../../references/branch-setup.md` "Restack" before they continue, and report which Traces moved.
 
 ## Per-trace sequence
 
@@ -83,7 +83,7 @@ If all internal blockers are resolved, continue silently.
 
 The sub-agent runs the inlined implement-trace steps. It must:
 
-- Set up the trace branch from the delivery-mode base (creating the feature branch first in `staged` delivery, if absent) per `../../references/branch-setup.md`
+- Set up the trace branch off its **stack base** — resolved per `../../references/branch-setup.md` "Resolve the stack base" (create the feature branch first in `staged` delivery when the base is the feature branch and it is absent)
 - Run the TDD cycle against the claimed scenarios per `../../references/commit-conventions.md`
 - Explicitly run `gh issue edit <trace_number> --add-label "implemented"` — mandatory, per the sub-agent protocol
 - Return the **"Revealed:"** learnings block — what the Trace exposed about the Spine, the plan, or the spec
@@ -109,11 +109,11 @@ If a covered scenario's tests **fail**, ask "Trace #<n> — [n] test(s) failed. 
 - **Skip and continue** → skip this Trace for now; its Feature's sequence pauses with it
 - **Stop loop** → exit the loop entirely
 
-Capture the verify results (pass/fail per claimed scenario) for the re-aim in step e.
+Capture the verify results (pass/fail per claimed scenario) for the re-aim in step e. On a ✅ or ⚠️ verdict the inlined verify-trace steps also set the `verified` label and tick the Trace's entry in the Feature's Trace Plan — both mandatory.
 
 ### d. Open PR, wait for pipeline, merge
 
-The sub-agent runs the inlined create-pr steps. The PR base is this Trace's **stack base** per `../../references/branch-setup.md` "Base-branch policy" — the branch of the Trace it builds on when that Trace is still open, otherwise the feature branch (`staged`) or `main` (`trunk`). Closure happens via `Closes #<trace_number>` in the PR body per `../../references/commit-conventions.md` — do not call `gh issue close` directly.
+The sub-agent runs the inlined create-pr steps. The PR base is this Trace's **stack base** per `../../references/branch-setup.md` "Base-branch policy" — the branch of the Trace it builds on when that Trace is still open, otherwise the feature branch (`staged`) or `main` (`trunk`). When the `gh-stack` extension is installed, the inlined create-pr steps also link the stack (per `../../references/branch-setup.md` "Native stacks"). Closure happens via `Closes #<trace_number>` in the PR body per `../../references/commit-conventions.md` — do not call `gh issue close` directly.
 
 **Opening this PR does not block the Feature's other Traces.** Traces in the next sub-phase branch off this Trace's branch as soon as it is pushed and green. Everything below runs alongside them, not in front of them. In `trunk` delivery, when this Trace exhausts the Trace Plan, the body also carries `Closes #<feature_number>` on its own line. Run non-interactively — no confirmation, title review, or body approval.
 
@@ -126,11 +126,13 @@ gh pr checks <pr_number> --watch
 This blocks until every check finishes. Once complete, inspect the result:
 
 ```bash
-gh pr checks <pr_number> --json name,state,conclusion \
-  --jq '.[] | "\(.state) \(.conclusion) \(.name)"'
+gh pr checks <pr_number> --json name,state,bucket \
+  --jq '.[] | "\(.bucket) \(.name)"'
 ```
 
-**If all checks pass** (`conclusion: SUCCESS` or `conclusion: SKIPPED` for every check) → merge automatically:
+`bucket` is one of `pass`, `fail`, `pending`, `skipping`, `cancel`. (`gh pr checks --json` has no `conclusion` field.)
+
+**If all checks pass** (`bucket` is `pass` or `skipping` for every check) → merge automatically:
 
 ```bash
 gh pr merge <pr_number> --merge --delete-branch
@@ -140,7 +142,7 @@ gh pr merge <pr_number> --merge --delete-branch
 
 If the merge is refused because the base branch requires an approving review, leave the PR open and continue. The Traces stacked on it already have the code they need. Collect the pending approval as a loop gate rather than idling on it.
 
-**If any check fails** (`conclusion: FAILURE` or `conclusion: ACTION_REQUIRED`), ask "Trace #<n> PR pipeline failed — [list failing check names]. How do you want to proceed?" — header `Pipeline failed`:
+**If any check fails** (`bucket` is `fail` or `cancel` for any check), ask "Trace #<n> PR pipeline failed — [list failing check names]. How do you want to proceed?" — header `Pipeline failed`:
 
 - **Fix and re-run** → pause the loop; push a fix, then re-run the pipeline
 - **Skip this trace** → leave the PR open; the Feature's sequence pauses with it
@@ -167,6 +169,7 @@ If refine reports nothing to change, continue silently.
 
 Re-read the Feature body's Trace Plan — the re-aim may have changed it:
 
+- Confirm the landed Trace's entry is checked (`[x]`). `wtf.verify-trace` ticks it; if the tick is missing, tick it now with the gh body helper (`../../references/gh-body-helper.md`) and note the repair in the progress line.
 - Update the remaining sequence to the new order and batching.
 - If a new entry has no Trace issue yet, create it before dispatch: spawn a sub-agent with the inlined non-interactive steps of `skills/wtf.write-trace/SKILL.md`.
 - If the plan is exhausted, run Feature completion (`wtf.loop` step 5) for this unit.

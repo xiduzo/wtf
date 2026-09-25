@@ -54,7 +54,11 @@ Scenario: Edge case
 
 ## Edge Cases
 
-## <!-- Explicitly name them here so Deepening Traces can claim scenarios that cover them. Use domain language. -->
+<!-- Explicitly name them here so Deepening Traces can claim scenarios that cover them. Use domain language. -->
+
+-
+
+---
 
 ## Domain Events
 

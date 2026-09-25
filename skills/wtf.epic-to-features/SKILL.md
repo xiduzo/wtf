@@ -141,8 +141,8 @@ Then call `AskUserQuestion` (per `../references/questioning-style.md`):
 - question: "What's next?"
 - header: "Next step"
 - options:
-  - **Plan first Feature's Traces** → follow `wtf.feature-to-traces` with the first created Feature number (default)
-  - **Plan another Feature's Traces** → follow `wtf.feature-to-traces` with a different Feature number
+  - **Plan first Feature's Traces** → follow `wtf.feature-to-traces` with the first created Feature number and `$WTF_PLAN` (default; per the Hand-offs rule in `../references/planning-mode.md`)
+  - **Plan another Feature's Traces** → follow `wtf.feature-to-traces` with a different Feature number and `$WTF_PLAN`
   - **Stop here** → exit. No further action
 
 > Suggest `/clear` before continuing if the conversation has grown long.
