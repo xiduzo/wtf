@@ -6,25 +6,7 @@ WTF is a set of skills for AI coding assistants. The skills cover research, visi
 
 Each skill pauses at a judgment call instead of guessing. The GitHub issue holds the design, the implementation notes, and the verification verdict side by side. It stays the single source of truth.
 
-## Quick start
-
-Install the skills from your project root:
-
-```bash
-npx skills add https://github.com/xiduzo/wtf
-```
-
-Open your AI assistant and run the setup skill:
-
-```
-/wtf.setup
-```
-
-Update the skills later with `npx skills update`.
-
-You need the [GitHub CLI (`gh`)](https://cli.github.com), authenticated with the `repo` scope, and an AI assistant that supports skills. [Getting started](https://github.com/xiduzo/wtf/wiki/Getting-Started) lists what `wtf.setup` installs.
-
-## How it works
+## The lifecycle
 
 ```mermaid
 flowchart LR
@@ -49,9 +31,14 @@ flowchart LR
   classDef magenta fill:#EC00EC,stroke:#EC00EC,color:#fff
 ```
 
-Plan an Epic, split it into Features, and cut each Feature into Traces. A Trace claims a subset of a story's Gherkin scenarios and implements them through every layer in one pass. Run the Traces by hand, one skill at a time, or let `wtf.loop` run them all. Each Feature ships as one linear stack of Trace PRs.
+- **Steer** — living VISION, TECH, DESIGN, and QA docs inform every write. See [Steering docs](Steering-Docs.md).
+- **Discover** — spikes and user insights feed planning. See [Planning](Planning.md).
+- **Plan** — Epic → Feature → Trace. User stories and their Gherkin scenarios live on the Feature. Each Trace claims a subset of those scenarios. See [The Trace model](The-Trace-Model.md).
+- **Build and verify** — by hand, one skill at a time, or with `wtf.loop`. See [Running Traces](Running-Traces.md) and [Autonomous execution](Autonomous-Execution.md).
+- **Ship** — PRs written from the full spec hierarchy, changelogs written from the Gherkin. See [Delivery and stacks](Delivery-and-Stacks.md) and [Release and closure](Release-and-Closure.md).
+- **Learn** — retros and reflections write learnings back into the steering docs.
 
-The shortest path:
+## The shortest path
 
 ```
 wtf.write-epic              → draft the strategic initiative
@@ -60,18 +47,7 @@ wtf.feature-to-traces       → plan and create the Trace sequence per Feature
 wtf.loop                    → implement → verify → PR → re-aim, autonomously
 ```
 
-## Documentation
-
-The [wiki](https://github.com/xiduzo/wtf/wiki/Home) has the full documentation:
-
-- [Getting started](https://github.com/xiduzo/wtf/wiki/Getting-Started) — prerequisites and what `wtf.setup` installs
-- [Configuration](https://github.com/xiduzo/wtf/wiki/Configuration) — the four settings in `.wtf/config.json`
-- [The Trace model](https://github.com/xiduzo/wtf/wiki/The-Trace-Model) — Trace, Skeleton, Spine, and Scenario Claim
-- [Delivery and stacks](https://github.com/xiduzo/wtf/wiki/Delivery-and-Stacks) — how Trace PRs stack and merge back into `main`
-- [Planning](https://github.com/xiduzo/wtf/wiki/Planning), [Running Traces](https://github.com/xiduzo/wtf/wiki/Running-Traces), and [Autonomous execution](https://github.com/xiduzo/wtf/wiki/Autonomous-Execution)
-- [Skill reference](https://github.com/xiduzo/wtf/wiki/Skill-Reference) — every skill with its trigger
-
-The wiki pages live in [`docs/wiki/`](docs/wiki/). Edit them there. A workflow syncs them to the wiki on every push to `main`.
+Every step writes back to the GitHub issue. Start with [Getting started](Getting-Started.md).
 
 ## When not to use WTF
 
