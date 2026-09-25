@@ -144,17 +144,23 @@ Turn on **Settings → General → Automatically delete head branches** so a hum
 
 A stacked PR can never merge before the PR it is based on. Merge bottom-up, in stack order.
 
-### Native stacks (optional)
+### Native stacks
 
-When the `github/gh-stack` extension is installed (`gh extension list | grep -q gh-stack`), link a Feature's open Trace PRs into one native stack after each stacked PR opens:
+`wtf.setup` installs the `github/gh-stack` extension. After each stacked PR opens, link it into its native stack. Pass PR numbers, bottom to top, from the stack root up to this PR:
 
 ```bash
-gh stack link <bottom-pr> <next-pr> ... <top-pr>   # bottom to top
+gh stack link <bottom-pr> <next-pr> ... <this-pr>   # bottom to top
 ```
 
-When a stack already exists for the Feature, run `gh stack unstack <stack-number>` first — `gh stack link` re-creates it with the new PR. A native stack renders the stack map on every PR, so the PR body must not say "stacked on #N". Merge bottom-up with `gh pr merge --merge --delete-branch` or `gh stack merge`; the head branch must be deleted either way.
+`gh stack link` creates the stack when none exists and updates it when one does. PRs already in the stack stay in it. Pass PR numbers, not branch names: a branch name with no open PR makes the command open a PR on its own. A native stack renders the stack map on every PR, so the PR body must not say "stacked on #N".
 
-Without the extension, the retarget-on-delete mechanism above is the fallback, and the PR body says the PR is stacked and names its base branch.
+A native stack is one linear chain. Link only the PRs on this PR's own base chain, not every open Trace PR of the Feature.
+
+Merge bottom-up with `gh pr merge --merge --delete-branch`. The head branch must be deleted. `gh stack merge` merges every layer up to a chosen PR in one atomic operation. It is for a human in an interactive terminal: pick the merge-commit method, never squash.
+
+A stack locks the base branch of every PR in it. `gh pr edit --base` on a stacked PR fails with "part of a stack". Run `gh stack unstack <stack-number>` first, change the base, then link again. The stack number is shown in the GitHub stack UI on any PR of the stack. Unstack removes the grouping only. The PRs stay open. GitHub stacked PRs are a public preview feature.
+
+**Fallback.** If `gh extension list` does not show `gh-stack` (the install failed or setup did not run), the retarget-on-delete mechanism above still applies. Skip the link and make the PR body say that the PR is stacked and name its base branch.
 
 ## Restack — when a base Trace changes
 

@@ -37,7 +37,7 @@ If `gh` is not authenticated, tell the user to run `gh auth login`. Stop. Do not
 gh extension list
 ```
 
-Check the output for both extensions below. If an extension is missing, install it:
+Check the output for all three extensions below. If an extension is missing, install it:
 
 ```bash
 # Sub-issue hierarchy (epic → feature → trace)
@@ -45,23 +45,26 @@ gh extension install yahsan2/gh-sub-issue
 
 # Issue dependency tracking (X blocks Y)
 gh extension install xiduzo/gh-issue-dependency
+
+# Native stacked PRs (Trace stacks)
+gh extension install github/gh-stack
 ```
 
-If installation fails (for example network error or permissions), warn the user. Relationship tracking stays unavailable until the extension is installed. Note the failure for the final status report.
+If installation fails (for example network error or permissions), warn the user. Note the failure for the final status report. Without `gh-sub-issue` or `gh-issue-dependency`, relationship tracking stays unavailable until the extension is installed. Without `gh-stack`, Trace PRs still stack by base branch, but GitHub renders no stack map. `wtf.create-pr` then keeps the "stacked PR" note in the PR body (see `../references/branch-setup.md` "Native stacks").
 
 After you try installation, verify the command syntax for each newly installed extension:
 
 ```bash
 gh sub-issue --help
 gh issue-dependency --help
+gh stack --help
 ```
 
-Record two booleans for the final report:
+Record three booleans for the final report:
 
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
 - `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
-
-Optional: `github/gh-stack` — native stacked PRs for Trace stacks (`../references/branch-setup.md` "Native stacks"). Do not install it unasked. Mention it once, then move on.
+- `gh-stack-available`: true if `github/gh-stack` is installed and working
 
 ### 4. Detect repo context
 
@@ -574,6 +577,7 @@ gh CLI installed          ✅
 gh authenticated          ✅
 gh-sub-issue extension    ✅  (or ⚠️ not installed — relationship links unavailable)
 gh-issue-dependency ext   ✅  (or ⚠️ not installed — dependency links unavailable)
+gh-stack extension        ✅  (or ⚠️ not installed — no native stack map, Trace PRs still stack by base branch)
 Repo context              ✅  owner/repo  (or ⚠️ not detected)
 Token scopes              ✅  repo  (or ⚠️ missing — run `gh auth refresh -s repo`)
 Repo write permission     ✅  push/maintain/admin  (or ⚠️ read-only — labels & links will fail)

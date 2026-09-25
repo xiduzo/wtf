@@ -1,5 +1,5 @@
 {
-  "_note": "Stacked Trace branch. Deepening #12 builds on Extension #11 whose branch trace/11-settlement-export is still open on origin with an open PR. Delivery is staged and the feature branch is feature/5-payment-settlement. Expected: the PR base is trace/11-settlement-export (the stack base), not the feature branch; the body carries `Closes #12` and says the PR is stacked. The gh-stack extension is not installed.",
+  "_note": "Stacked Trace branch. Deepening #12 builds on Extension #11 whose branch trace/11-settlement-export is still open on origin with an open PR. Delivery is staged and the feature branch is feature/5-payment-settlement. Expected: the PR base is trace/11-settlement-export (the stack base), not the feature branch; the body carries `Closes #12` and says the PR is stacked. The gh-stack extension is deliberately absent, so this eval exercises the no-native-stack fallback (wtf.setup installs it by default).",
   "branch": "trace/12-settlement-failures",
   "config": {
     "_note": "contents of .wtf/config.json",

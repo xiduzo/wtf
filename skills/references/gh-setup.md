@@ -19,7 +19,7 @@ Skip this entire step if **any** of the following is true:
 ## Which sections apply to which skills
 
 - **Sections 1–2 (install + auth):** all skills — hard stop if either fails.
-- **Sections 3–4 (extensions):** only skills that create or traverse native sub-issue/dependency links (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-trace`, `wtf.loop`, `wtf.refine`, `wtf.epic-to-features`, `wtf.feature-to-traces`). Other skills (`wtf.verify-trace`, `wtf.create-pr`, `wtf.report-bug`, `wtf.design-trace`, `wtf.design-feature`, `wtf.pr-review`, `wtf.changelog`, `wtf.spike`, `wtf.retro`, `wtf.health`, `wtf.hotfix`) may skip these — they do not rely on the extensions.
+- **Sections 3–4 (extensions):** only skills that create or traverse native sub-issue/dependency links (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-trace`, `wtf.loop`, `wtf.refine`, `wtf.epic-to-features`, `wtf.feature-to-traces`). Other skills (`wtf.verify-trace`, `wtf.create-pr`, `wtf.report-bug`, `wtf.design-trace`, `wtf.design-feature`, `wtf.pr-review`, `wtf.changelog`, `wtf.spike`, `wtf.retro`, `wtf.health`, `wtf.hotfix`) may skip these — they do not rely on the extensions. `wtf.create-pr` runs section 3 for `gh-stack` only, when the PR base is a `trace/*` branch.
 - **Section 5 (repo detect):** run if the skill needs the `<owner>/<repo>` pair (wiki sync, repo-scoped queries).
 
 ## 1. Verify `gh` is installed
@@ -44,7 +44,7 @@ If not authenticated: tell the user to run `gh auth login` and stop. Do not cont
 gh extension list
 ```
 
-Check the output for both extensions below. For each that is missing, install it:
+Check the output for all three extensions below. For each that is missing, install it:
 
 ```bash
 # Sub-issue hierarchy (epic → feature → trace)
@@ -52,16 +52,22 @@ gh extension install yahsan2/gh-sub-issue
 
 # Issue dependency tracking (X blocks Y)
 gh extension install xiduzo/gh-issue-dependency
+
+# Native stacked PRs (Trace stacks)
+gh extension install github/gh-stack
 ```
 
-If installation fails (e.g. network error, permissions), warn the user that relationship tracking is unavailable until the extension is installed. **Do not fall back to writing `Depends on #X` or `Blocks #Y` into issue bodies** — body-text relationship references are not used in this workflow.
+If `gh-stack` fails to install, Trace PRs still stack by base branch. `wtf.create-pr` then keeps the "stacked PR" note in the PR body. See `./branch-setup.md` "Native stacks".
 
-After this step, record two booleans for use in the rest of the session:
+If `gh-sub-issue` or `gh-issue-dependency` fails to install (e.g. network error, permissions), warn the user that relationship tracking is unavailable until the extension is installed. **Do not fall back to writing `Depends on #X` or `Blocks #Y` into issue bodies** — body-text relationship references are not used in this workflow.
+
+After this step, record three booleans for use in the rest of the session:
 
 - `gh-sub-issue-available`: true if `yahsan2/gh-sub-issue` is installed and working
 - `gh-issue-dependency-available`: true if `xiduzo/gh-issue-dependency` is installed and working
+- `gh-stack-available`: true if `github/gh-stack` is installed and working
 
-All callers use these flags when they decide whether to create native links.
+All callers use the first two flags when they decide whether to create native links. `wtf.create-pr` and `wtf.loop` use `gh-stack-available` when they decide whether to link a native stack.
 
 ## 4. Confirm command syntax (first install only)
 
@@ -70,6 +76,7 @@ After you install an extension for the first time, verify the available commands
 ```bash
 gh sub-issue --help
 gh issue-dependency --help
+gh stack --help
 ```
 
 Skip this step on later sessions if the extensions already work. Use the output to confirm the exact flag names. The reference signatures below are expected but may vary by extension version:
@@ -186,7 +193,7 @@ gh repo view --json nameWithOwner -q .nameWithOwner
 
 Store the result as `<owner>/<repo>` for all later extension calls in this session.
 
-## Appendix — Sub-issue and dependency cookbook
+## Appendix — Sub-issue, dependency, and stack cookbook
 
 Canonical call shapes for the two extensions installed above. Skills cite this section rather than re-document the patterns.
 
@@ -249,3 +256,41 @@ Typical wtf usage:
 | `wtf.loop` step 1 | `gh issue-dependency list <n>` per node | Build DAG for topo sort |
 
 For the full traversal pattern (Trace → Feature → Epic walk), see `./spec-hierarchy.md`. Do not reimplement that walk per skill.
+
+### Stacks — `gh stack`
+
+WTF links stacks on GitHub without local tracking. Do not use `gh stack init`, `add`, or `submit` for Trace branches. The Trace branches already exist, and `wtf.create-pr` opens their PRs.
+
+```bash
+# Link open PRs into one stack on GitHub, bottom to top. Creates the stack or
+# updates it. PRs already in the stack stay in it.
+gh stack link <bottom-pr> <next-pr> ... <top-pr>
+
+# Append to an existing stack by its number (shown in the GitHub stack UI):
+gh stack link <stack-number> <new-pr>
+
+# Remove the stack grouping on GitHub. The PRs stay open. GitHub keeps PRs
+# that are queued for merge or have auto-merge on in the stack.
+gh stack unstack <stack-number>
+
+# Merge every layer up to a PR in one atomic operation (interactive wizard):
+gh stack merge <pr-number>
+```
+
+Pass PR numbers to `gh stack link`, not branch names. A branch name with no open PR makes the command push the branch and open a PR on its own.
+
+Typical wtf usage:
+
+| Caller | Call | Purpose |
+|---|---|---|
+| `wtf.create-pr` step 8 | `gh stack link <bottom-pr> ... <this-pr>` | Add the new Trace PR to its stack |
+| `wtf.loop` step d | same, inlined | Same, non-interactive |
+| `wtf.loop` step d | `gh pr merge <n> --merge --delete-branch` | Merge one layer, bottom-up. Never squash a Trace PR. |
+| Human | `gh stack merge <pr-number>` | Merge several layers at once. Pick the merge-commit method, not squash. |
+
+Gotchas:
+
+- `gh pr edit --base` on a stacked PR fails with `part of a stack`. Unstack, change the base, link again.
+- `gh stack view` shows local tracking only. A linked stack has none. Check the stack map on the PR page instead.
+- `gh stack submit` does nothing when every PR already exists. Use `gh stack link`.
+- `gh stack modify` is an interactive TUI. Do not use it from a skill.

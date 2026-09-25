@@ -16,7 +16,7 @@ It writes a PR description that explains why the change exists, not only what it
 
 Run steps 1–2 of `../references/gh-setup.md` (install check and auth check).
 Stop if `gh` is not installed or not authenticated.
-Extensions are not required for this skill.
+The `gh-stack` extension is needed only for a stacked Trace PR (step 8). `wtf.setup` installs it. No other extension is required.
 
 Skip this step if invoked from `wtf.verify-trace` or another skill that already ran gh-setup this session.
 
@@ -173,7 +173,7 @@ python3 .wtf/gh-body.py create --pr \
 
 Print the PR URL.
 
-**Native stack (optional).** If `gh extension list` shows `gh-stack` and the base is a `trace/*` branch, link the Feature's open Trace PRs into one native stack per `../references/branch-setup.md` "Native stacks": `gh stack unstack <stack-number>` when one exists, then `gh stack link <bottom-pr> ... <this-pr>` bottom to top. GitHub then renders the stack on every PR, so do not add the "stacked PR" note to the body.
+**Native stack.** When the base is a `trace/*` branch, link this PR into its native stack per `../references/branch-setup.md` "Native stacks": `gh stack link <bottom-pr> ... <this-pr>`, PR numbers bottom to top along this PR's base chain. The command creates the stack or updates it. GitHub then renders the stack on every PR, so do not add the "stacked PR" note to the body. `wtf.setup` installs `gh-stack`. If `gh extension list` does not show it, skip the link and keep the "stacked PR" note in the body (the fallback in "Native stacks").
 
 ### 9. Update the Trace issue (if linked)
 

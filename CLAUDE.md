@@ -63,7 +63,7 @@ Cross-skill references live in `skills/references/`:
 | `conflict-graph.md` | File-conflict graph for parallel scheduling — across Features, and across a Feature's Traces once its Skeleton lands |
 | `ddd-writing-rules.md` | Ubiquitous-language rules for issue/Gherkin authoring |
 | `gh-body-helper.md` | Cross-platform UTF-8-safe issue/PR body read & write (`.wtf/gh-body.py`) |
-| `gh-setup.md` | `gh` CLI + extension install + sub-issue/dependency cookbook |
+| `gh-setup.md` | `gh` CLI + extension install + sub-issue/dependency/stack cookbook |
 | `issue-classification.md` | Native issue types vs. labels — mode resolve, classify, query, detect |
 | `issue-template-loading.md` | Template verify + halt-or-setup + body-file create pattern |
 | `lifecycle-labels.md` | Label semantics + absent/overwrite gate templates |
