@@ -3,22 +3,26 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `feat/add-date-filter` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked task. Skip steps 3–4 (no task hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/feat-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output. Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `feat/add-date-filter` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked Trace. Skip steps 3–4 (no trace hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/feat-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output (diff base: main). Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
       "expected_output": "A PR draft whose title matches `^feat(.*): ` (Conventional Commits format) and whose body contains a Summary section and a Test plan section.",
-      "files": ["evals/fixtures/feat-branch.json"],
+      "files": [
+        "evals/fixtures/feat-branch.json"
+      ],
       "expectations": [
         "The PR title matches the pattern `^feat(\\([a-z-]+\\))?: `",
         "The PR title contains at least one of: 'date', 'filter', 'settlement'",
         "The PR body contains a Summary section",
         "The PR body contains a Test plan section",
-        "The PR body does not contain a 'Closes #' line (no linked task)"
+        "The PR body does not contain a 'Closes #' line (no linked trace)"
       ]
     },
     {
       "id": 2,
-      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `fix/prevent-double-settlement` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked task. Skip steps 3–4 (no task hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/fix-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output. Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `fix/prevent-double-settlement` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked Trace. Skip steps 3–4 (no trace hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/fix-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output (diff base: main). Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
       "expected_output": "A PR draft whose title matches `^fix(.*): ` (Conventional Commits format) and whose Summary section describes the bug being prevented (double settlement on retry).",
-      "files": ["evals/fixtures/fix-branch.json"],
+      "files": [
+        "evals/fixtures/fix-branch.json"
+      ],
       "expectations": [
         "The PR title matches the pattern `^fix(\\([a-z-]+\\))?: `",
         "The PR title contains at least one of: 'settlement', 'double', 'retry'",
@@ -29,15 +33,32 @@
     },
     {
       "id": 3,
-      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `refactor/extract-fulfilment-service` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked task. Skip steps 3–4 (no task hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/refactor-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output. Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `refactor/extract-fulfilment-service` (step 1 — confirmed, no existing PR). Skip step 2 — there is no linked Trace. Skip steps 3–4 (no trace hierarchy). Instead of running git commands in step 5, use the data from `evals/fixtures/refactor-branch.json`: its `git_log` field is the `git log --oneline` output, and its `git_diff_stat` field is the `git diff --stat` output (diff base: main). Draft the PR (step 6). Skip steps 7–10 — output the draft title and body only.",
       "expected_output": "A PR draft whose title matches `^(refactor|chore)(.*): ` (Conventional Commits format), whose Changes section groups changes logically rather than listing raw file names, and whose Test plan has at least one item.",
-      "files": ["evals/fixtures/refactor-branch.json"],
+      "files": [
+        "evals/fixtures/refactor-branch.json"
+      ],
       "expectations": [
         "The PR title matches the pattern `^(refactor|chore)(\\([a-z-]+\\))?: `",
         "The PR title contains at least one of: 'fulfilment', 'service', 'extract'",
         "The PR body Changes section does not read as a raw file list (i.e. does not enumerate every filename verbatim without grouping context)",
         "The PR body Test plan section contains at least one checklist item (line starting with '- [ ]' or '* [ ]')",
         "The PR body contains a Summary section"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a PR for the current branch. Test mode: skip step 0 (gh setup already confirmed). The current branch is `trace/12-settlement-failures` (step 1 — confirmed, no existing PR). Step 2: the linked Trace is #12 — confirmed. Step 3: the `verified` label is present, continue silently. Instead of running gh or git commands, use `evals/fixtures/stacked-trace-branch.json`: its `trace`, `feature`, and `epic` fields are the spec hierarchy (step 4); its `config` field is `.wtf/config.json`; its `remote_branches` field is the `git ls-remote --heads origin` output; its `pull_requests` field is the `gh pr list` output; its `gh_extensions` field is the `gh extension list` output (gh-stack is not installed); its `git_log` and `git_diff_stat` fields are the `git log --oneline` and `git diff --stat` output against the resolved base (step 5). Draft the PR (step 6). Skip step 7. For step 8, resolve the base branch but do not create the PR. Skip steps 9–10. Output the resolved base branch, the draft title, and the draft body.",
+      "expected_output": "The resolved PR base is `trace/11-settlement-export` — the branch of the Trace this one builds on, still open on origin — not the feature branch and not main. The title follows Conventional Commits. The body carries `Closes #12`, a Summary that names the Deepening position and Trace #11 as the Trace it builds on, one Test plan item for the claimed scenario, and a note that this is a stacked PR that merges after #61 / the trace/11-… branch.",
+      "files": [
+        "evals/fixtures/stacked-trace-branch.json"
+      ],
+      "expectations": [
+        "The resolved PR base branch is trace/11-settlement-export",
+        "The PR base is neither feature/5-payment-settlement nor main",
+        "The PR body contains a line `Closes #12`",
+        "The PR title matches the pattern `^(feat|fix|refactor|chore)(\\([a-z-]+\\))?: `",
+        "The PR body states that this PR is stacked on the Trace #11 branch (or PR #61) and merges after it"
       ]
     }
   ]

@@ -1,15 +1,23 @@
 {
-  "_note": "Diamond with file conflict: A unblocked; B and C both blocked by A, both touch src/api/; D blocked by B and C. B and C share a file area so must be in separate sub-phases even though they have identical blockers. Expected: Phase 1 (A), Phase 2a (B), Phase 2b (C), Phase 3 (D).",
+  "_note": "Feature-level diamond with file conflict: Feature #30 unblocked; Features #31 and #32 both blocked by #30, both touch src/api/; Feature #33 blocked by #31 and #32. Features are the parallel unit — #31 and #32 share a file area, so they land in separate sub-phases even though they have identical blockers. Each Feature carries one Trace. Expected: Phase 1 (#30), Phase 2 sub-phase a (#31), Phase 2 sub-phase b (#32), Phase 3 (#33).",
   "nodes": [
-    { "number": 30, "title": "Task A — Auth middleware", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/middleware/"] },
-    { "number": 31, "title": "Task B — User endpoints", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/api/"] },
-    { "number": 32, "title": "Task C — Admin endpoints", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/api/"] },
-    { "number": 33, "title": "Task D — Integration tests", "type": "task", "labels": ["task", "designed"], "impacted_areas": ["src/tests/"] }
+    { "number": 30, "title": "Feature: Auth middleware", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/middleware/"], "trace_plan": ["☄️ #34 Skeleton — authenticated request happy path (claims: all scenarios)"] },
+    { "number": 31, "title": "Feature: User endpoints", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/api/"], "trace_plan": ["☄️ #35 Skeleton — user profile happy path (claims: all scenarios)"] },
+    { "number": 32, "title": "Feature: Admin endpoints", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/api/"], "trace_plan": ["☄️ #36 Skeleton — admin listing happy path (claims: all scenarios)"] },
+    { "number": 33, "title": "Feature: Integration tests", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/tests/"], "trace_plan": ["☄️ #37 Skeleton — end-to-end smoke path (claims: all scenarios)"] },
+    { "number": 34, "title": "Trace: Skeleton — authenticated request happy path", "type": "trace", "labels": ["trace", "designed"], "feature": 30 },
+    { "number": 35, "title": "Trace: Skeleton — user profile happy path", "type": "trace", "labels": ["trace", "designed"], "feature": 31 },
+    { "number": 36, "title": "Trace: Skeleton — admin listing happy path", "type": "trace", "labels": ["trace", "designed"], "feature": 32 },
+    { "number": 37, "title": "Trace: Skeleton — end-to-end smoke path", "type": "trace", "labels": ["trace", "designed"], "feature": 33 }
   ],
   "edges": {
     "30": { "blocks": [31, 32], "blocked_by": [] },
     "31": { "blocks": [33], "blocked_by": [30] },
     "32": { "blocks": [33], "blocked_by": [30] },
-    "33": { "blocks": [], "blocked_by": [31, 32] }
+    "33": { "blocks": [], "blocked_by": [31, 32] },
+    "34": { "blocks": [], "blocked_by": [] },
+    "35": { "blocks": [], "blocked_by": [] },
+    "36": { "blocks": [], "blocked_by": [] },
+    "37": { "blocks": [], "blocked_by": [] }
   }
 }

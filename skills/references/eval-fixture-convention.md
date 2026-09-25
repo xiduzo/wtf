@@ -35,7 +35,7 @@ Fields match the skill-creator schema. See the plugin's `references/schemas.md`.
 
 ## Writing good expectations
 
-- **Invariant over time.** "The 🕐 section includes task #17" beats "The report shows 480 days stale." Exact numbers change. Structure does not.
+- **Invariant over time.** "The 🕐 section includes trace #17" beats "The report shows 480 days stale." Exact numbers change. Structure does not.
 - **Substring / presence checks.** "The report includes the phrase 'All open issues are in a healthy state'" is testable by a grader. "The report is well-formatted" is not.
 - **Prefer regex-expressible invariants.** "The PR title matches `^(feat|fix|chore)(\([a-z-]+\))?: `" is robust. Exact strings break on prose edits.
 - **3–5 expectations per eval.** Too few miss regressions. Too many make grading slow and brittle.
@@ -51,11 +51,12 @@ Most wtf skills run `gh issue list`, `gh pr list`, or similar commands. To make 
      "_note": "What this fixture represents",
      "epics": [...],
      "features": [...],
-     "tasks": [...],
+     "traces": [...],
      "bugs": [...],
      "pull_requests": [...]
    }
    ```
+   A fixture that exercises the legacy-Task read path may also carry a `tasks` array with `task`-labeled issues.
 3. In the eval `prompt`, include an explicit test-mode instruction:
    > "Test mode: skip step 0 (gh setup already confirmed). Instead of running `gh issue list` commands, read `evals/fixtures/<scenario>.json` and use its arrays as the live data."
 4. List the fixture in `files` so the skill executor has access to it.
@@ -67,7 +68,7 @@ Most wtf skills run `gh issue list`, `gh pr list`, or similar commands. To make 
   {
     "number": 42,
     "title": "Human-readable title",
-    "labels": [{"name": "task"}, {"name": "implemented"}],
+    "labels": [{"name": "trace"}, {"name": "implemented"}],
     "updatedAt": "2026-05-02T14:30:00Z"
   }
 ]
@@ -88,7 +89,7 @@ Most wtf skills run `gh issue list`, `gh pr list`, or similar commands. To make 
 
 ## Staleness in fixtures
 
-Set `updatedAt` far in the past (e.g. `"2025-01-01T10:00:00Z"`) for tasks that should always appear as stale, no matter when the eval runs. Avoid dates that sit only barely past the threshold. A fixture set 8 days in the past stops being stale after one week of clock drift or timezone differences.
+Set `updatedAt` far in the past (e.g. `"2025-01-01T10:00:00Z"`) for issues that should always appear as stale, no matter when the eval runs. Avoid dates that sit only barely past the threshold. A fixture set 8 days in the past stops being stale after one week of clock drift or timezone differences.
 
 ## Skills suitable for evals
 

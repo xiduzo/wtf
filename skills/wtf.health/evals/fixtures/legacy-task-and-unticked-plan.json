@@ -1,0 +1,80 @@
+{
+  "_note": "Fixture for eval 4 — a migrated repo. `tasks` holds one legacy task-labeled issue (#33) that no Trace Plan entry names. `traces` holds #42, labeled verified with a merged PR, but its Trace Plan entry in Feature #10 is still `[ ]` — the plan is out of sync with the labels. Arrays match gh issue list --json number,title,labels,updatedAt output; features also carry body; pull_requests carry state.",
+  "epics": [
+    {
+      "number": 5,
+      "title": "🎯 Settlement Visibility",
+      "labels": [
+        {
+          "name": "epic"
+        }
+      ],
+      "updatedAt": "2026-05-01T09:00:00Z"
+    }
+  ],
+  "features": [
+    {
+      "number": 10,
+      "title": "🚀 Merchant can view settlement status for a completed payment",
+      "labels": [
+        {
+          "name": "feature"
+        },
+        {
+          "name": "designed"
+        }
+      ],
+      "updatedAt": "2026-05-01T10:00:00Z",
+      "body": "## User Stories\n\n### Story: Merchant sees settlement status\nAs a Merchant, I want to see the settlement status of a completed payment, so that I can track my payout.\n\n```gherkin\nScenario: Status shown for a settled payment\n  Given a Merchant has a completed payment that is settled\n  When the Merchant opens the payment detail page\n  Then the settlement status 'Settled' is shown\n```\n\n## Trace Plan\n\n1. [ ] ☄️ Skeleton — Merchant sees settlement status for one completed payment (claims: \"Status shown for a settled payment\") #42"
+    }
+  ],
+  "traces": [
+    {
+      "number": 42,
+      "title": "☄️ Skeleton — Merchant sees settlement status for one completed payment",
+      "labels": [
+        {
+          "name": "trace"
+        },
+        {
+          "name": "designed"
+        },
+        {
+          "name": "implemented"
+        },
+        {
+          "name": "verified"
+        }
+      ],
+      "updatedAt": "2026-05-03T14:30:00Z"
+    }
+  ],
+  "tasks": [
+    {
+      "number": 33,
+      "title": "🛠 Task: Seed settlement fixtures for staging",
+      "labels": [
+        {
+          "name": "task"
+        },
+        {
+          "name": "designed"
+        },
+        {
+          "name": "implemented"
+        }
+      ],
+      "updatedAt": "2026-05-02T11:00:00Z"
+    }
+  ],
+  "bugs": [],
+  "pull_requests": [
+    {
+      "number": 7,
+      "title": "feat(settlement): show status for a settled payment",
+      "headRefName": "trace/42-settlement-status",
+      "body": "Closes #42",
+      "state": "MERGED"
+    }
+  ]
+}

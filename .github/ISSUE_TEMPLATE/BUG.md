@@ -11,7 +11,7 @@ assignees: ""
 ## Related
 
 - Feature: #
-- Task: #
+- Trace: #
 
 ---
 
@@ -33,7 +33,7 @@ assignees: ""
 
 ## Contracts Violated
 
-<!-- If this is an API/data bug, paste the relevant contract section from the Task -->
+<!-- If this is an API/data bug, paste the relevant contract section from the Trace -->
 
 ```json
 {}

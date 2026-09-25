@@ -2,7 +2,7 @@
   "_note": "Fixture for eval 1 — clean project with no findings. Arrays match gh issue list --json number,title,labels,updatedAt output.",
   "epics": [],
   "features": [],
-  "tasks": [],
+  "traces": [],
   "bugs": [],
   "pull_requests": []
 }

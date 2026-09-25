@@ -17,13 +17,13 @@
     {
       "id": 2,
       "prompt": "Test mode: skip steps 0–5 (gh setup, bug identification, scope confirmation, TECH.md load, branch setup, and codebase exploration are already done). Read evals/fixtures/scope-gate-fires.json and use its codebase_findings as the exploration result. Run step 6 only: evaluate whether the scope gate fires for this fix, describe what was found, and present the keep/proceed vs switch-to-normal-flow choice to the user. Do not write any code or tests.",
-      "expected_output": "The scope gate fires. The output describes the findings: 6 files affected (exceeds the 3–4 file threshold), one schema migration (add_currency_code to settlements table), and two API contract changes. The user is presented with a binary choice: proceed as hotfix (accepting the larger scope) or switch to the normal write-epic + write-task flow. No code or tests are written.",
+      "expected_output": "The scope gate fires. The output describes the findings: 6 files affected (exceeds the 3–4 file threshold), one schema migration (add_currency_code to settlements table), and two API contract changes. The user is presented with a binary choice: proceed as hotfix (accepting the larger scope) or switch to the normal Trace workflow (write-feature + feature-to-traces). No code or tests are written.",
       "files": ["evals/fixtures/scope-gate-fires.json"],
       "expectations": [
         "The output explicitly states that the scope gate fires — it does not silently proceed to implementation.",
         "The output reports the number of files affected (6) and notes this exceeds the hotfix threshold of 3–4 files.",
         "The output describes the schema migration (adding currency_code to the settlements table) and the API contract change.",
-        "The user is presented with two distinct options: proceed as hotfix or switch to the normal flow (write-epic / write-task).",
+        "The user is presented with two distinct options: proceed as hotfix or switch to the normal Trace workflow (write-feature / feature-to-traces).",
         "No code, test, or file edit appears in the output — step 6 only."
       ]
     },

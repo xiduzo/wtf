@@ -1,25 +1,25 @@
 {
-  "_note": "Feature scope with one new capability (Added) and one bug fix (Fixed) — both sections must appear, correctly classified",
+  "_note": "Feature scope with one new capability (Added) and one bug fix (Fixed) — both sections must appear, correctly classified. Scenario text is canonical in the feature body; each trace carries a Scenario Claim plus a synced copy.",
   "feature": {
     "number": 20,
-    "title": "Settlement export and duplicate prevention",
-    "body": "## Goal\nMerchants can download their settlement data for offline reconciliation, and the system prevents duplicate settlement records from being created.\n\n## Acceptance Criteria\n- Merchants can export the settlement list as a CSV file\n- Duplicate settlements are rejected at ingestion time with a clear error\n- Existing settlements are not affected by the duplicate check",
+    "title": "🚀 Settlement export and duplicate prevention",
+    "body": "## Goal\nMerchants can download their settlement data for offline reconciliation, and the system prevents duplicate settlement records from being created.\n\n## Acceptance Criteria\n- Merchants can export the settlement list as a CSV file\n- Duplicate settlements are rejected at ingestion time with a clear error\n- Existing settlements are not affected by the duplicate check\n\n## User Stories\n\n### Story: Merchant exports settlements\nAs a Merchant, I want to export my settlement list as a CSV file, so that I can reconcile payouts in external tools.\n\n```gherkin\nScenario: Merchant exports settlements as CSV\n  Given a merchant is viewing the settlement list\n  When they click the 'Export CSV' button\n  Then a CSV file containing all visible settlements is downloaded to their device\n  And the file includes columns for settlement ID, amount, currency, and payout date\n```\n\n### Story: Merchant is protected from duplicate settlements\nAs a Merchant, I want duplicate settlement submissions rejected, so that my settlement list stays accurate.\n\n```gherkin\nScenario: Duplicate settlement is rejected\n  Given a settlement with reference ID 'STL-9982' already exists\n  When the system receives a second ingestion request for settlement 'STL-9982'\n  Then the duplicate is rejected and not stored\n  And the merchant sees an error indicating the settlement already exists\n\nScenario: Non-duplicate settlement is accepted\n  Given no settlement with reference ID 'STL-9983' exists\n  When the system receives an ingestion request for settlement 'STL-9983'\n  Then the settlement is stored successfully\n  And the merchant sees the new settlement in their list\n```\n\n## Trace Plan\n\n1. [x] ☄️ Skeleton — Merchant exports settlements as CSV (claims: \"Merchant exports settlements as CSV\")\n2. [x] ☄️ Reject duplicate settlement on ingestion (claims: \"Duplicate settlement is rejected\", \"Non-duplicate settlement is accepted\")",
     "state": "CLOSED"
   },
-  "tasks": [
+  "traces": [
     {
       "number": 25,
-      "title": "Add CSV export button to settlement list",
-      "labels": [{"name": "task"}, {"name": "verified"}],
+      "title": "☄️ Skeleton — Merchant exports settlements as CSV",
+      "labels": [{"name": "trace"}, {"name": "verified"}],
       "state": "CLOSED",
-      "body": "## Functional Description\nAllow merchants to download their current settlement list as a CSV file for use in external reconciliation tools.\n\n## Gherkin\n```gherkin\nScenario: Merchant exports settlements as CSV\n  Given a merchant is viewing the settlement list\n  When they click the 'Export CSV' button\n  Then a CSV file containing all visible settlements is downloaded to their device\n  And the file includes columns for settlement ID, amount, currency, and payout date\n```"
+      "body": "## Story\nAs a Merchant, I want to export my settlement list as a CSV file, so that I can reconcile payouts in external tools.\n\n## Scenario Claim\n- Merchant exports settlements as CSV\n\n## Spine Position\nSkeleton — proves the export path from settlement list to file download.\n\n<details><summary>Synced from Feature #20 — edit there, not here</summary>\n\n```gherkin\nScenario: Merchant exports settlements as CSV\n  Given a merchant is viewing the settlement list\n  When they click the 'Export CSV' button\n  Then a CSV file containing all visible settlements is downloaded to their device\n  And the file includes columns for settlement ID, amount, currency, and payout date\n```\n\n</details>"
     },
     {
       "number": 26,
-      "title": "Reject duplicate settlement on ingestion",
-      "labels": [{"name": "task"}, {"name": "bug"}, {"name": "verified"}],
+      "title": "☄️ Reject duplicate settlement on ingestion",
+      "labels": [{"name": "trace"}, {"name": "bug"}, {"name": "verified"}],
       "state": "CLOSED",
-      "body": "## Functional Description\nPrevent duplicate settlement records from being stored when the same settlement is submitted more than once.\n\n## Gherkin\n```gherkin\nScenario: Duplicate settlement is rejected\n  Given a settlement with reference ID 'STL-9982' already exists\n  When the system receives a second ingestion request for settlement 'STL-9982'\n  Then the duplicate is rejected and not stored\n  And the merchant sees an error indicating the settlement already exists\n\nScenario: Non-duplicate settlement is accepted\n  Given no settlement with reference ID 'STL-9983' exists\n  When the system receives an ingestion request for settlement 'STL-9983'\n  Then the settlement is stored successfully\n  And the merchant sees the new settlement in their list\n```"
+      "body": "## Story\nAs a Merchant, I want duplicate settlement submissions rejected, so that my settlement list stays accurate.\n\n## Scenario Claim\n- Duplicate settlement is rejected\n- Non-duplicate settlement is accepted\n\n## Spine Position\nExtension — builds on Trace #25, adds the ingestion duplicate check.\n\n<details><summary>Synced from Feature #20 — edit there, not here</summary>\n\n```gherkin\nScenario: Duplicate settlement is rejected\n  Given a settlement with reference ID 'STL-9982' already exists\n  When the system receives a second ingestion request for settlement 'STL-9982'\n  Then the duplicate is rejected and not stored\n  And the merchant sees an error indicating the settlement already exists\n\nScenario: Non-duplicate settlement is accepted\n  Given no settlement with reference ID 'STL-9983' exists\n  When the system receives an ingestion request for settlement 'STL-9983'\n  Then the settlement is stored successfully\n  And the merchant sees the new settlement in their list\n```\n\n</details>"
     }
   ]
 }

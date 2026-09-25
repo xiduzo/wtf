@@ -1,11 +1,11 @@
 ---
 name: wtf.hotfix
-description: This skill should be used when something is broken in production and needs an immediate fix that bypasses the normal Epic→Feature→Task planning flow — for example "production is down", "hotfix needed", "critical bug in prod", "emergency fix for #X", "patch this now", "security patch", or "this can't wait for the normal flow". Cuts a hotfix branch directly from main, implements a narrow fix with TDD, and opens a PR back to main. Not for large or unclear changes — use write-epic + write-task for those.
+description: This skill should be used when something is broken in production and needs an immediate fix that bypasses the normal Epic→Feature→Trace planning flow — for example "production is down", "hotfix needed", "critical bug in prod", "emergency fix for #X", "patch this now", "security patch", or "this can't wait for the normal flow". Cuts a hotfix branch directly from main, implements a narrow fix with TDD, and opens a PR back to main. Not for large or unclear changes — use write-feature + feature-to-traces for those.
 ---
 
 # Hotfix
 
-Emergency fix path that skips the normal Epic→Feature→Task hierarchy.
+Emergency fix path that skips the normal Epic→Feature→Trace hierarchy.
 
 This skill moves a narrow, well-understood fix into production as fast as possible.
 It still keeps a test, a commit trail, and a PR review.
@@ -14,7 +14,7 @@ It still keeps a test, a commit trail, and a PR review.
 
 **Use when:** something is broken in production, the fix is narrow and well-understood, and waiting for the full workflow is not acceptable.
 
-**Do not use when:** the fix is large, the scope is unclear, or the change needs design review — use `wtf.write-epic` + `wtf.write-task` instead.
+**Do not use when:** the fix is large, the scope is unclear, or the change needs design review — use the normal Trace workflow (`wtf.write-feature` → `wtf.feature-to-traces`) instead.
 
 ## Process
 
@@ -56,7 +56,7 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
   - **Not sure — it may be larger than that** → use the normal workflow instead
 
 If "Not sure" → exit.
-Suggest `wtf.write-task` as the next step.
+Suggest the normal Trace workflow as the next step: `wtf.write-feature`, then `wtf.feature-to-traces`.
 
 ### 3. Load the technical steering document
 
@@ -89,13 +89,13 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - header: "Scope gate"
 - options:
   - **Proceed as hotfix** → accept the larger scope. The user understands the risk.
-  - **Switch to normal flow** → exit and use `write-epic` + `write-task` instead
+  - **Switch to normal flow** → exit and use the normal Trace workflow (`wtf.write-feature` → `wtf.feature-to-traces`) instead
 
 ### 7. Implement the fix
 
 Write the failing test first (one test per broken behavior).
 Then implement the minimum fix to make it pass.
-Follow the TDD cycle from `wtf.implement-task` step 8.
+Follow the TDD cycle from `wtf.implement-trace` step 9.
 
 Run the full test suite after the fix:
 

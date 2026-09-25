@@ -1,0 +1,17 @@
+{
+  "_note": "Feature in the Trace-model shape: one story with four canonical Gherkin scenarios, a Trace Plan whose Skeleton entry is created (#56), and one existing child Trace claiming the happy path. Eval: produce the Story and Scenario Claim sections for plan entry 2. Scenarios must be copied verbatim from the Feature — never re-derived — and must not overlap the Skeleton's claim.",
+  "feature": {
+    "number": 55,
+    "title": "🚀 Feature: Settlement PDF export",
+    "labels": [{ "name": "feature" }],
+    "body": "## Bounded Context\nSettlement domain. Merchant actor. Reads from settlement records; no write side effects.\n\n## User Stories\n\n### Story 1: Export settlement history as a PDF\n\n- As a **Merchant**, I want **to export my settlement history as a PDF** so that **I can satisfy my accounting and audit needs**\n\n#### Acceptance Criteria\n\n- [ ] Merchants can trigger a PDF download of their settlement history\n- [ ] The PDF includes a header with the Merchant name, export date, and date range\n- [ ] An empty result set produces a PDF with headers and a 'No settlements found' message\n- [ ] Only Merchants with the settlement.export permission can trigger an export\n\n#### Scenarios\n\n```gherkin\nScenario: Merchant downloads a settlement PDF\n  Given a Merchant with the settlement.export permission has settlements in the selected date range\n  When the Merchant triggers a PDF export\n  Then the Merchant receives a PDF of the settlement history for that range\n\nScenario: PDF header shows Merchant name and date range\n  Given a Merchant has triggered a PDF export\n  When the export completes\n  Then the PDF header shows the Merchant name, the export date, and the selected date range\n\nScenario: Empty settlement range produces a placeholder PDF\n  Given a Merchant has no settlements in the selected date range\n  When the Merchant triggers a PDF export\n  Then the PDF shows 'No settlements found' with the headers intact\n\nScenario: Merchant without export permission sees no export action\n  Given a Merchant without the settlement.export permission\n  When the Merchant views the settlement history\n  Then no export action is available\n```\n\n## Domain Events\n\n- Emits: `SettlementExportRequested`, `SettlementExportReady`\n- Consumes: none\n\n## Trace Plan\n\n1. [x] ☄️ Skeleton — Export settlement history as a PDF: proves the export path end-to-end (claims: \"Merchant downloads a settlement PDF\") #56\n2. [ ] ☄️ Deepening — Export settlement history as a PDF: header, empty range, and permission gate (claims: \"PDF header shows Merchant name and date range\", \"Empty settlement range produces a placeholder PDF\", \"Merchant without export permission sees no export action\")"
+  },
+  "traces": [
+    {
+      "number": 56,
+      "title": "☄️ Trace: Skeleton — settlement PDF export",
+      "labels": [{ "name": "trace" }, { "name": "implemented" }],
+      "scenario_claim": ["Merchant downloads a settlement PDF"]
+    }
+  ]
+}

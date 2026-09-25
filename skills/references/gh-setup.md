@@ -12,14 +12,14 @@ Run `../references/gh-setup.md`. Stop if `gh` is not installed or not authentica
 
 Skip this entire step if **any** of the following is true:
 
-- The calling orchestrator already ran gh-setup this session (e.g. `wtf.epic-to-features` → `wtf.write-feature`, `wtf.implement-task` → `wtf.verify-task`). The orchestrator passes the confirmation when it does not ask again.
+- The calling orchestrator already ran gh-setup this session (e.g. `wtf.epic-to-features` → `wtf.write-feature`, `wtf.implement-trace` → `wtf.verify-trace`). The orchestrator passes the confirmation when it does not ask again.
 - A prior wtf skill in the same session ran gh-setup and succeeded.
-- The skill re-invokes itself in a loop (e.g. "Write next Task" → restart from step 2).
+- The skill re-invokes itself in a loop (e.g. "Write next Trace" → restart from step 2).
 
 ## Which sections apply to which skills
 
 - **Sections 1–2 (install + auth):** all skills — hard stop if either fails.
-- **Sections 3–4 (extensions):** only skills that create or traverse native sub-issue/dependency links (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-task`, `wtf.loop`, `wtf.refine`, `wtf.epic-to-features`, `wtf.feature-to-tasks`). Other skills (`wtf.verify-task`, `wtf.create-pr`, `wtf.report-bug`, `wtf.design-task`, `wtf.design-feature`, `wtf.pr-review`, `wtf.changelog`, `wtf.spike`, `wtf.retro`, `wtf.health`, `wtf.hotfix`) may skip these — they do not rely on the extensions.
+- **Sections 3–4 (extensions):** only skills that create or traverse native sub-issue/dependency links (`wtf.write-epic`, `wtf.write-feature`, `wtf.write-trace`, `wtf.loop`, `wtf.refine`, `wtf.epic-to-features`, `wtf.feature-to-traces`). Other skills (`wtf.verify-trace`, `wtf.create-pr`, `wtf.report-bug`, `wtf.design-trace`, `wtf.design-feature`, `wtf.pr-review`, `wtf.changelog`, `wtf.spike`, `wtf.retro`, `wtf.health`, `wtf.hotfix`) may skip these — they do not rely on the extensions.
 - **Section 5 (repo detect):** run if the skill needs the `<owner>/<repo>` pair (wiki sync, repo-scoped queries).
 
 ## 1. Verify `gh` is installed
@@ -47,7 +47,7 @@ gh extension list
 Check the output for both extensions below. For each that is missing, install it:
 
 ```bash
-# Sub-issue hierarchy (epic → feature → task)
+# Sub-issue hierarchy (epic → feature → trace)
 gh extension install yahsan2/gh-sub-issue
 
 # Issue dependency tracking (X blocks Y)
@@ -216,10 +216,10 @@ Typical wtf usage:
 | Caller | Call | Purpose |
 |---|---|---|
 | `wtf.write-feature` | `gh sub-issue add <epic> <feature>` | Link new Feature under Epic |
-| `wtf.write-task` | `gh sub-issue add <feature> <task>` | Link new Task under Feature |
-| `wtf.feature-to-tasks` | `gh sub-issue list <feature> --relation parent` | Find parent Epic |
+| `wtf.write-trace` | `gh sub-issue add <feature> <trace>` | Link new Trace under Feature |
+| `wtf.feature-to-traces` | `gh sub-issue list <feature> --relation parent` | Find parent Epic |
 | `wtf.epic-to-features` | `gh sub-issue list <epic>` | List existing Features |
-| `wtf.verify-task` Full Feature | `gh sub-issue list <feature>` | Authoritative Task list |
+| `wtf.verify-trace` Full Feature | `gh sub-issue list <feature>` | Authoritative Trace list (plus legacy Tasks) |
 | `wtf.loop` | `gh sub-issue list <epic>` then per-Feature | Walk the full DAG |
 | `wtf.changelog` | `gh sub-issue list <epic>` then per-Feature | Walk closed work |
 
@@ -245,7 +245,7 @@ Typical wtf usage:
 |---|---|---|
 | `wtf.write-epic` | `gh issue-dependency add <epic> --blocked-by <n>` | Record Epic-level dependency |
 | `wtf.write-feature` | `gh issue-dependency add <feature> --blocked-by <n>` | Record sibling-feature dep |
-| `wtf.write-task` | `gh issue-dependency add <task> --blocked-by <n>` | Cross-feature task dep |
+| `wtf.write-trace` | `gh issue-dependency add <trace> --blocked-by <n>` | Cross-feature trace dep |
 | `wtf.loop` step 1 | `gh issue-dependency list <n>` per node | Build DAG for topo sort |
 
-For the full traversal pattern (Task → Feature → Epic walk), see `./spec-hierarchy.md`. Do not reimplement that walk per skill.
+For the full traversal pattern (Trace → Feature → Epic walk), see `./spec-hierarchy.md`. Do not reimplement that walk per skill.

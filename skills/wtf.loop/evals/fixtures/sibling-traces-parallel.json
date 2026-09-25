@@ -1,0 +1,110 @@
+{
+  "_note": "One Feature whose Skeleton #10 already merged (its trace/10-… branch was deleted on merge). Extension #11 and Deepening #12 both build on #10 and declare disjoint Impacted Areas; Deepening #13 builds on #11 and overlaps its files. Expected: #11 and #12 in the same trace sub-phase (parallel, each in its own worktree, PR base = feature branch); #13 in a later trace sub-phase, stacked on trace/11-… without waiting for #11's merge.",
+  "config": {
+    "delivery": "staged"
+  },
+  "remote_branches": [
+    "main",
+    "feature/5-payment-settlement"
+  ],
+  "feature": {
+    "number": 5,
+    "title": "🚀 Feature: Payment settlement",
+    "labels": [
+      "feature",
+      "designed"
+    ],
+    "body": "## Bounded Context\nPayments\n\n## User Stories\n\n### Story 1: Merchant sees settlement status\n- As a Merchant, I want to see the settlement status of a payment so that I know when funds arrive.\n\n```gherkin\nScenario: Status shown for a settled payment\n  Given a Merchant has a settled payment\n  When the Merchant opens the settlement list\n  Then the payment shows status 'settled'\n\nScenario: Status for a failed settlement\n  Given a Merchant has a failed settlement\n  When the Merchant opens the settlement list\n  Then the payment shows status 'failed' with a reason code\n```\n\n### Story 2: Merchant exports settlements\n- As a Merchant, I want to export my settlements so that I can reconcile them in my accounting tool.\n\n```gherkin\nScenario: Export settled payments as CSV\n  Given a Merchant has settled payments\n  When the Merchant exports the settlement list\n  Then a CSV file with one row per settlement downloads\n\nScenario: Export with no settlements\n  Given a Merchant has no settlements\n  When the Merchant exports the settlement list\n  Then an empty CSV with only a header row downloads\n```\n\n## Trace Plan\n1. [x] ☄️ Skeleton — Merchant sees settlement status: status for one settled payment (claims: \"Status shown for a settled payment\") #10\n2. [ ] ☄️ Extension — Merchant exports settlements: CSV export on the Spine (claims: \"Export settled payments as CSV\") #11\n3. [ ] ☄️ Deepening — Merchant sees settlement status: failure modes (claims: \"Status for a failed settlement\") #12\n4. [ ] ☄️ Deepening — Merchant exports settlements: empty export (claims: \"Export with no settlements\") #13\n\n## Impacted Areas\n- src/settlements/"
+  },
+  "nodes": [
+    {
+      "number": 10,
+      "title": "☄️ Trace: Skeleton — status for one settled payment",
+      "type": "trace",
+      "state": "CLOSED",
+      "labels": [
+        "trace",
+        "designed",
+        "implemented",
+        "verified"
+      ],
+      "feature": 5,
+      "body": "## Spine Position\n- Position: Skeleton\n- Builds on: none\n\n## Impacted Areas\n- Backend: src/settlements/status/StatusService.ts\n- Frontend: src/ui/SettlementList.tsx\n- Database: —\n- APIs: GET /settlements\n- External systems: —"
+    },
+    {
+      "number": 11,
+      "title": "☄️ Trace: Extension — settlement export",
+      "type": "trace",
+      "state": "OPEN",
+      "labels": [
+        "trace",
+        "designed"
+      ],
+      "feature": 5,
+      "body": "## Spine Position\n- Position: Extension\n- Builds on: Trace #10\n\n## Impacted Areas\n- Backend: src/settlements/export/ExportService.ts\n- Frontend: src/ui/SettlementExport.tsx\n- Database: —\n- APIs: GET /settlements/export\n- External systems: —"
+    },
+    {
+      "number": 12,
+      "title": "☄️ Trace: Deepening — settlement failures",
+      "type": "trace",
+      "state": "OPEN",
+      "labels": [
+        "trace",
+        "designed"
+      ],
+      "feature": 5,
+      "body": "## Spine Position\n- Position: Deepening\n- Builds on: Trace #10\n\n## Impacted Areas\n- Backend: src/settlements/status/StatusService.ts\n- Frontend: src/ui/SettlementList.tsx\n- Database: —\n- APIs: GET /settlements\n- External systems: —"
+    },
+    {
+      "number": 13,
+      "title": "☄️ Trace: Deepening — empty export",
+      "type": "trace",
+      "state": "OPEN",
+      "labels": [
+        "trace",
+        "designed"
+      ],
+      "feature": 5,
+      "body": "## Spine Position\n- Position: Deepening\n- Builds on: Trace #11\n\n## Impacted Areas\n- Backend: src/settlements/export/ExportService.ts\n- Frontend: src/ui/SettlementExport.tsx\n- Database: —\n- APIs: GET /settlements/export\n- External systems: —"
+    }
+  ],
+  "edges": {
+    "10": {
+      "blocks": [
+        11,
+        12
+      ],
+      "blocked_by": []
+    },
+    "11": {
+      "blocks": [
+        13
+      ],
+      "blocked_by": [
+        10
+      ]
+    },
+    "12": {
+      "blocks": [],
+      "blocked_by": [
+        10
+      ]
+    },
+    "13": {
+      "blocks": [],
+      "blocked_by": [
+        11
+      ]
+    }
+  },
+  "pull_requests": [
+    {
+      "number": 60,
+      "title": "feat(settlements): show status for a settled payment",
+      "headRefName": "trace/10-settlement-status",
+      "baseRefName": "feature/5-payment-settlement",
+      "state": "MERGED",
+      "body": "Closes #10"
+    }
+  ]
+}

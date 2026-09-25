@@ -1,0 +1,68 @@
+{
+  "_note": "Stacked Trace branch. Deepening #12 builds on Extension #11 whose branch trace/11-settlement-export is still open on origin with an open PR. Delivery is staged and the feature branch is feature/5-payment-settlement. Expected: the PR base is trace/11-settlement-export (the stack base), not the feature branch; the body carries `Closes #12` and says the PR is stacked. The gh-stack extension is not installed.",
+  "branch": "trace/12-settlement-failures",
+  "config": {
+    "_note": "contents of .wtf/config.json",
+    "classification": "labels",
+    "delivery": "staged"
+  },
+  "gh_extensions": [
+    "yahsan2/gh-sub-issue",
+    "xiduzo/gh-issue-dependency"
+  ],
+  "remote_branches": [
+    "main",
+    "feature/5-payment-settlement",
+    "trace/11-settlement-export",
+    "trace/12-settlement-failures"
+  ],
+  "pull_requests": [
+    {
+      "number": 61,
+      "title": "feat(settlements): export settled payments as CSV",
+      "headRefName": "trace/11-settlement-export",
+      "baseRefName": "feature/5-payment-settlement",
+      "state": "OPEN",
+      "body": "Closes #11"
+    }
+  ],
+  "trace": {
+    "number": 12,
+    "title": "☄️ Trace: Deepening — settlement failures",
+    "labels": [
+      {
+        "name": "trace"
+      },
+      {
+        "name": "designed"
+      },
+      {
+        "name": "implemented"
+      },
+      {
+        "name": "verified"
+      }
+    ],
+    "body": "## Story\n\n- As a **Merchant**, I want to see the settlement status of a payment so that I know when funds arrive.\n\n## Scenario Claim\n\n- Scenario: Status for a failed settlement\n\n<details>\n<summary>Claimed scenarios — synced from Feature #5 — edit there, not here</summary>\n\n```gherkin\nScenario: Status for a failed settlement\n  Given a Merchant has a failed settlement\n  When the Merchant opens the settlement list\n  Then the payment shows status 'failed' with a reason code\n```\n\n</details>\n\n## Spine Position\n\n- Position: Deepening\n- Builds on: Trace #11\n\n## Impacted Areas\n\n- Backend: src/settlements/status/StatusService.ts\n- Frontend: src/ui/SettlementList.tsx\n- Database: —\n- APIs: GET /settlements\n- External systems: —\n\n## Technical Approach\n\n- Architecture decisions: reuse the status projection the Skeleton added; map failure reason codes in StatusService\n- Data flow: settlement record → StatusService.failureReason → SettlementList badge\n- Trade-offs: reason codes are mapped in the service, not the UI, so the export Trace can reuse them\n\n## Definition of Done\n\n- [x] All claimed scenarios covered by tests\n- [x] Contracts match implementation\n- [x] Observability in place\n- [x] System releasable after merge\n- [ ] Code reviewed\n- [x] Design reviewed (if UI)\n- [x] Documentation updated"
+  },
+  "feature": {
+    "number": 5,
+    "title": "🚀 Feature: Payment settlement",
+    "labels": [
+      {
+        "name": "feature"
+      },
+      {
+        "name": "designed"
+      }
+    ],
+    "body": "## Bounded Context\nPayments\n\n## User Stories\n\n### Story 1: Merchant sees settlement status\n- As a **Merchant**, I want to see the settlement status of a payment so that I know when funds arrive.\n\n#### Acceptance Criteria\n- [ ] Merchants can see the status of a settled payment\n- [ ] Merchants can see why a settlement failed\n\n```gherkin\nScenario: Status shown for a settled payment\n  Given a Merchant has a settled payment\n  When the Merchant opens the settlement list\n  Then the payment shows status 'settled'\n\nScenario: Status for a failed settlement\n  Given a Merchant has a failed settlement\n  When the Merchant opens the settlement list\n  Then the payment shows status 'failed' with a reason code\n```\n\n### Story 2: Merchant exports settlements\n- As a **Merchant**, I want to export my settlements so that I can reconcile them in my accounting tool.\n\n```gherkin\nScenario: Export settled payments as CSV\n  Given a Merchant has settled payments\n  When the Merchant exports the settlement list\n  Then a CSV file with one row per settlement downloads\n```\n\n## Trace Plan\n1. [x] ☄️ Skeleton — Merchant sees settlement status: status for one settled payment (claims: \"Status shown for a settled payment\") #10\n2. [ ] ☄️ Extension — Merchant exports settlements: CSV export on the Spine (claims: \"Export settled payments as CSV\") #11\n3. [ ] ☄️ Deepening — Merchant sees settlement status: failure modes (claims: \"Status for a failed settlement\") #12\n\n## Delivery Override\n- Mode:\n- Reason:"
+  },
+  "epic": {
+    "number": 2,
+    "title": "🎯 Epic: Settlement visibility",
+    "body": "## Goal\nMerchants understand where their money is without contacting support."
+  },
+  "git_log": "c4d5e6f feat(settlements): show failure reason code on the settlement list\nb3c4d5e test(settlements): cover failed settlement status",
+  "git_diff_stat": " src/settlements/status/StatusService.ts      | 18 ++++++++++++++++\n src/ui/SettlementList.tsx                     |  9 ++++++++\n tests/settlements/status.failed.test.ts       | 31 +++++++++++++++++++++++++++\n 3 files changed, 58 insertions(+)"
+}

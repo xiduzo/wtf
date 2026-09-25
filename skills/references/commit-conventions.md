@@ -25,9 +25,9 @@ Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.
 
 | Trailer | Used in |
 |---|---|
-| `Task: #<task_number>` | Regular implementation commits (`wtf.implement-task`) |
+| `Trace: #<trace_number>` | Regular implementation commits (`wtf.implement-trace`) |
 | `Bug: #<bug_number>` | Hotfix commits (`wtf.hotfix`) |
-| `Scenario: <scenario name>` | Atomic commits that complete a specific Gherkin scenario during the TDD cycle |
+| `Scenario: <scenario name>` | Atomic commits that complete one scenario from the Trace's Scenario Claim during the TDD cycle |
 
 Do NOT put `Closes #<n>` in commit messages. Close issues via the PR body — see below. This keeps the audit trail consistent. Every closed issue then has a merged PR that names it.
 
@@ -46,9 +46,10 @@ Closes #15
 
 Rules:
 
-- Task PRs always include `Closes #<task_number>`.
-- Feature PRs always include `Closes #<feature_number>` plus one `Closes #<task_number>` line per closed task.
-- Epic closure chains automatically from Feature PRs that include `Closes #<epic_number>`.
+- Trace PRs always include `Closes #<trace_number>`.
+- In `staged` delivery, feature PRs include `Closes #<feature_number>` plus one `Closes #<trace_number>` line per completed Trace.
+- In `trunk` delivery, there is no feature PR. The final Trace PR — the one that exhausts the Trace Plan — also includes `Closes #<feature_number>`. The merged-PR audit trail stays intact.
+- Epic closure chains automatically from the PR that closes the Epic's final Feature and includes `Closes #<epic_number>`.
 - Hotfix PRs always include `Closes #<bug_number>`.
 
 ## When to close directly

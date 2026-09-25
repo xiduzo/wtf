@@ -3,8 +3,8 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Write the changelog for this feature release. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (scope already identified: Feature scope). Instead of running `gh` commands to fetch issues, read `evals/fixtures/all-added.json`: its `feature` field is the Feature issue, and its `tasks` array are the closed child tasks. Produce the changelog entry draft (step 3). Skip steps 4–8 (review, write, release). Today's date is 2026-05-04.",
-      "expected_output": "A Keep-a-Changelog formatted entry with a `## [` header dated 2026-05-04, a `### Added` section containing both tasks in user-facing domain language, with each entry linking to an issue number. No implementation vocabulary (refactored, migrated, implemented, updated the API) appears anywhere in the output.",
+      "prompt": "Write the changelog for this feature release. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (scope already identified: Feature scope). Instead of running `gh` commands to fetch issues, read `evals/fixtures/all-added.json`: its `feature` field is the Feature issue (its body holds the canonical scenarios and the Trace Plan), and its `traces` array are the closed child Traces with their Scenario Claims. Produce the changelog entry draft (step 3). Skip steps 4–8 (review, write, release). Today's date is 2026-05-04.",
+      "expected_output": "A Keep-a-Changelog formatted entry with a `## [` header dated 2026-05-04, a `### Added` section containing both claimed capabilities in user-facing domain language, with each entry linking to an issue number. No implementation vocabulary (refactored, migrated, implemented, updated the API) appears anywhere in the output.",
       "files": ["evals/fixtures/all-added.json"],
       "expectations": [
         "The output contains a `## [` header (Keep-a-Changelog format)",
@@ -16,8 +16,8 @@
     },
     {
       "id": 2,
-      "prompt": "Write the changelog for this feature release. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (scope already identified: Feature scope). Instead of running `gh` commands to fetch issues, read `evals/fixtures/mixed-added-fixed.json`: its `feature` field is the Feature issue, and its `tasks` array are the closed child tasks. Produce the changelog entry draft (step 3). Skip steps 4–8 (review, write, release). Today's date is 2026-05-04.",
-      "expected_output": "A Keep-a-Changelog formatted entry with both a `### Added` section (for the new capability task) and a `### Fixed` section (for the bug-fix task). Each entry uses domain language and links to an issue number. No implementation vocabulary appears.",
+      "prompt": "Write the changelog for this feature release. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (scope already identified: Feature scope). Instead of running `gh` commands to fetch issues, read `evals/fixtures/mixed-added-fixed.json`: its `feature` field is the Feature issue (its body holds the canonical scenarios and the Trace Plan), and its `traces` array are the closed child Traces with their Scenario Claims. Produce the changelog entry draft (step 3). Skip steps 4–8 (review, write, release). Today's date is 2026-05-04.",
+      "expected_output": "A Keep-a-Changelog formatted entry with both a `### Added` section (for the new capability trace) and a `### Fixed` section (for the bug-fix trace). Each entry uses domain language and links to an issue number. No implementation vocabulary appears.",
       "files": ["evals/fixtures/mixed-added-fixed.json"],
       "expectations": [
         "The output contains a `### Added` section",
@@ -29,14 +29,14 @@
     },
     {
       "id": 3,
-      "prompt": "Write the changelog for this feature release. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (scope already identified: Feature scope). Instead of running `gh` commands to fetch issues, read `evals/fixtures/drop-internal-refactor.json`: its `feature` field is the Feature issue, and its `tasks` array are the closed child tasks. Produce the changelog entry draft (step 3). Skip steps 4–8 (review, write, release). Today's date is 2026-05-04.",
-      "expected_output": "A Keep-a-Changelog formatted entry that includes only the user-facing task. The internal refactor task (task #33) is either omitted entirely or, if mentioned, contains no implementation vocabulary. The output must not describe the database migration or schema refactoring as a user-facing change.",
+      "prompt": "Write the changelog for this feature release. Test mode: skip step 0 (gh setup already confirmed). Skip step 1 (scope already identified: Feature scope). Instead of running `gh` commands to fetch issues, read `evals/fixtures/drop-internal-refactor.json`: its `feature` field is the Feature issue (its body holds the canonical scenarios and the Trace Plan), and its `traces` array are the closed child work items — one Trace plus one legacy Task issue. Produce the changelog entry draft (step 3). Skip steps 4–8 (review, write, release). Today's date is 2026-05-04.",
+      "expected_output": "A Keep-a-Changelog formatted entry that includes only the user-facing trace. The internal legacy Task (#33) is either omitted entirely or, if mentioned, contains no implementation vocabulary. The output must not describe the database migration or schema refactoring as a user-facing change.",
       "files": ["evals/fixtures/drop-internal-refactor.json"],
       "expectations": [
         "The output contains a `## [` header (Keep-a-Changelog format)",
         "The output does not contain the words 'refactored', 'migrated', 'schema', or 'database migration'",
-        "Task #33 (the internal refactor) does not appear as a changelog entry",
-        "The user-facing task (#34) appears in the output with a link to `[#34]`",
+        "Issue #33 (the internal legacy Task) does not appear as a changelog entry",
+        "The user-facing trace (#34) appears in the output with a link to `[#34]`",
         "The output does not contain implementation vocabulary such as 'refactored', 'implemented', or 'migrated'"
       ]
     }

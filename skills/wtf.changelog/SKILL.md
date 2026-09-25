@@ -1,13 +1,14 @@
 ---
 name: wtf.changelog
-description: This skill should be used when a developer wants to generate release notes or a changelog entry after merging a Feature or closing an Epic — for example "write the changelog", "generate release notes", "what shipped in this release", "create a GitHub Release for this feature", "document what we built", "update CHANGELOG.md", or "summarize what merged". Derives user-facing language from closed Task Gherkin scenarios and Feature Acceptance Criteria rather than from raw commit messages.
+description: This skill should be used when a developer wants to generate release notes or a changelog entry after merging a Feature or closing an Epic — for example "write the changelog", "generate release notes", "what shipped in this release", "create a GitHub Release for this feature", "document what we built", "update CHANGELOG.md", or "summarize what merged". Derives user-facing language from Feature capability names and canonical Gherkin scenarios, attributed through verified Traces' Scenario Claims, rather than from raw commit messages.
 ---
 
 # Changelog
 
 Generate a changelog entry or GitHub Release from merged work.
 
-This skill derives user-facing language from the spec hierarchy (Epic → Feature → Task Gherkin), not from raw commit messages.
+This skill derives user-facing language from the spec hierarchy (Epic → Feature → canonical Gherkin scenarios), not from raw commit messages.
+The Feature body is canonical for scenario text. Verified Traces' Scenario Claims attribute which shipped behavior each Trace delivered.
 The output reads as product changes, not implementation details.
 
 Shared behavior:
@@ -30,29 +31,29 @@ If an Epic or Feature number was already passed in as context (e.g. from `wtf.re
 Otherwise ask the user whether the changelog covers a Feature, an Epic, or a date range.
 Each scope has distinct follow-up queries:
 
-- **Feature scope** — walk the Feature and its closed child tasks per `../references/spec-hierarchy.md` to extract Gherkin and Functional Description per task.
-- **Epic scope** — walk Epic → Features → Tasks per the same reference, in parallel at each level.
+- **Feature scope** — walk the Feature and its closed child Traces per `../references/spec-hierarchy.md`. Extract the capability name, the user stories, and their canonical Gherkin scenarios from the Feature body. Extract each verified Trace's Scenario Claim to attribute shipped behavior. A legacy Task child carries its own Gherkin and Functional Description in-body — extract those instead.
+- **Epic scope** — walk Epic → Features → Traces per the same reference, in parallel at each level.
 - **Date range scope** — fetch merged PRs between two dates via `gh pr list --state merged --json number,title,mergedAt,body` and filter with `--jq`.
 
 ### 2. Classify and translate each change
 
-For every closed Feature or Task in scope, do two things in one pass:
+For every closed Feature or Trace in scope, do two things in one pass:
 
 **a. Classify** into one of these buckets using the signal column:
 
 | Type | Signal |
 |---|---|
-| **Added** | New capability — Feature or Task implements a previously-unavailable user action |
+| **Added** | New capability — Feature or Trace implements a previously-unavailable user action |
 | **Changed** | Refactor, performance, or UX enhancement reflected in Gherkin `Then` steps |
-| **Fixed** | Linked bug issue, or Gherkin scenario describes a failure path that now passes |
-| **Deprecated** | Mentioned in Feature ACs or Task Functional Description as phasing out |
-| **Removed** | Task or Feature explicitly tears down prior behavior |
-| **Breaking** | Contract change in Task Contracts section, `!` in PR title, or `BREAKING CHANGE:` trailer per `../references/commit-conventions.md` |
+| **Fixed** | Linked bug issue, or a claimed scenario describes a failure path that now passes |
+| **Deprecated** | Mentioned in Feature ACs or the Trace's story as phasing out |
+| **Removed** | Trace or Feature explicitly tears down prior behavior |
+| **Breaking** | Contract change in the Trace's Technical Approach (legacy Task: Contracts section), `!` in PR title, or `BREAKING CHANGE:` trailer per `../references/commit-conventions.md` |
 
 **b. Translate into user-facing language:**
 
-- Pull the domain actor and business outcome from the Feature capability name or Task Functional Description.
-- Use the Gherkin `Then` steps as the concrete observable change, translated to plain language.
+- Pull the domain actor and business outcome from the Feature capability name and its user stories (legacy Task: its Functional Description).
+- Use the canonical Gherkin `Then` steps from the Feature body as the concrete observable change, translated to plain language. Take only the scenarios that verified Traces claim (legacy Task: its in-body Gherkin).
 - Do NOT use implementation vocabulary ("refactored X", "migrated Y", "updated the API") — use domain outcomes ("Merchants can now filter settlements by date range").
 - Drop internal-only work (test infra, CI config, internal refactors with no user-facing effect) unless the release contains nothing else.
 

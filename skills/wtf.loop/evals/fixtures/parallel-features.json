@@ -1,0 +1,19 @@
+{
+  "_note": "Cross-feature parallelism: three single-story Features, zero dependencies, disjoint impacted areas. Each Feature carries one Trace. Expected: 1 phase, 1 sub-phase, all three Feature units in parallel. The parallel unit is the Feature — each Feature's Trace runs inside its own unit.",
+  "nodes": [
+    { "number": 20, "title": "Feature: Dashboard widget", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/ui/"], "trace_plan": ["☄️ #23 Skeleton — widget happy path (claims: all scenarios)"] },
+    { "number": 21, "title": "Feature: Background export job", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/jobs/"], "trace_plan": ["☄️ #24 Skeleton — export happy path (claims: all scenarios)"] },
+    { "number": 22, "title": "Feature: Analytics event", "type": "feature", "labels": ["feature"], "impacted_areas": ["src/analytics/"], "trace_plan": ["☄️ #25 Skeleton — event happy path (claims: all scenarios)"] },
+    { "number": 23, "title": "Trace: Skeleton — widget happy path", "type": "trace", "labels": ["trace", "designed"], "feature": 20 },
+    { "number": 24, "title": "Trace: Skeleton — export happy path", "type": "trace", "labels": ["trace", "designed"], "feature": 21 },
+    { "number": 25, "title": "Trace: Skeleton — event happy path", "type": "trace", "labels": ["trace", "designed"], "feature": 22 }
+  ],
+  "edges": {
+    "20": { "blocks": [], "blocked_by": [] },
+    "21": { "blocks": [], "blocked_by": [] },
+    "22": { "blocks": [], "blocked_by": [] },
+    "23": { "blocks": [], "blocked_by": [] },
+    "24": { "blocks": [], "blocked_by": [] },
+    "25": { "blocks": [], "blocked_by": [] }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "skill_name": "wtf.feature-to-traces",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run wtf.feature-to-traces in test mode. Skip steps 0–1 (gh setup and planning mode confirmed, guided mode; instead of gh commands, read `evals/fixtures/migration-implied.json` and use its `feature` object as the live data — the Feature has no child Traces). The Feature body has no Trace Plan. Run step 3 only: derive the Trace Plan. Output the derived plan as it would be written into the Feature body. Do not create issues.",
+      "expected_output": "An ordered Trace Plan whose first entry is the single Skeleton, claiming the Merchant fee-visibility story's happy-path scenario end-to-end — the fee column, calculation, API field, and UI display in one pass. The schema change is inside the Skeleton, not a separate entry. Later entries are Deepening entries for the edge cases (zero fee, rounding), each naming the story and its claimed scenarios.",
+      "files": ["evals/fixtures/migration-implied.json"],
+      "expectations": [
+        "The plan contains exactly one Skeleton entry and it is item 1",
+        "No entry is a standalone schema/database migration — the fee column change is part of the Skeleton's end-to-end pass",
+        "No entry is a single-layer slice (no separate 'API' entry, 'UI' entry, or 'calculation logic' entry without the rest of the path)",
+        "Every entry names the Merchant story and claims one or more scenarios by name",
+        "Entries after the Skeleton cover the edge cases (zero total and/or rounding) as Deepening entries"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run wtf.feature-to-traces in test mode. Skip steps 0–1 (gh setup and planning mode confirmed, guided mode; instead of gh commands, read `evals/fixtures/cross-layer-feature.json` and use its `feature` object as the live data — the Feature has no child Traces). The Feature body has no Trace Plan but carries a legacy Proposed Tasks checklist. Run step 3 only: derive the Trace Plan. Output the derived plan and state how you treated the Proposed Tasks checklist. Do not create issues.",
+      "expected_output": "The legacy Proposed Tasks checklist (API filter / query optimisation / date picker UI / URL persistence) is recognized as a layer split and explicitly not adopted. The derived plan is spine-first: one Skeleton claiming the date-range-filter story's happy path through API and UI in a single Trace, followed by Deepening entries claiming the edge-case scenarios (only `from`, only `to`, invalid dates).",
+      "files": ["evals/fixtures/cross-layer-feature.json"],
+      "expectations": [
+        "The output states that the Proposed Tasks checklist is a layer split and is not used as the Trace Plan",
+        "The plan contains exactly one Skeleton entry and it is item 1",
+        "The Skeleton's claim delivers the date range filter end-to-end — no plan entry separates the API filter from the date picker UI as independent items",
+        "No entry mirrors the four layer tasks one-to-one (no standalone 'query optimisation' or 'URL persistence' entry without an end-to-end scenario claim)",
+        "Entries after the Skeleton are Deepening entries claiming edge-case scenarios (single-sided ranges and/or invalid dates), each naming the story"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run wtf.feature-to-traces in test mode. Skip steps 0–1 (gh setup and planning mode confirmed, guided mode; instead of gh commands, read `evals/fixtures/complex-edge-case.json` and use its `feature` object as the live data — the Feature has no child Traces). The Feature body has no Trace Plan and has two user stories. Run step 3 only: derive the Trace Plan, naming the primary story. Output the derived plan. Do not create issues.",
+      "expected_output": "An ordered plan where the basic CSV download story is the primary story: item 1 is the single Skeleton claiming its happy-path scenario. The chunked ZIP export (AC3) is its own Deepening entry citing the CSV story — not folded into the Skeleton. The filtered-export story is delivered by its own entry. Every entry names its story and its Scenario Claim.",
+      "files": ["evals/fixtures/complex-edge-case.json"],
+      "expectations": [
+        "The plan contains exactly one Skeleton entry and it is item 1, claiming the basic CSV download happy path",
+        "The chunked/ZIP export appears as its own dedicated entry after the Skeleton, not inside the Skeleton's claim",
+        "The chunked/ZIP export entry cites the CSV download story (a Deepening entry is never storyless)",
+        "The filtered-export story ('active filters applied to my CSV export') is delivered by its own entry naming that story",
+        "No entry is a layer slice — every entry claims scenarios end-to-end rather than splitting backend from frontend"
+      ]
+    }
+  ]
+}

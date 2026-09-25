@@ -1,17 +1,19 @@
 ---
 name: wtf.pr-review
-description: This skill should be used when a developer or tech lead wants to review a pull request for correctness, spec adherence, and code quality — for example "review PR #42", "check this PR against the spec", "does this PR match the task?", "code review PR #X", "review this before I approve", "check if the implementation matches the contracts", or "does this PR have the right tests?". Reviews the diff against the linked Task spec (Gherkin scenarios, Contracts, Impacted Areas) and posts a structured GitHub PR review. Distinct from verify-task, which is QA testing by running the software — this skill reads the code.
+description: This skill should be used when a developer or tech lead wants to review a pull request for correctness, spec adherence, and code quality — for example "review PR #42", "check this PR against the spec", "does this PR match the trace?", "code review PR #X", "review this before I approve", "check if the implementation matches the contracts", or "does this PR have the right tests?". Reviews the diff against the linked Trace spec (story, Scenario Claim, Spine Position, Contracts) and posts a structured GitHub PR review. Distinct from verify-trace, which is QA testing by running the software — this skill reads the code.
 ---
 
 # PR Review
 
 Review a pull request as a tech lead.
 
-This skill reads the diff against the linked Task spec (Gherkin, Contracts, Impacted Areas).
-It catches spec drift, missing test coverage, and contract violations before merge.
+This skill reads the diff against the linked Trace spec (story, Scenario Claim, Spine Position, Contracts).
+The claimed scenario text is canonical in the parent Feature body — the review fetches it from there.
+It catches spec drift, missing test coverage, contract violations, and work outside the claim before merge.
 It does this by reading the code, not by running the software.
+Review a PR for a legacy Task against the Gherkin and Impacted Areas in the Task body.
 
-**Distinct from `wtf.verify-task`:** `wtf.verify-task` is a QA engineer running the implemented behavior against Gherkin scenarios (does the software do what it says?).
+**Distinct from `wtf.verify-trace`:** `wtf.verify-trace` is a QA engineer running the implemented behavior against the claimed Gherkin scenarios (does the software do what it says?).
 This skill is a developer reviewing the code itself (is the code written correctly against the spec?).
 
 ## Process
@@ -43,19 +45,24 @@ gh pr view <pr_number> --json number,title,body,headRefName,baseRefName,addition
 
 ### 2. Fetch the spec hierarchy
 
-Extract a Task number from the PR body (`Closes #<n>` or `Fixes #<n>`) per the PR-extraction recipe in `../references/spec-hierarchy.md`.
-If found, walk Task → Feature → Epic per the same reference.
-Extract Gherkin, Contracts, Impacted Areas, and DoD from the Task.
-Extract ACs, Goal, and constraints from the Feature and Epic.
+Extract a Trace number from the PR body (`Closes #<n>` or `Fixes #<n>`) per the PR-extraction recipe in `../references/spec-hierarchy.md`.
+If found, walk Trace → Feature → Epic per the same reference.
+From the Trace, extract the story, the Scenario Claim, the Spine Position, Contracts, and DoD.
+From the Feature, extract the **canonical** text of each claimed scenario, plus ACs and Goal.
+Extract constraints from the Epic.
+The Feature body is canonical for scenario text — review against it, not against the Trace's synced copy.
 
-If no Task number is found, call `AskUserQuestion` (per `../references/questioning-style.md`):
-- question: "Is there a Task issue linked to this PR?"
-- header: "Linked task"
+If the linked issue is a legacy Task (see `../references/issue-classification.md`), review against the Task body instead.
+Extract its in-body Gherkin, Contracts, Impacted Areas, and DoD per the legacy sections of `../references/spec-hierarchy.md`.
+
+If no Trace number is found, call `AskUserQuestion` (per `../references/questioning-style.md`):
+- question: "Is there a Trace issue linked to this PR?"
+- header: "Linked trace"
 - options:
-  - **No linked task** → review from diff only
-  - **Yes — I'll provide the number** → enter the task issue number
+  - **No linked trace** → review from diff only
+  - **Yes — I'll provide the number** → enter the trace issue number
 
-If there is no linked Task, the review proceeds from diff context alone (step 4 will note the absence of a spec as a finding).
+If there is no linked Trace, the review proceeds from diff context alone (step 4 will note the absence of a spec as a finding).
 
 ### 3. Load the technical steering document
 
@@ -73,7 +80,7 @@ Read the full diff.
 Note:
 - Which files changed and which layers they touch
 - What was added vs. removed vs. moved
-- Whether the changes stay within the Impacted Areas listed in the Task
+- Whether every change serves a claimed scenario or a contract (for a legacy Task: whether the changes stay within its Impacted Areas)
 
 ### 5. Run the review checklist
 
@@ -82,23 +89,30 @@ Record findings as PASS / FAIL / WARN per item.
 
 **a. Spec adherence**
 
-For each Gherkin scenario in the Task:
+For each scenario in the Scenario Claim, use the canonical text from the Feature body (for a legacy Task: each Gherkin scenario in the Task body):
 - Is there a test that covers this scenario? (search test files for scenario name or equivalent describe/it block)
 - Does the implementation match the Given/When/Then behavior — not just passing the test, but structurally doing what the scenario describes?
 
-Flag: missing test for a scenario, test present but testing the wrong behavior, implementation that bypasses the scenario entirely.
+Flag: missing test for a claimed scenario, test present but testing the wrong behavior, implementation that bypasses the scenario entirely.
+Also flag implementation or tests for scenarios **outside** the claim — those belong to other Traces in the Trace Plan (scope creep).
 
 **b. Contract compliance**
 
-For each entry in the Task's Contracts & Interfaces section:
+For each entry in the Trace's Contracts & Interfaces section:
 - Does the code implement exactly the specified shape? (field names, types, optionality)
 - Are there any added fields not in the spec (scope creep)?
 - Are any specified fields missing from the implementation?
 
 Flag: schema drift, extra fields, missing fields, wrong types.
 
-**c. Impacted Areas**
+**c. Spine Position**
 
+Read the Trace's Spine Position and review the diff against it:
+- **Skeleton** — review for lean-but-complete: production quality with error handling and tests, minimal surface, no gold-plating. Flag speculative abstraction, handling for unclaimed edge cases, or configuration nothing in the claim needs.
+- **Extension / Deepening** — confirm the diff builds on the named prior Traces and does not rework the Spine without a stated reason.
+- In both cases, flag changed files that no claimed scenario and no contract explains (scope creep signal).
+
+For a legacy Task, replace this dimension with an Impacted Areas check.
 Cross-reference the Task's Impacted Areas list against the actual changed files:
 - Unexpected files changed outside the listed areas (scope creep signal)
 - Listed areas with no changes (may indicate incomplete implementation)
@@ -119,8 +133,9 @@ Review changed code against the patterns and constraints in `docs/steering/TECH.
 
 **f. Definition of Done**
 
-Check the Task's DoD checklist against the diff:
+Check the Trace's DoD checklist against the diff:
 - Are all DoD items evidenced in the diff or existing code?
+- The releasability item ("System releasable after merge") matters most — a Trace never merges as a prototype.
 
 ### 6. Summarise findings
 
@@ -129,11 +144,11 @@ Produce a structured review summary:
 ```
 PR Review — #<pr_number>: <title>
 ───────────────────────────────────────────────
-Linked task: #<n> | Spec coverage: [n/n scenarios covered]
+Linked trace: #<n> | Claim coverage: [n/n claimed scenarios covered]
 
-PASS  Spec adherence     — all [n] scenarios have matching tests
-WARN  Contract compliance — `paymentId` field missing from response shape (Task spec: required)
-PASS  Impacted Areas     — changes within declared scope
+PASS  Spec adherence     — all [n] claimed scenarios have matching tests, nothing outside the claim
+WARN  Contract compliance — `paymentId` field missing from response shape (Trace spec: required)
+PASS  Spine position     — Skeleton stays lean: minimal surface, no gold-plating
 WARN  Code quality       — `processSettlement()` is 58 lines (threshold: 40)
 PASS  Test coverage      — happy path + 2 error paths
 FAIL  DoD                — "Observability: metrics emitted" not evidenced in diff
@@ -141,8 +156,8 @@ FAIL  DoD                — "Observability: metrics emitted" not evidenced in d
 Verdict: REQUEST CHANGES
 ───────────────────────────────────────────────
 Required (blocking merge):
-  1. [Contract] Add `paymentId` to settlement response — Task spec requires it (Contracts §2)
-  2. [DoD] Emit the `settlement_processed` metric — listed as required in Task DoD
+  1. [Contract] Add `paymentId` to settlement response — Trace spec requires it (Contracts §2)
+  2. [DoD] Emit the `settlement_processed` metric — listed as required in Trace DoD
 
 Suggested (non-blocking):
   3. [Quality] Extract `processSettlement()` into smaller functions — currently 58 lines

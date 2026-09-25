@@ -3,9 +3,11 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/clean.json` and use its `epics`, `features`, `tasks`, `bugs`, and `pull_requests` arrays as the live issue data. Each array matches the `gh issue list --json number,title,labels,updatedAt` format.",
+      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/clean.json` and use its `epics`, `features`, `traces`, `bugs`, and `pull_requests` arrays as the live issue data. Each array matches the `gh issue list --json number,title,labels,updatedAt` format.",
       "expected_output": "A health report stating that all open issues are in a healthy state, with no ⚠️ or 🕐 sections.",
-      "files": ["evals/fixtures/clean.json"],
+      "files": [
+        "evals/fixtures/clean.json"
+      ],
       "expectations": [
         "The report includes the phrase 'All open issues are in a healthy state'",
         "The report does not contain any ⚠️ Needs attention section",
@@ -14,24 +16,43 @@
     },
     {
       "id": 2,
-      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/implemented-not-verified.json` and use its `epics`, `features`, `tasks`, `bugs`, and `pull_requests` arrays as the live issue data. Each array matches the `gh issue list --json number,title,labels,updatedAt` format.",
-      "expected_output": "A health report with a ⚠️ Needs attention section showing task #42 as implemented but not verified, with the next step suggesting `wtf.verify-task`.",
-      "files": ["evals/fixtures/implemented-not-verified.json"],
+      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/implemented-not-verified.json` and use its `epics`, `features`, `traces`, `bugs`, and `pull_requests` arrays as the live issue data. Each array matches the `gh issue list --json number,title,labels,updatedAt` format (the features array also carries `body`).",
+      "expected_output": "A health report with a ⚠️ Needs attention section showing trace #42 as implemented but not verified, with the next step suggesting `wtf.verify-trace`.",
+      "files": [
+        "evals/fixtures/implemented-not-verified.json"
+      ],
       "expectations": [
-        "The ⚠️ Needs attention section includes task #42",
+        "The ⚠️ Needs attention section includes trace #42",
         "The report identifies the gap as implemented but not verified",
-        "The suggested next step references verify-task or wtf.verify-task for task #42"
+        "The suggested next step references verify-trace or wtf.verify-trace for trace #42"
       ]
     },
     {
       "id": 3,
-      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/stale-designed.json` and use its `epics`, `features`, `tasks`, `bugs`, and `pull_requests` arrays as the live issue data. Each array matches the `gh issue list --json number,title,labels,updatedAt` format. Today's date is 2026-05-04.",
-      "expected_output": "A health report with a 🕐 Stale section containing task #17, indicating it has been inactive since being designed, with a stale count of at least 7 days.",
-      "files": ["evals/fixtures/stale-designed.json"],
+      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/stale-designed.json` and use its `epics`, `features`, `traces`, `bugs`, and `pull_requests` arrays as the live issue data. Each array matches the `gh issue list --json number,title,labels,updatedAt` format (the features array also carries `body`). Today's date is 2026-05-04.",
+      "expected_output": "A health report with a 🕐 Stale section containing trace #17, indicating it has been inactive since being designed, with a stale count of at least 7 days.",
+      "files": [
+        "evals/fixtures/stale-designed.json"
+      ],
       "expectations": [
-        "The 🕐 Stale section includes task #17",
-        "The report indicates the task has had no activity since it was designed",
+        "The 🕐 Stale section includes trace #17",
+        "The report indicates the trace has had no activity since it was designed",
         "The stale duration shown is at least 7 days"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Run a health check on the project. Test mode: skip step 0 (gh setup already confirmed) and step 1 (use 'Full project' scope). Instead of running `gh issue list` commands in step 2, read `evals/fixtures/legacy-task-and-unticked-plan.json` and use its `epics`, `features`, `traces`, `tasks`, `bugs`, and `pull_requests` arrays as the live issue data. `tasks` is what the legacy-Task filter of the Trace query returns. Each array matches the `gh issue list --json number,title,labels,updatedAt` format (the features array also carries `body`; pull_requests carry `state`). Today's date is 2026-05-04.",
+      "expected_output": "A health report that lists legacy Task #33 as waiting for QA and marks it 'legacy Task', and flags Trace #42 under ⚠️ Needs attention as verified while its Trace Plan entry in Feature #10 is still unticked (Trace Plan out of sync). The next step for #42 is to tick the plan entry (or re-run verify-trace), not to write a new Trace. Nothing suggests write-trace for the legacy Task.",
+      "files": [
+        "evals/fixtures/legacy-task-and-unticked-plan.json"
+      ],
+      "expectations": [
+        "The report lists issue #33 and marks the finding 'legacy Task'",
+        "The ⚠️ Needs attention section includes trace #42 with a 'Trace Plan out of sync' finding (verified label, plan entry unticked)",
+        "The suggested next step for #42 refers to ticking its Trace Plan entry in Feature #10 or re-running verify-trace, not write-trace",
+        "The report does not suggest write-trace for legacy Task #33",
+        "The summary counts line reports 1 legacy Task"
       ]
     }
   ]

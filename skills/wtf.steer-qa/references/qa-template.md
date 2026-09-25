@@ -36,7 +36,7 @@ Last updated: [DATE]
 
 ## Gherkin → Test Mapping
 
-[How Gherkin scenarios from Task issues map to automated tests. One scenario = one test case minimum.]
+[How the canonical Gherkin scenarios in Feature issues map to automated tests. One scenario = one test case minimum. If a Gherkin runner exists (e.g. playwright-bdd, cucumber-js, behave), declare it here — `wtf.verify-trace` executes each Trace's claimed scenarios with the declared runner.]
 
 - Each Gherkin scenario maps to at least one automated test
 - Test names must reference the scenario name so failures are traceable
@@ -45,9 +45,9 @@ Last updated: [DATE]
 
 ## Definition of Done
 
-[Checklist items that must pass before any task is considered ready to merge.]
+[Checklist items that must pass before any trace is considered ready to merge.]
 
-- [ ] All Gherkin scenarios covered by automated tests
+- [ ] All claimed Gherkin scenarios covered by automated tests
 - [ ] Coverage meets threshold on all new/modified files
 - [ ] Linting and type-checking pass
 - [ ] No new flaky tests introduced

@@ -6,22 +6,22 @@ Every steering doc lives at `docs/steering/<NAME>.md`. Treat the docs as living.
 
 ## Consumer-side load
 
-Any non-steer skill that needs steering context follows this single procedure. Skills citing it: `wtf.design-feature`, `wtf.design-task`, `wtf.implement-task`, `wtf.hotfix`, `wtf.pr-review`, `wtf.spike`, `wtf.verify-task`, `wtf.retro`, `wtf.reflect`.
+Any non-steer skill that needs steering context follows this single procedure. Skills citing it: `wtf.design-feature`, `wtf.design-trace`, `wtf.implement-trace`, `wtf.hotfix`, `wtf.pr-review`, `wtf.spike`, `wtf.verify-trace`, `wtf.retro`, `wtf.reflect`.
 
 1. Use the Read tool to attempt reading `docs/steering/<DOC>.md` (one of `TECH.md`, `QA.md`, `DESIGN.md`, `VISION.md`).
 2. If it **exists**, keep its content in context. Apply it silently throughout the session. Do not surface it to the user.
 3. If it **does not exist**, choose the appropriate behavior for the skill:
-   - **Strict consumer** (skill cannot do its job without the doc — for example `wtf.design-task`, `wtf.design-feature`, `wtf.implement-task`, `wtf.verify-task`): apply `./questioning-style.md` and ask "`docs/steering/<DOC>.md` does not exist yet. <one-line description of what the doc captures>. Would you like to create it now?" — header `<Doc> steering doc missing`:
+   - **Strict consumer** (skill cannot do its job without the doc — for example `wtf.design-trace`, `wtf.design-feature`, `wtf.implement-trace`, `wtf.verify-trace`): apply `./questioning-style.md` and ask "`docs/steering/<DOC>.md` does not exist yet. <one-line description of what the doc captures>. Would you like to create it now?" — header `<Doc> steering doc missing`:
      - **Create it now** → invoke the matching `wtf.steer-<doc>` skill (recommended), then return and continue
      - **Skip for this session** → continue without it. Decisions will not reference project standards.
    - **Best-effort consumer** (skill can degrade gracefully — for example `wtf.hotfix`, `wtf.pr-review`, `wtf.spike`): silently continue without it. Note in any output if the doc would have changed the recommendation.
 
 | Skill | Doc(s) consumed | Mode |
 |---|---|---|
-| `wtf.implement-task` | `TECH.md`, `QA.md` (coverage threshold) | strict for TECH, soft default for QA |
-| `wtf.design-task` | `DESIGN.md` | strict |
+| `wtf.implement-trace` | `TECH.md`, `QA.md` (coverage threshold) | strict for TECH, soft default for QA |
+| `wtf.design-trace` | `DESIGN.md` | strict |
 | `wtf.design-feature` | `DESIGN.md` | strict |
-| `wtf.verify-task` | `QA.md` | strict |
+| `wtf.verify-trace` | `QA.md` | strict |
 | `wtf.pr-review` | `TECH.md` | best-effort |
 | `wtf.hotfix` | `TECH.md` | best-effort |
 | `wtf.spike` | `TECH.md` | best-effort |

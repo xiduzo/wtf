@@ -1,6 +1,6 @@
 ---
 name: wtf.spike
-description: This skill should be used when a developer or tech lead needs to investigate a technical unknown before committing to an approach — for example "run a spike on X", "I need to research this before writing the epic", "we don't know how to approach this yet", "investigate if we can use X for Y", "time-box this exploration", "what's the right architecture for this?", or "should we use A or B?". Produces a findings document and a concrete recommendation that feeds directly into write-epic or write-task.
+description: This skill should be used when a developer or tech lead needs to investigate a technical unknown before committing to an approach — for example "run a spike on X", "I need to research this before writing the epic", "we don't know how to approach this yet", "investigate if we can use X for Y", "time-box this exploration", "what's the right architecture for this?", or "should we use A or B?". Produces a findings document and a concrete recommendation that feeds directly into write-epic or write-trace.
 ---
 
 # Spike
@@ -168,5 +168,5 @@ Call `AskUserQuestion` (per `../references/questioning-style.md`):
 - header: "Next step"
 - options:
   - **Write an Epic from this** → follow `wtf.write-epic`, seeding it with the spike's recommendation (default)
-  - **Write a Task from this** → follow `wtf.write-task` with the spike recommendation as the task description
+  - **Write a Trace from this** → follow `wtf.write-trace` with the spike recommendation as Technical Approach context
   - **Stop here** → exit. The team will decide separately.

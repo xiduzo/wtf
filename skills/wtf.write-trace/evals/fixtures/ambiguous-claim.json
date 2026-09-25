@@ -1,0 +1,18 @@
+{
+  "_note": "Vague request 'add a trace for settlement error handling' against a Feature whose story has four unclaimed scenarios and a Trace Plan that only covers the created Skeleton (#61). Step 2 must show the claim state and ask which scenario subset to claim — not invent a claim, not overlap the Skeleton's claim, not draft.",
+  "trace_request": "Add a trace for settlement error handling",
+  "feature": {
+    "number": 60,
+    "title": "🚀 Feature: Settlement error handling",
+    "labels": [{ "name": "feature" }],
+    "body": "## Bounded Context\nSettlement domain. Merchant and Operator actors. Payment processor integration boundary.\n\n## User Stories\n\n### Story 1: Surface and recover failed settlements\n\n- As a **Merchant**, I want **failed settlements to be retried and surfaced** so that **I do not lose revenue silently**\n\n#### Acceptance Criteria\n\n- [ ] Failed settlements are retried up to 3 times before being marked as permanently failed\n- [ ] Merchants receive a notification when a settlement fails permanently\n- [ ] Operators can view and manually retry failed settlements\n\n#### Scenarios\n\n```gherkin\nScenario: Failed settlement is retried\n  Given a settlement attempt has failed\n  When the retry runs\n  Then the settlement is attempted again and the Merchant balance stays consistent\n\nScenario: Settlement is marked permanently failed after three retries\n  Given a settlement has failed three retry attempts\n  When the last retry fails\n  Then the settlement is marked as permanently failed\n\nScenario: Merchant is notified of a permanent settlement failure\n  Given a settlement is marked as permanently failed\n  When the SettlementPermanentlyFailed event is received\n  Then the Merchant receives a failure notification\n\nScenario: Operator manually retries a failed settlement\n  Given an Operator views a permanently failed settlement\n  When the Operator requests a retry\n  Then a SettlementRetryRequested event is emitted and the settlement is retried\n\nScenario: Duplicate operator retry is idempotent\n  Given an Operator has already requested a retry for a settlement\n  When the Operator requests a retry again\n  Then no second SettlementRetryRequested event is emitted\n```\n\n## Domain Events\n\n- Emits: `SettlementFailed`, `SettlementPermanentlyFailed`, `SettlementRetryRequested`\n- Consumes: none\n\n## Trace Plan\n\n1. [x] ☄️ Skeleton — Surface and recover failed settlements: proves the retry path end-to-end (claims: \"Failed settlement is retried\") #61"
+  },
+  "traces": [
+    {
+      "number": 61,
+      "title": "☄️ Trace: Skeleton — settlement retry path",
+      "labels": [{ "name": "trace" }, { "name": "verified" }],
+      "scenario_claim": ["Failed settlement is retried"]
+    }
+  ]
+}
